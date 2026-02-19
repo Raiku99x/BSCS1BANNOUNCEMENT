@@ -26,7 +26,7 @@
   --sidebar-w: 128px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;overflow-x:hidden;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;overflow-x:hidden;overflow-y:auto;}
 
 /* TOPBAR */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
@@ -45,7 +45,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .date-bar span{color:var(--text);}
 
 /* APP BODY */
-.app-body{display:flex;flex-direction:column;height:calc(100vh - 96px);overflow:hidden;}
+.app-body{display:flex;flex-direction:column;min-height:calc(100vh - 96px);}
 
 /* TOP PANEL */
 .top-panel{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;height:255px;}
@@ -82,7 +82,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .no-featured p{font-size:11px;}
 
 /* ALL TASK HEADER */
-.all-task-header{display:flex;align-items:center;padding:9px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;gap:8px;}
+.all-task-header{display:flex;align-items:center;padding:9px 16px;background:var(--surface);border-bottom:1px solid var(--border);border-top:1px solid var(--border);flex-shrink:0;gap:8px;position:sticky;top:57px;z-index:90;}
 .all-task-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap;}
 .task-count-badge{background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
 .header-right{display:flex;align-items:center;gap:6px;margin-left:auto;}
@@ -98,9 +98,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .search-input::placeholder{color:var(--sub);}
 
 /* TASK LIST AREA */
-.task-area{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:8px;}
-.task-area::-webkit-scrollbar{width:4px;}
-.task-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.task-area{padding:12px 14px;display:flex;flex-direction:column;gap:10px;}
 
 /* ════════════════════════
    TASK CARD
