@@ -88,19 +88,56 @@ body.dark .footer-creator{border-color:rgba(108,99,255,0.3);}
 .filter-btn{display:flex;align-items:center;gap:7px;padding:9px 10px;border-radius:10px;background:var(--surf2);border:1.5px solid transparent;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;transition:all 0.18s;text-align:left;width:100%;}
 .f-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .f-all      .f-dot{background:var(--accent);}
-.f-today    .f-dot{background:#0284c7;}
 .f-soon     .f-dot{background:var(--amber);}
+.f-today    .f-dot{background:#ea6b0e;}
 .f-overdue  .f-dot{background:var(--red);}
 .f-done     .f-dot{background:var(--green);}
 .filter-btn:hover{background:var(--surf3);color:var(--text);}
 .filter-btn.active.f-all    {background:var(--acc-lt);border-color:var(--accent);color:var(--accent);}
-.filter-btn.active.f-today  {background:rgba(2,132,199,0.10);border-color:#0284c7;color:#0284c7;}
 .filter-btn.active.f-soon   {background:var(--amb-lt);border-color:var(--amber);color:var(--amber);}
+.filter-btn.active.f-today  {background:rgba(234,107,14,0.10);border-color:#ea6b0e;color:#ea6b0e;}
 .filter-btn.active.f-overdue{background:var(--red-lt);border-color:var(--red);color:var(--red);}
 .filter-btn.active.f-done   {background:var(--grn-lt);border-color:var(--green);color:var(--green);}
+
+/* OVERDUE GLOW — pulses when there are overdue tasks */
+@keyframes overdueGlow{
+  0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,0);}
+  50%    {box-shadow:0 0 0 4px rgba(220,38,38,0.28),0 0 12px 2px rgba(220,38,38,0.18);}
+}
+body.dark @keyframes overdueGlow{
+  50%{box-shadow:0 0 0 4px rgba(255,91,91,0.3),0 0 14px 3px rgba(255,91,91,0.2);}
+}
+.f-overdue.has-overdue{
+  animation:overdueGlow 1.8s ease-in-out infinite;
+  border-color:rgba(220,38,38,0.5) !important;
+  color:var(--red) !important;
+}
+.f-overdue.has-overdue .f-dot{
+  box-shadow:0 0 0 3px rgba(220,38,38,0.25);
+}
+.f-overdue.has-overdue .filter-count{
+  background:var(--red);color:#fff;
+}
 .filter-count{margin-left:auto;font-size:10px;font-weight:700;background:var(--surf3);color:var(--sub);padding:1px 6px;border-radius:20px;}
 .filter-btn.active .filter-count{background:rgba(0,0,0,0.10);color:inherit;}
 body.dark .filter-btn.active .filter-count{background:rgba(255,255,255,0.12);}
+
+/* OVERDUE GLOW — pulses when there are overdue tasks */
+@keyframes overdueGlow{
+  0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,0);background:var(--surf2);}
+  50%{box-shadow:0 0 0 4px rgba(220,38,38,0.18),0 0 14px rgba(220,38,38,0.22);background:var(--red-lt);}
+}
+body.dark @keyframes overdueGlow{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,91,91,0);}
+  50%{box-shadow:0 0 0 4px rgba(255,91,91,0.2),0 0 16px rgba(255,91,91,0.28);}
+}
+.f-overdue.has-overdue{
+  animation:overdueGlow 2s ease-in-out infinite;
+  border-color:rgba(220,38,38,0.35) !important;
+  color:var(--red) !important;
+}
+.f-overdue.has-overdue .f-dot{background:var(--red);animation:none;}
+.f-overdue.has-overdue .filter-count{background:var(--red);color:#fff;}
 
 /* FEATURED */
 .featured-panel{flex:1;background:var(--surface);padding:12px 14px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;}
@@ -175,9 +212,13 @@ body.dark .cat-other     {background:rgba(90,100,116,0.22);color:#94a3b8;}
 .task-card.overdue-card{border-color:var(--red) !important;}
 .task-card.overdue-card:hover{border-color:var(--red) !important;box-shadow:0 4px 20px rgba(220,38,38,0.18);}
 
-/* due meta */
-.card-due-meta{font-size:11px;color:var(--sub);padding:0 14px 6px;display:flex;align-items:center;gap:5px;}
-.overdue-chip{font-size:10px;font-weight:700;color:var(--red);background:var(--red-lt);padding:2px 7px;border-radius:20px;}
+/* STATUS LABEL beside due date */
+.status-chip{font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap;}
+.status-chip.overdue{background:var(--red-lt);color:var(--red);}
+.status-chip.today  {background:rgba(234,107,14,0.12);color:#ea6b0e;}
+.status-chip.soon   {background:var(--amb-lt);color:var(--amber);}
+.status-chip.done   {background:var(--grn-lt);color:var(--green);}
+body.dark .status-chip.today{background:rgba(234,107,14,0.18);color:#fb923c;}
 
 /* collapsed description */
 .card-desc-collapsed{margin:0 14px 10px;background:var(--surf3);border-radius:8px;padding:9px 11px;cursor:pointer;font-size:12px;color:var(--sub);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;transition:background 0.15s;border:1px solid transparent;}
@@ -320,11 +361,11 @@ input[type=file]{display:none;}
       <button class="filter-btn f-all active" onclick="setFilter('all')">
         <span class="f-dot"></span>All<span class="filter-count" id="cnt-all">0</span>
       </button>
-      <button class="filter-btn f-today" onclick="setFilter('today')">
-        <span class="f-dot"></span>Today<span class="filter-count" id="cnt-today">0</span>
-      </button>
       <button class="filter-btn f-soon" onclick="setFilter('soon')">
         <span class="f-dot"></span>Soon<span class="filter-count" id="cnt-soon">0</span>
+      </button>
+      <button class="filter-btn f-today" onclick="setFilter('today')">
+        <span class="f-dot"></span>Today<span class="filter-count" id="cnt-today">0</span>
       </button>
       <button class="filter-btn f-overdue" onclick="setFilter('overdue')">
         <span class="f-dot"></span>Overdue<span class="filter-count" id="cnt-overdue">0</span>
@@ -608,8 +649,11 @@ function updateCounts(){
   document.getElementById('cnt-all').textContent    =tasks.length;
   document.getElementById('cnt-today').textContent  =tasks.filter(t=>isToday(t)).length;
   document.getElementById('cnt-soon').textContent   =tasks.filter(t=>isDueSoon(t)).length;
-  document.getElementById('cnt-overdue').textContent=tasks.filter(t=>isOverdue(t)).length;
+  const overdueCount=tasks.filter(t=>isOverdue(t)).length;
+  document.getElementById('cnt-overdue').textContent=overdueCount;
   document.getElementById('cnt-done').textContent   =tasks.filter(t=>t.done).length;
+  // Glow the overdue button when there's at least 1 overdue task
+  document.querySelector('.f-overdue').classList.toggle('has-overdue', overdueCount>0);
 }
 
 function renderFeatured(){
@@ -643,7 +687,13 @@ function renderTasks(){
     if(search&&!t.name.toLowerCase().includes(search)&&!(t.notes||'').toLowerCase().includes(search))return false;
     return true;
   });
-  const notDone=list.filter(t=>!t.done).sort((a,b)=>{
+  // Split: upcoming (not overdue, not done) → overdue → done
+  const upcoming=list.filter(t=>!t.done&&!isOverdue(t)).sort((a,b)=>{
+    const da=a.date?new Date(a.date+'T'+(a.time||'23:59')):new Date('9999');
+    const db=b.date?new Date(b.date+'T'+(b.time||'23:59')):new Date('9999');
+    return da-db;
+  });
+  const overdue=list.filter(t=>!t.done&&isOverdue(t)).sort((a,b)=>{
     const da=a.date?new Date(a.date+'T'+(a.time||'23:59')):new Date('9999');
     const db=b.date?new Date(b.date+'T'+(b.time||'23:59')):new Date('9999');
     return da-db;
@@ -659,7 +709,14 @@ function renderTasks(){
     el.innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 12h6M12 9v6"/></svg><h3>${tasks.length?'No tasks match':'Nothing here yet'}</h3><p>${tasks.length?'Try a different filter.':'Tap + to add your first task.'}</p></div>`;
     return;
   }
-  let html=notDone.map(t=>buildCard(t)).join('');
+  let html=upcoming.map(t=>buildCard(t)).join('');
+
+  // Overdue section — own red divider at the bottom of active tasks
+  if(overdue.length){
+    html+=`<div class="done-divider overdue-divider"><div class="done-divider-line" style="background:rgba(220,38,38,0.3)"></div><span class="done-divider-label" style="color:var(--red)">⚠ Overdue (${overdue.length})</span><div class="done-divider-line" style="background:rgba(220,38,38,0.3)"></div></div>`;
+  }
+  html+=overdue.map(t=>buildCard(t)).join('');
+
   if(done.length){
     html+=`<div class="done-divider"><div class="done-divider-line"></div><span class="done-divider-label">Completed (${done.length})</span><div class="done-divider-line"></div></div>`;
     html+=done.map(t=>buildCard(t)).join('');
@@ -672,9 +729,18 @@ function renderTasks(){
 // ─────────────────────────────────────────────
 function buildCard(t){
   const over=isOverdue(t);
+  const tod=isToday(t);
+  const soon=isDueSoon(t);
   const due=fmtDue(t.date,t.time);
   const notes=t.notes||'';
   const imgs=t.images||[];
+
+  // Determine status chip
+  let statusChip='';
+  if(t.done)                       statusChip=`<span class="status-chip done">Done</span>`;
+  else if(over)                    statusChip=`<span class="status-chip overdue">Overdue</span>`;
+  else if(tod)                     statusChip=`<span class="status-chip today">Today</span>`;
+  else if(soon)                    statusChip=`<span class="status-chip soon">Soon</span>`;
 
   // Creator byline — shown in footer left of View/Close
   const creatorChip=t.createdBy
@@ -735,9 +801,10 @@ function buildCard(t){
       <span class="badge cat-${t.category}">${CAT_LABELS[t.category]||t.category}</span>
     </div>
 
-    ${due?`<div class="card-due-meta">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      ${esc(due)} ${over&&!t.done?'<span class="overdue-chip">Overdue</span>':''}
+    ${due||statusChip?`<div class="card-due-meta">
+      ${due?`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      ${esc(due)}`:''}
+      ${statusChip}
     </div>`:''}
 
     <div class="card-desc-collapsed ${!notes?'no-desc':''}" onclick="expandCard('${t.id}')">
