@@ -526,7 +526,7 @@ textarea.form-control { resize: vertical; min-height: 70px; }
     <div class="detail-notes" id="detailNotes">No notes.</div>
     <div class="detail-footer">
       <div class="detail-footer-left">
-        <button class="detail-action-btn" onclick="editSelected()" title="Edit">
+        <button class="detail-action-btn" id="editDetailBtn" onclick="editSelected()" title="Edit">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         </button>
         <button class="detail-action-btn del" onclick="deleteSelected()" title="Delete">
@@ -670,7 +670,10 @@ function setRole(r) {
   currentRole = r;
   document.getElementById('adminBtn').style.opacity = r==='admin'?'1':'0.4';
   document.getElementById('userBtn').style.opacity  = r==='user'?'1':'0.4';
+  // Only admin can see Add button
   document.getElementById('addBtn').style.display = r==='admin'?'flex':'none';
+  // Hide/show edit button in detail panel
+  document.getElementById('editDetailBtn').style.display = r==='admin'?'flex':'none';
   renderAll();
 }
 
@@ -880,6 +883,7 @@ function playCompletion(el, cb) {
 
 // ─── MODAL ───
 function openModal(id) {
+  if (currentRole !== 'admin') return; // only admin can add/edit
   editId = id||null;
   document.getElementById('modalTitle').textContent = editId?'Edit Task':'Add Task';
   if (editId) {
