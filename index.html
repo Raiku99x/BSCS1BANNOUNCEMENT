@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root {
-  /* LIGHT MODE — default */
   --bg:      #f4f3f0;
   --surface: #ffffff;
   --surf2:   #f9f8f6;
@@ -27,8 +26,6 @@
   --sidebar-w: 128px;
   --shadow:  0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.05);
 }
-
-/* DARK MODE */
 body.dark {
   --bg:      #0f0f13;
   --surface: #17171d;
@@ -72,19 +69,19 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 /* TOP PANEL */
 .top-panel{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;height:255px;}
 
-/* SIDEBAR */
+/* SIDEBAR — now shows categories + due soon */
 .sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;gap:6px;padding:12px 8px;}
 .filter-btn{display:flex;align-items:center;gap:7px;padding:9px 10px;border-radius:10px;background:var(--surf2);border:1.5px solid transparent;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;transition:all 0.18s;text-align:left;width:100%;}
 .f-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.f-all .f-dot{background:var(--accent);}
-.f-inprog .f-dot{background:var(--amber);}
-.f-soon .f-dot{background:var(--red);}
-.f-done .f-dot{background:var(--green);}
+.f-all    .f-dot{background:var(--accent);}
+.f-soon   .f-dot{background:var(--red);}
+.f-done   .f-dot{background:var(--green);}
+.f-active .f-dot{background:var(--amber);}
 .filter-btn:hover{background:var(--surf3);color:var(--text);}
-.filter-btn.active.f-all{background:var(--acc-lt);border-color:var(--accent);color:var(--accent);}
-.filter-btn.active.f-inprog{background:var(--amb-lt);border-color:var(--amber);color:var(--amber);}
-.filter-btn.active.f-soon{background:var(--red-lt);border-color:var(--red);color:var(--red);}
-.filter-btn.active.f-done{background:var(--grn-lt);border-color:var(--green);color:var(--green);}
+.filter-btn.active.f-all   {background:var(--acc-lt);border-color:var(--accent);color:var(--accent);}
+.filter-btn.active.f-soon  {background:var(--red-lt);border-color:var(--red);color:var(--red);}
+.filter-btn.active.f-done  {background:var(--grn-lt);border-color:var(--green);color:var(--green);}
+.filter-btn.active.f-active{background:var(--amb-lt);border-color:var(--amber);color:var(--amber);}
 .filter-count{margin-left:auto;font-size:10px;font-weight:700;background:var(--surf3);color:var(--sub);padding:1px 6px;border-radius:20px;}
 .filter-btn.active .filter-count{background:rgba(0,0,0,0.10);color:inherit;}
 body.dark .filter-btn.active .filter-count{background:rgba(255,255,255,0.12);}
@@ -109,9 +106,6 @@ body.dark .filter-btn.active .filter-count{background:rgba(255,255,255,0.12);}
 .all-task-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap;}
 .task-count-badge{background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
 .header-right{display:flex;align-items:center;gap:6px;margin-left:auto;}
-.sort-btn{font-size:10px;font-weight:700;letter-spacing:0.05em;padding:4px 10px;border-radius:6px;border:1.5px solid var(--border);background:var(--surf2);color:var(--sub);cursor:pointer;transition:all 0.15s;font-family:'Outfit',sans-serif;}
-.sort-btn:hover{border-color:var(--accent);color:var(--accent);}
-.sort-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
 .search-btn{width:30px;height:30px;border-radius:8px;border:1.5px solid var(--border);background:var(--surf2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sub);transition:all 0.15s;}
 .search-btn:hover{border-color:var(--accent);color:var(--accent);}
 .search-bar{display:none;padding:0 16px 10px;background:var(--surface);border-bottom:1px solid var(--border);}
@@ -123,26 +117,24 @@ body.dark .filter-btn.active .filter-count{background:rgba(255,255,255,0.12);}
 /* TASK LIST AREA */
 .task-area{padding:12px 14px;display:flex;flex-direction:column;gap:10px;}
 
-/* ════════════════════════
-   TASK CARD
-   ════════════════════════ */
+/* ── DONE SECTION DIVIDER ── */
+.done-divider{display:flex;align-items:center;gap:10px;padding:4px 0 2px;color:var(--sub);}
+.done-divider-line{flex:1;height:1px;background:var(--border);}
+.done-divider-label{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;}
+
+/* TASK CARD */
 .task-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s;animation:fadeUp 0.22s ease;box-shadow:var(--shadow);}
 .task-card:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(0,0,0,0.10);}
 .task-card.expanded{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent);}
-.task-card.done-card{opacity:0.5;}
+.task-card.done-card{opacity:0.52;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
 
-/* top row */
-.card-top{display:flex;align-items:center;gap:10px;padding:12px 14px 8px;}
-.status-dot{width:12px;height:12px;border-radius:50%;border:2px solid currentColor;flex-shrink:0;cursor:pointer;transition:transform 0.12s;}
-.status-dot:hover{transform:scale(1.4);}
-.status-dot.todo{color:var(--sub);background:transparent;}
-.status-dot.inprog{color:var(--amber);background:var(--amber);}
-.status-dot.done{color:var(--green);background:var(--green);}
+/* TOP ROW — no status dot */
+.card-top{display:flex;align-items:center;gap:10px;padding:13px 14px 10px;}
 .card-name{flex:1;min-width:0;font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .task-card.done-card .card-name{text-decoration:line-through;color:var(--sub);}
 
-/* badge — solid enough for light mode */
+/* badge */
 .badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
 .cat-quiz      {background:#ede9fe;color:#5b21b6;}
 .cat-project   {background:#dbeafe;color:#1e40af;}
@@ -163,7 +155,7 @@ body.dark .cat-output    {background:rgba(133,77,14,0.22);color:#fcd34d;}
 body.dark .cat-online    {background:rgba(3,105,161,0.22);color:#7dd3fc;}
 body.dark .cat-other     {background:rgba(90,100,116,0.22);color:#94a3b8;}
 
-/* CATEGORY COLOR LINE — replaces progress bar */
+/* category color line */
 .card-cat-line{height:3px;width:100%;margin-bottom:8px;}
 .cat-line-quiz      {background:#7c3aed;}
 .cat-line-project   {background:#1d4ed8;}
@@ -179,28 +171,45 @@ body.dark .cat-other     {background:rgba(90,100,116,0.22);color:#94a3b8;}
 .card-due-meta{font-size:11px;color:var(--sub);padding:0 14px 6px;display:flex;align-items:center;gap:5px;}
 .overdue-chip{font-size:10px;font-weight:700;color:var(--red);background:var(--red-lt);padding:2px 7px;border-radius:20px;}
 
-/* collapsed description — 3 lines, clickable */
+/* collapsed description */
 .card-desc-collapsed{margin:0 14px 10px;background:var(--surf3);border-radius:8px;padding:9px 11px;cursor:pointer;font-size:12px;color:var(--sub);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;transition:background 0.15s;border:1px solid transparent;}
 .card-desc-collapsed:hover{background:var(--border);color:var(--text);border-color:var(--accent);}
 .card-desc-collapsed.no-desc{font-style:italic;opacity:0.6;}
 
-/* collapsed footer buttons */
+/* ── CARD FOOTER ── */
 .card-footer{display:flex;align-items:center;padding:0 14px 12px;gap:8px;}
 .cfb{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;padding:5px 12px;border-radius:6px;border:1.5px solid var(--border);background:transparent;color:var(--sub);cursor:pointer;transition:all 0.15s;}
 .cfb:hover{background:var(--surf3);color:var(--text);}
-.cfb.view{margin:0 auto;border-radius:20px;border-color:var(--accent);color:var(--accent);padding:5px 20px;}
+
+/* view = centered pill */
+.cfb.view{border-radius:20px;border-color:var(--accent);color:var(--accent);padding:5px 20px;}
 .cfb.view:hover{background:var(--acc-lt);}
+
+/* del */
 .cfb.del:hover{border-color:var(--red);color:var(--red);}
+
+/* edit */
 .cfb.edit:hover{border-color:var(--accent);color:var(--accent);}
 
-/* expanded body — hidden when collapsed */
+/* mark as done — green pill */
+.cfb.mark-done{border-radius:20px;border-color:var(--green);color:var(--green);padding:5px 16px;}
+.cfb.mark-done:hover{background:var(--grn-lt);}
+
+/* undo done — amber */
+.cfb.undo-done{border-radius:20px;border-color:var(--amber);color:var(--amber);padding:5px 16px;}
+.cfb.undo-done:hover{background:var(--amb-lt);}
+
+/* push view to far right */
+.cfb-spacer{flex:1;}
+
+/* expanded body */
 .card-expanded-body{display:none;flex-direction:column;}
 .task-card.expanded .card-expanded-body{display:flex;}
 .task-card.expanded .card-desc-collapsed{display:none;}
 .task-card.expanded .card-footer{display:none;}
 
 /* expanded description full */
-.card-desc-full{margin:0 14px 12px;background:var(--surf3);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text);line-height:1.65;max-height:150px;overflow-y:auto;border:1px solid var(--border);}
+.card-desc-full{margin:0 14px 12px;background:var(--surf3);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text);line-height:1.65;max-height:160px;overflow-y:auto;border:1px solid var(--border);}
 .card-desc-full::-webkit-scrollbar{width:3px;}
 .card-desc-full::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 
@@ -208,12 +217,11 @@ body.dark .cat-other     {background:rgba(90,100,116,0.22);color:#94a3b8;}
 .card-images{display:flex;gap:8px;padding:0 14px 12px;overflow-x:auto;}
 .card-images::-webkit-scrollbar{height:3px;}
 .card-images::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
-.card-img-thumb{width:72px;height:60px;border-radius:8px;flex-shrink:0;background:var(--surf3);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:10px;font-weight:600;overflow:hidden;cursor:pointer;transition:border-color 0.15s;}
+.card-img-thumb{width:80px;height:66px;border-radius:8px;flex-shrink:0;background:var(--surf3);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:10px;font-weight:600;overflow:hidden;cursor:pointer;transition:border-color 0.15s;}
 .card-img-thumb:hover{border-color:var(--accent);}
 .card-img-thumb img{width:100%;height:100%;object-fit:cover;}
-.add-img-btn{width:72px;height:60px;border-radius:8px;flex-shrink:0;background:transparent;border:1.5px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--sub);font-size:9px;font-weight:600;cursor:pointer;gap:3px;transition:border-color 0.15s;}
+.add-img-btn{width:80px;height:66px;border-radius:8px;flex-shrink:0;background:transparent;border:1.5px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--sub);font-size:9px;font-weight:600;cursor:pointer;gap:3px;transition:border-color 0.15s;}
 .add-img-btn:hover{border-color:var(--accent);color:var(--accent);}
-.add-img-btn svg{opacity:0.5;}
 
 /* expanded footer */
 .card-footer-exp{display:flex;align-items:center;gap:8px;margin:0 14px;padding:10px 0 12px;border-top:1px solid var(--border);}
@@ -283,24 +291,24 @@ input[type=file]{display:none;}
 <!-- APP BODY -->
 <div class="app-body">
 
-  <!-- TOP PANEL: sidebar + featured -->
+  <!-- TOP PANEL -->
   <div class="top-panel">
     <div class="sidebar">
       <button class="filter-btn f-all active" onclick="setFilter('all')">
         <span class="f-dot"></span>All<span class="filter-count" id="cnt-all">0</span>
       </button>
-      <button class="filter-btn f-inprog" onclick="setFilter('inprog')">
-        <span class="f-dot"></span>In Prog<span class="filter-count" id="cnt-inprog">0</span>
-      </button>
       <button class="filter-btn f-soon" onclick="setFilter('soon')">
-        <span class="f-dot"></span>Due Soon<span class="filter-count" id="cnt-soon">0</span>
+        <span class="f-dot"></span>Soon<span class="filter-count" id="cnt-soon">0</span>
+      </button>
+      <button class="filter-btn f-active" onclick="setFilter('active')">
+        <span class="f-dot"></span>Active<span class="filter-count" id="cnt-active">0</span>
       </button>
       <button class="filter-btn f-done" onclick="setFilter('done')">
         <span class="f-dot"></span>Done<span class="filter-count" id="cnt-done">0</span>
       </button>
     </div>
     <div class="featured-panel">
-      <div class="featured-label">Featured</div>
+      <div class="featured-label">Due Soon</div>
       <div id="featuredList"></div>
     </div>
   </div>
@@ -310,8 +318,6 @@ input[type=file]{display:none;}
     <span class="all-task-title">All Tasks</span>
     <span class="task-count-badge" id="taskCountBadge">0</span>
     <div class="header-right">
-      <button class="sort-btn active" data-sort="due" onclick="setSortMode('due')">DUE</button>
-      <button class="sort-btn" data-sort="do" onclick="setSortMode('do')">DO</button>
       <button class="search-btn" onclick="toggleSearch()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </button>
@@ -355,12 +361,6 @@ input[type=file]{display:none;}
       <div class="form-group"><label class="form-label">Due Time</label><input class="form-control" id="fTime" type="time"/></div>
     </div>
     <div class="form-group">
-      <label class="form-label">Status</label>
-      <select class="form-control" id="fStatus">
-        <option value="todo">To Do</option><option value="inprog">In Progress</option><option value="done">Done</option>
-      </select>
-    </div>
-    <div class="form-group">
       <label class="form-label">Description / Notes</label>
       <textarea class="form-control" id="fNotes" placeholder="Details, links, reminders…"></textarea>
     </div>
@@ -380,11 +380,11 @@ input[type=file]{display:none;}
 <input type="file" id="imgUpload" accept="image/*" multiple onchange="handleImgUpload(event)"/>
 
 <script>
-const KEY='taskhub-v3';
+const KEY='taskhub-v4';
 const CAT_LABELS={quiz:'Quiz',project:'Project',assignment:'Assignment',exam:'Exam',study:'Study',review:'Review',output:'Output',online:'Online Class',other:'Other'};
 
 let tasks=[], editId=null, uploadTargetId=null;
-let activeFilter='all', activeSortMode='due', currentRole='admin', isDark=false;
+let activeFilter='all', currentRole='admin', isDark=false;
 
 function load(){
   try{const s=localStorage.getItem(KEY);if(s)tasks=JSON.parse(s);}catch(e){tasks=[];}
@@ -397,20 +397,20 @@ function seed(){
   const today=new Date();
   const add=n=>{const d=new Date(today);d.setDate(d.getDate()+n);return d.toISOString().split('T')[0];};
   tasks=[
-    {id:'1',name:'Ethics Essay Submission',category:'assignment',date:add(2),time:'23:59',status:'todo',notes:'Topic: AI in Education. Minimum 1500 words. Include at least 5 references in APA format.',images:[],progress:30,_expanded:false,created:Date.now()-5000},
-    {id:'2',name:'Discrete Math Quiz',category:'quiz',date:add(1),time:'10:00',status:'inprog',notes:'Cover Chapters 4–6. Focus on proofs and set theory. Bring a scientific calculator.',images:[],progress:60,_expanded:false,created:Date.now()-4000},
-    {id:'3',name:'Group Project Slides',category:'project',date:add(5),time:'14:00',status:'todo',notes:'8 slides minimum. Submit on Google Classroom before the deadline. All group members must contribute.',images:[],progress:10,_expanded:false,created:Date.now()-3000},
-    {id:'4',name:'Pathfit Activity Output',category:'output',date:add(0),time:'08:00',status:'done',notes:'Video output uploaded to the class portal.',images:[],progress:100,_expanded:false,created:Date.now()-2000},
-    {id:'5',name:'Calculus Problem Set',category:'assignment',date:add(-1),time:'23:59',status:'todo',notes:'Chapter 7, items 1–25. Show complete solutions with all steps.',images:[],progress:0,_expanded:false,created:Date.now()-1000},
-    {id:'6',name:'Midterm Exam Review',category:'exam',date:add(3),time:'09:00',status:'inprog',notes:'Review all lecture notes from Week 1 to Week 8. Focus on formulas.',images:[],progress:45,_expanded:false,created:Date.now()-500},
+    {id:'1',name:'Ethics Essay Submission',category:'assignment',date:add(2),time:'23:59',done:false,notes:'Topic: AI in Education. Minimum 1500 words. Include at least 5 references in APA format.',images:[],_expanded:false,created:Date.now()-5000},
+    {id:'2',name:'Discrete Math Quiz',category:'quiz',date:add(1),time:'10:00',done:false,notes:'Cover Chapters 4–6. Focus on proofs and set theory. Bring a scientific calculator.',images:[],_expanded:false,created:Date.now()-4000},
+    {id:'3',name:'Group Project Slides',category:'project',date:add(5),time:'14:00',done:false,notes:'8 slides minimum. Submit on Google Classroom before the deadline. All group members must contribute.',images:[],_expanded:false,created:Date.now()-3000},
+    {id:'4',name:'Pathfit Activity Output',category:'output',date:add(0),time:'08:00',done:true,notes:'Video output uploaded to the class portal.',images:[],_expanded:false,created:Date.now()-2000},
+    {id:'5',name:'Calculus Problem Set',category:'assignment',date:add(-1),time:'23:59',done:false,notes:'Chapter 7, items 1–25. Show complete solutions with all steps.',images:[],_expanded:false,created:Date.now()-1000},
+    {id:'6',name:'Midterm Exam Review',category:'exam',date:add(3),time:'09:00',done:false,notes:'Review all lecture notes from Week 1 to Week 8. Focus on formulas.',images:[],_expanded:false,created:Date.now()-500},
   ];
   persist();
 }
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function isOverdue(t){return t.date&&t.status!=='done'&&new Date(t.date+'T'+(t.time||'23:59'))<new Date();}
+function isOverdue(t){return t.date&&!t.done&&new Date(t.date+'T'+(t.time||'23:59'))<new Date();}
 function isDueSoon(t){
-  if(!t.date||t.status==='done')return false;
+  if(!t.date||t.done)return false;
   const diff=(new Date(t.date+'T'+(t.time||'23:59'))-new Date())/(1000*60*60*24);
   return diff>=0&&diff<=2;
 }
@@ -436,11 +436,7 @@ function setFilter(f){
   document.querySelector('.f-'+f).classList.add('active');
   renderAll();
 }
-function setSortMode(m){
-  activeSortMode=m;
-  document.querySelectorAll('.sort-btn').forEach(b=>b.classList.toggle('active',b.dataset.sort===m));
-  renderTasks();
-}
+
 function toggleSearch(){
   document.getElementById('searchBar').classList.toggle('open');
   if(document.getElementById('searchBar').classList.contains('open'))
@@ -448,27 +444,30 @@ function toggleSearch(){
 }
 function toggleTheme(){
   isDark=!isDark;
-  document.body.classList.toggle('dark', isDark);
+  document.body.classList.toggle('dark',isDark);
 }
 
 function renderAll(){updateCounts();renderFeatured();renderTasks();}
 
 function updateCounts(){
   document.getElementById('cnt-all').textContent   =tasks.length;
-  document.getElementById('cnt-inprog').textContent=tasks.filter(t=>t.status==='inprog').length;
   document.getElementById('cnt-soon').textContent  =tasks.filter(t=>isDueSoon(t)||isOverdue(t)).length;
-  document.getElementById('cnt-done').textContent  =tasks.filter(t=>t.status==='done').length;
+  document.getElementById('cnt-active').textContent=tasks.filter(t=>!t.done).length;
+  document.getElementById('cnt-done').textContent  =tasks.filter(t=>t.done).length;
 }
 
 function renderFeatured(){
   const el=document.getElementById('featuredList');
-  const feat=tasks.filter(t=>t.status!=='done'&&(isOverdue(t)||isDueSoon(t)||t.status==='inprog'))
+  const feat=tasks.filter(t=>!t.done&&(isOverdue(t)||isDueSoon(t)))
     .sort((a,b)=>{
       const da=a.date?new Date(a.date+'T'+(a.time||'23:59')):new Date('9999');
       const db=b.date?new Date(b.date+'T'+(b.time||'23:59')):new Date('9999');
       return da-db;
     }).slice(0,4);
-  if(!feat.length){el.innerHTML=`<div class="no-featured"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><p>All caught up!</p></div>`;return;}
+  if(!feat.length){
+    el.innerHTML=`<div class="no-featured"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><p>All caught up!</p></div>`;
+    return;
+  }
   el.innerHTML=feat.map(t=>{
     const over=isOverdue(t),soon=isDueSoon(t)&&!over,due=fmtDue(t.date,t.time);
     return `<div class="featured-card ${over?'urgent':soon?'soon':''}" onclick="expandCard('${t.id}')">
@@ -480,98 +479,123 @@ function renderFeatured(){
 
 function renderTasks(){
   const search=(document.getElementById('searchInput').value||'').toLowerCase();
+
   let list=tasks.filter(t=>{
-    if(activeFilter==='inprog'&&t.status!=='inprog')return false;
-    if(activeFilter==='done'  &&t.status!=='done')  return false;
+    if(activeFilter==='done'  &&!t.done)return false;
+    if(activeFilter==='active'&& t.done)return false;
     if(activeFilter==='soon'  &&!isDueSoon(t)&&!isOverdue(t))return false;
     if(search&&!t.name.toLowerCase().includes(search)&&!(t.notes||'').toLowerCase().includes(search))return false;
     return true;
   });
-  const done=list.filter(t=>t.status==='done');
-  const notDone=list.filter(t=>t.status!=='done');
-  notDone.sort((a,b)=>{
+
+  // Split: not done sorted by due, done at bottom
+  const notDone=list.filter(t=>!t.done).sort((a,b)=>{
     const da=a.date?new Date(a.date+'T'+(a.time||'23:59')):new Date('9999');
     const db=b.date?new Date(b.date+'T'+(b.time||'23:59')):new Date('9999');
     return da-db;
   });
-  const sorted=[...notDone,...done];
-  document.getElementById('taskCountBadge').textContent=sorted.length;
+  const done=list.filter(t=>t.done).sort((a,b)=>{
+    const da=a.date?new Date(a.date+'T'+(a.time||'23:59')):new Date('9999');
+    const db=b.date?new Date(b.date+'T'+(b.time||'23:59')):new Date('9999');
+    return da-db;
+  });
+
+  document.getElementById('taskCountBadge').textContent=list.length;
   const el=document.getElementById('taskArea');
-  if(!sorted.length){
+
+  if(!list.length){
     el.innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 12h6M12 9v6"/></svg><h3>${tasks.length?'No tasks match':'Nothing here yet'}</h3><p>${tasks.length?'Try a different filter.':'Tap + to add your first task.'}</p></div>`;
     return;
   }
-  el.innerHTML=sorted.map(t=>buildCard(t)).join('');
+
+  let html=notDone.map(t=>buildCard(t)).join('');
+
+  // Done divider + done cards
+  if(done.length){
+    html+=`<div class="done-divider"><div class="done-divider-line"></div><span class="done-divider-label">Completed (${done.length})</span><div class="done-divider-line"></div></div>`;
+    html+=done.map(t=>buildCard(t)).join('');
+  }
+
+  el.innerHTML=html;
 }
 
 function buildCard(t){
   const over=isOverdue(t);
   const due=fmtDue(t.date,t.time);
-  const pct=t.progress||0;
   const notes=t.notes||'';
   const imgs=t.images||[];
 
-  // image thumbs
   const imgHTML=imgs.map((src,i)=>`<div class="card-img-thumb" onclick="openLightbox('${t.id}',${i})"><img src="${esc(src)}" alt=""/></div>`).join('');
   const addImgBtn=currentRole==='admin'?`<button class="add-img-btn" onclick="triggerImgUpload('${t.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>`:'';
 
   // ── COLLAPSED FOOTER ──
-  // Admin: DELETE | VIEW | EDIT
-  // User:        VIEW
-  const collapsedFooter = currentRole==='admin'
-    ? `<div class="card-footer">
-        <button class="cfb del" onclick="event.stopPropagation();deleteTask('${t.id}')">Delete</button>
-        <button class="cfb view" onclick="event.stopPropagation();expandCard('${t.id}')">View</button>
-        <button class="cfb edit" onclick="event.stopPropagation();openModal('${t.id}')">Edit</button>
-      </div>`
-    : `<div class="card-footer">
-        <button class="cfb view" onclick="event.stopPropagation();expandCard('${t.id}')">View</button>
-      </div>`;
+  // ADMIN: EDIT | DELETE | [spacer] | VIEW
+  // USER:  MARK AS DONE / UNDO | [spacer] | VIEW
+  let collapsedFooter;
+  if(currentRole==='admin'){
+    collapsedFooter=`<div class="card-footer">
+      <button class="cfb edit" onclick="event.stopPropagation();openModal('${t.id}')">Edit</button>
+      <button class="cfb del"  onclick="event.stopPropagation();deleteTask('${t.id}')">Delete</button>
+      <span class="cfb-spacer"></span>
+      <button class="cfb view" onclick="event.stopPropagation();expandCard('${t.id}')">View</button>
+    </div>`;
+  } else {
+    const doneBtn=t.done
+      ? `<button class="cfb undo-done" onclick="event.stopPropagation();toggleDone('${t.id}')">↩ Undo</button>`
+      : `<button class="cfb mark-done" onclick="event.stopPropagation();toggleDone('${t.id}')">✓ Mark Done</button>`;
+    collapsedFooter=`<div class="card-footer">
+      ${doneBtn}
+      <span class="cfb-spacer"></span>
+      <button class="cfb view" onclick="event.stopPropagation();expandCard('${t.id}')">View</button>
+    </div>`;
+  }
 
   // ── EXPANDED FOOTER ──
-  // Admin: DELETE | CLOSE | EDIT
-  // User:         CLOSE
-  const expandedFooter = currentRole==='admin'
-    ? `<div class="card-footer-exp">
-        <button class="cfb del" onclick="event.stopPropagation();deleteTask('${t.id}')">Delete</button>
-        <button class="cfb view" onclick="event.stopPropagation();collapseCard('${t.id}')">Close</button>
-        <button class="cfb edit" onclick="event.stopPropagation();openModal('${t.id}')">Edit</button>
-      </div>`
-    : `<div class="card-footer-exp">
-        <button class="cfb view" onclick="event.stopPropagation();collapseCard('${t.id}')">Close</button>
-      </div>`;
+  // ADMIN: EDIT | DELETE | [spacer] | CLOSE
+  // USER:  MARK AS DONE / UNDO | [spacer] | CLOSE
+  let expandedFooter;
+  if(currentRole==='admin'){
+    expandedFooter=`<div class="card-footer-exp">
+      <button class="cfb edit" onclick="event.stopPropagation();openModal('${t.id}')">Edit</button>
+      <button class="cfb del"  onclick="event.stopPropagation();deleteTask('${t.id}')">Delete</button>
+      <span class="cfb-spacer"></span>
+      <button class="cfb view" onclick="event.stopPropagation();collapseCard('${t.id}')">Close</button>
+    </div>`;
+  } else {
+    const doneBtn=t.done
+      ? `<button class="cfb undo-done" onclick="event.stopPropagation();toggleDone('${t.id}')">↩ Undo Done</button>`
+      : `<button class="cfb mark-done" onclick="event.stopPropagation();toggleDone('${t.id}')">✓ Mark Done</button>`;
+    expandedFooter=`<div class="card-footer-exp">
+      ${doneBtn}
+      <span class="cfb-spacer"></span>
+      <button class="cfb view" onclick="event.stopPropagation();collapseCard('${t.id}')">Close</button>
+    </div>`;
+  }
 
   return `
-  <div class="task-card ${t.status==='done'?'done-card':''} ${t._expanded?'expanded':''}" id="card-${t.id}" data-id="${t.id}">
+  <div class="task-card ${t.done?'done-card':''} ${t._expanded?'expanded':''}" id="card-${t.id}" data-id="${t.id}">
 
-    <!-- TOP: status + name + badge -->
     <div class="card-top">
-      <div class="status-dot ${t.status}" onclick="event.stopPropagation();cycleStatus('${t.id}')" title="Cycle status"></div>
       <div class="card-name">${esc(t.name)}</div>
       <span class="badge cat-${t.category}">${CAT_LABELS[t.category]||t.category}</span>
     </div>
 
-    <!-- CATEGORY COLOR LINE -->
     <div class="card-cat-line cat-line-${t.category}"></div>
 
-    <!-- DUE META -->
     ${due?`<div class="card-due-meta">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       ${esc(due)} ${over?'<span class="overdue-chip">Overdue</span>':''}
     </div>`:''}
 
-    <!-- COLLAPSED: description 3 lines (click to expand) -->
     <div class="card-desc-collapsed ${!notes?'no-desc':''}" onclick="expandCard('${t.id}')">
       ${esc(notes)||'No description — click to view.'}
     </div>
 
-    <!-- COLLAPSED FOOTER -->
     ${collapsedFooter}
 
-    <!-- EXPANDED BODY (hidden when collapsed) -->
     <div class="card-expanded-body">
       <div class="card-desc-full">${esc(notes)||'<em style="opacity:0.5">No description.</em>'}</div>
-      <div class="card-images">${imgHTML}${addImgBtn}</div>
+      ${(imgHTML||addImgBtn)?`<div class="card-images">${imgHTML}${addImgBtn}</div>`:''}
       ${expandedFooter}
     </div>
 
@@ -590,18 +614,23 @@ function collapseCard(id){
   renderTasks();
 }
 
-// ── STATUS ──
-function cycleStatus(id){
+// ── TOGGLE DONE ──
+function toggleDone(id){
   const t=tasks.find(x=>x.id===id);if(!t)return;
-  const next={todo:'inprog',inprog:'done',done:'todo'}[t.status];
-  if(next==='done'&&t.status!=='done'){
+  if(!t.done){
+    // marking done — play animation
     const card=document.getElementById('card-'+id);
-    playCompletion(card,()=>{t.status=next;t.progress=100;persist();renderAll();});
-  } else {t.status=next;if(next==='todo')t.progress=0;persist();renderAll();}
+    playCompletion(card,()=>{t.done=true;persist();renderAll();});
+  } else {
+    // undo
+    t.done=false;
+    persist();renderAll();
+  }
 }
 
-// ── DELETE ──
+// ── DELETE (admin only) ──
 function deleteTask(id){
+  if(currentRole!=='admin')return;
   if(!confirm('Delete this task?'))return;
   tasks=tasks.filter(t=>t.id!==id);persist();renderAll();
 }
@@ -640,22 +669,21 @@ function playCompletion(el,cb){
   setTimeout(()=>{chk.remove();el.querySelectorAll('.conf-p').forEach(p=>p.remove());el.classList.remove('task-completing');cb();},580);
 }
 
-// ── MODAL ──
+// ── MODAL (admin only) ──
 function openModal(id){
   if(currentRole!=='admin')return;
   editId=id||null;
   document.getElementById('modalTitle').textContent=editId?'Edit Task':'Add Task';
   if(editId){
     const t=tasks.find(x=>x.id===editId);
-    document.getElementById('fName').value  =t.name;
-    document.getElementById('fCat').value   =t.category;
-    document.getElementById('fDate').value  =t.date||'';
-    document.getElementById('fTime').value  =t.time||'';
-    document.getElementById('fStatus').value=t.status;
-    document.getElementById('fNotes').value =t.notes||'';
+    document.getElementById('fName').value =t.name;
+    document.getElementById('fCat').value  =t.category;
+    document.getElementById('fDate').value =t.date||'';
+    document.getElementById('fTime').value =t.time||'';
+    document.getElementById('fNotes').value=t.notes||'';
   } else {
     ['fName','fDate','fTime','fNotes'].forEach(i=>document.getElementById(i).value='');
-    document.getElementById('fCat').value='quiz';document.getElementById('fStatus').value='todo';
+    document.getElementById('fCat').value='quiz';
   }
   document.getElementById('overlay').classList.add('open');
   setTimeout(()=>document.getElementById('fName').focus(),100);
@@ -667,9 +695,9 @@ function saveTask(){
   const name=document.getElementById('fName').value.trim();
   if(!name){document.getElementById('fName').style.borderColor='var(--red)';document.getElementById('fName').focus();return;}
   document.getElementById('fName').style.borderColor='';
-  const data={name,category:document.getElementById('fCat').value,date:document.getElementById('fDate').value,time:document.getElementById('fTime').value,status:document.getElementById('fStatus').value,notes:document.getElementById('fNotes').value.trim()};
+  const data={name,category:document.getElementById('fCat').value,date:document.getElementById('fDate').value,time:document.getElementById('fTime').value,notes:document.getElementById('fNotes').value.trim()};
   if(editId){const idx=tasks.findIndex(t=>t.id===editId);tasks[idx]={...tasks[idx],...data};}
-  else{tasks.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),created:Date.now(),images:[],progress:0,_expanded:false,...data});}
+  else{tasks.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),created:Date.now(),images:[],done:false,_expanded:false,...data});}
   closeModal();persist();renderAll();
 }
 
