@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Task Hub</title>
+<title>BSCS1B</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root {
@@ -49,7 +49,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 
 /* TOPBAR */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
-.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;letter-spacing:-0.5px;}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;letter-spacing:0.5px;}
 .logo span{color:var(--accent);}
 .topbar-right{display:flex;align-items:center;gap:8px;}
 .role-btn{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:6px 14px;border-radius:20px;border:none;cursor:pointer;transition:all 0.15s;}
@@ -63,11 +63,41 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .admin-tag{font-size:11px;font-weight:700;color:var(--accent);background:var(--acc-lt);border:1px solid var(--accent);padding:4px 10px;border-radius:20px;display:none;align-items:center;gap:5px;}
 .admin-tag svg{width:11px;height:11px;}
 .admin-tag.visible{display:flex;}
+.admin-tag.kandiaru-glow{
+  color:#a78bfa;
+  background:rgba(139,92,246,0.15);
+  border-color:#8b5cf6;
+  box-shadow:0 0 8px 2px rgba(139,92,246,0.35),0 0 20px 4px rgba(139,92,246,0.15);
+  animation:kandiGlow 2.2s ease-in-out infinite;
+}
+@keyframes kandiGlow{
+  0%,100%{box-shadow:0 0 6px 1px rgba(139,92,246,0.3),0 0 14px 3px rgba(139,92,246,0.12);}
+  50%    {box-shadow:0 0 12px 4px rgba(139,92,246,0.55),0 0 28px 8px rgba(139,92,246,0.2);}
+}
+body.dark .admin-tag.kandiaru-glow{
+  color:#c4b5fd;
+  background:rgba(139,92,246,0.2);
+  border-color:#a78bfa;
+}
 
 /* footer creator chip */
 .footer-creator{font-size:10px;font-weight:700;letter-spacing:0.03em;color:var(--accent);background:var(--acc-lt);border:1px solid rgba(91,82,232,0.2);padding:4px 10px;border-radius:20px;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;}
 .footer-creator svg{width:10px;height:10px;opacity:0.7;}
 body.dark .footer-creator{border-color:rgba(108,99,255,0.3);}
+
+/* Shared Kandiaru glow — applies to any chip/tag showing Kandiaru */
+.kandiaru-glow{
+  color:#a78bfa !important;
+  background:rgba(139,92,246,0.15) !important;
+  border-color:#8b5cf6 !important;
+  box-shadow:0 0 8px 2px rgba(139,92,246,0.35),0 0 20px 4px rgba(139,92,246,0.15) !important;
+  animation:kandiGlow 2.2s ease-in-out infinite !important;
+}
+body.dark .kandiaru-glow{
+  color:#c4b5fd !important;
+  background:rgba(139,92,246,0.2) !important;
+  border-color:#a78bfa !important;
+}
 
 /* USER BTN becomes LOGOUT when admin is active */
 .role-btn.logout{background:var(--red-lt);color:var(--red);border:1.5px solid var(--red);}
@@ -140,8 +170,31 @@ body.dark @keyframes overdueGlow{
 .f-overdue.has-overdue .filter-count{background:var(--red);color:#fff;}
 
 /* FEATURED */
-.featured-panel{flex:1;background:var(--surface);padding:12px 14px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;}
+.featured-panel{flex:1;background:var(--surface);padding:12px 14px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;}
 .featured-label{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--sub);margin-bottom:2px;}
+
+/* NOTES in featured */
+.notes-section-label{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--sub);display:flex;align-items:center;gap:6px;margin-top:2px;}
+.notes-section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.note-card{background:linear-gradient(135deg,rgba(255,214,0,0.10),rgba(255,180,0,0.06));border:1px solid rgba(196,122,10,0.25);border-left:3px solid var(--amber);border-radius:10px;padding:10px 12px;position:relative;animation:fadeUp 0.2s ease;box-shadow:0 1px 6px rgba(196,122,10,0.08);}
+body.dark .note-card{background:rgba(245,166,35,0.07);border-color:rgba(245,166,35,0.2);}
+.note-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:5px;}
+.note-card-text{font-size:12px;color:var(--text);line-height:1.55;word-break:break-word;overflow-wrap:anywhere;flex:1;}
+.note-del-btn{width:20px;height:20px;border-radius:6px;border:none;background:transparent;color:var(--sub);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;padding:0;}
+.note-del-btn:hover{background:var(--red-lt);color:var(--red);}
+.note-card-meta{display:flex;align-items:center;gap:6px;margin-top:6px;}
+.note-author{font-size:10px;font-weight:700;color:var(--amber);background:var(--amb-lt);padding:2px 7px;border-radius:20px;display:flex;align-items:center;gap:3px;}
+.note-author svg{width:9px;height:9px;}
+.note-expiry{font-size:10px;color:var(--sub);margin-left:auto;}
+
+/* Add note button (admin only, inside featured panel) */
+.add-note-btn{display:none;align-items:center;gap:5px;padding:6px 11px;border-radius:8px;border:1.5px dashed var(--amber);background:transparent;font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;color:var(--amber);cursor:pointer;transition:all 0.15s;width:fit-content;}
+.add-note-btn:hover{background:var(--amb-lt);}
+.add-note-btn.visible{display:flex;}
+
+.feat-section-divider{display:flex;align-items:center;gap:6px;margin:2px 0;}
+.feat-section-divider-line{flex:1;height:1px;background:var(--border);}
+.feat-section-divider-label{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--sub);white-space:nowrap;}
 .featured-card{background:var(--surf2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;cursor:pointer;transition:all 0.15s;border-left:3px solid var(--accent);box-shadow:var(--shadow);}
 .featured-card:hover{background:var(--surf3);transform:translateX(2px);}
 .featured-card.urgent{border-left-color:var(--red);}
@@ -161,6 +214,8 @@ body.dark @keyframes overdueGlow{
 .header-right{display:flex;align-items:center;gap:6px;margin-left:auto;}
 .search-btn{width:30px;height:30px;border-radius:8px;border:1.5px solid var(--border);background:var(--surf2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sub);transition:all 0.15s;}
 .search-btn:hover{border-color:var(--accent);color:var(--accent);}
+.add-task-btn{font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.04em;padding:7px 14px;border-radius:20px;border:1.5px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.add-task-btn:hover{opacity:0.85;}
 .search-bar{display:none;padding:0 16px 10px;background:var(--surface);border-bottom:1px solid var(--border);}
 .search-bar.open{display:block;}
 .search-input{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color 0.15s;}
@@ -221,7 +276,7 @@ body.dark .cat-other     {background:rgba(90,100,116,0.22);color:#94a3b8;}
 body.dark .status-chip.today{background:rgba(234,107,14,0.18);color:#fb923c;}
 
 /* collapsed description */
-.card-desc-collapsed{margin:0 14px 10px;background:var(--surf3);border-radius:8px;padding:9px 11px;cursor:pointer;font-size:12px;color:var(--sub);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;transition:background 0.15s;border:1px solid transparent;word-break:break-word;overflow-wrap:break-word;white-space:pre-wrap;}
+.card-desc-collapsed{margin:0 14px 10px;background:var(--surf3);border-radius:8px;padding:9px 11px;cursor:pointer;font-size:12px;color:var(--sub);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;transition:background 0.15s;border:1px solid transparent;word-break:break-all;overflow-wrap:anywhere;}
 .card-desc-collapsed:hover{background:var(--border);color:var(--text);border-color:var(--accent);}
 .card-desc-collapsed.no-desc{font-style:italic;opacity:0.6;}
 
@@ -244,7 +299,7 @@ body.dark .status-chip.today{background:rgba(234,107,14,0.18);color:#fb923c;}
 .task-card.expanded .card-expanded-body{display:flex;}
 .task-card.expanded .card-desc-collapsed{display:none;}
 .task-card.expanded .card-footer{display:none;}
-.card-desc-full{margin:0 14px 12px;background:var(--surf3);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text);line-height:1.65;max-height:160px;overflow-y:auto;overflow-x:hidden;border:1px solid var(--border);word-break:break-word;overflow-wrap:break-word;white-space:pre-wrap;}
+.card-desc-full{margin:0 14px 12px;background:var(--surf3);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text);line-height:1.65;max-height:160px;overflow-y:auto;overflow-x:hidden;border:1px solid var(--border);word-break:break-all;overflow-wrap:anywhere;white-space:pre-wrap;}
 .card-desc-full::-webkit-scrollbar{width:3px;}
 .card-desc-full::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 
@@ -339,6 +394,10 @@ textarea.form-control{resize:vertical;min-height:70px;}
 .del-btn-confirm{flex:1;background:var(--red);border:none;border-radius:10px;padding:10px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer;transition:opacity 0.15s;}
 .del-btn-confirm:hover{opacity:0.85;}
 
+/* CREDITS WATERMARK */
+.credits-badge{position:fixed;bottom:14px;right:16px;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.08em;color:var(--sub);opacity:0.38;pointer-events:none;user-select:none;z-index:50;}
+body.dark .credits-badge{opacity:0.22;}
+
 input[type=file]{display:none;}
 </style>
 </head>
@@ -346,19 +405,19 @@ input[type=file]{display:none;}
 
 <!-- TOPBAR -->
 <header class="topbar">
-  <div class="logo">Task<span>Hub</span></div>
+  <div class="logo">BSC<span>S1B</span></div>
   <div class="topbar-right">
     <!-- Admin name tag (shown when logged in) -->
     <div class="admin-tag" id="adminTag">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+      <span id="adminTagIcon"></span>
       <span id="adminTagName"></span>
     </div>
 
     <button class="role-btn admin" id="adminBtn" onclick="clickAdminBtn()">Admin</button>
     <!-- This button is "User" normally, becomes "Logout" when admin is logged in -->
     <button class="role-btn user" id="userBtn" onclick="userBtnClick()">User</button>
-    <button class="icon-top" onclick="toggleTheme()" title="Theme">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <button class="icon-top" onclick="toggleTheme()" title="Theme" id="themeBtn">
+      <svg id="themeIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
   </div>
 </header>
@@ -389,7 +448,14 @@ input[type=file]{display:none;}
       </button>
     </div>
     <div class="featured-panel">
-      <div class="featured-label">Due Soon</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="featured-label">Featured</div>
+        <button class="add-note-btn" id="addNoteBtn" onclick="openNoteModal()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Note
+        </button>
+      </div>
+      <div id="notesList"></div>
       <div id="featuredList"></div>
     </div>
   </div>
@@ -402,8 +468,8 @@ input[type=file]{display:none;}
       <button class="search-btn" onclick="toggleSearch()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </button>
-      <button class="icon-top" id="addBtn" onclick="openModal()" style="border-color:var(--accent);color:var(--accent);" title="Add Task">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <button class="add-task-btn" id="addBtn" onclick="openModal()" title="Add Task">
+        + Add Task
       </button>
     </div>
   </div>
@@ -510,10 +576,50 @@ input[type=file]{display:none;}
   </div>
 </div>
 
+<!-- ── ADD NOTE MODAL ── -->
+<div class="overlay" id="noteOverlay" onclick="handleNoteOverlay(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📌 Post a Note</div>
+    <div class="form-group">
+      <label class="form-label">Note Content *</label>
+      <textarea class="form-control" id="nText" placeholder="Write your announcement or reminder here…" style="min-height:90px;"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Visible For</label>
+      <select class="form-control" id="nExpiry">
+        <option value="1">1 Day</option>
+        <option value="3" selected>3 Days</option>
+        <option value="7">1 Week</option>
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeNoteModal()">Cancel</button>
+      <button class="btn-save" onclick="saveNote()" style="background:var(--amber);">Post Note</button>
+    </div>
+  </div>
+</div>
+
+<!-- CREDITS -->
+<div class="credits-badge">
+  <svg width="14" height="14" viewBox="0 0 24 30" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;margin-right:4px;">
+    <polygon points="3,6 5.5,1 8,6 5.5,9" fill="currentColor"/>
+    <line x1="2" y1="2" x2="9" y2="8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+    <polygon points="16,6 18.5,1 21,6 18.5,9" fill="currentColor"/>
+    <line x1="15" y1="2" x2="22" y2="8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M 0,13 Q 5,9 12,9 Q 19,9 24,13 Q 22,30 12,30 Q 2,30 0,13 Z" fill="currentColor" opacity="0.13"/>
+    <path d="M 0,13 Q 5,9 12,9 Q 19,9 24,13" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M 0,13 Q 2,30 12,30 Q 22,30 24,13" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <polyline points="1,13 3,20 5,13 7,21 9,13 11,22.5 13,13 15,21 17,13 19,20 21,13 23,13"
+      stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="miter" stroke-linecap="square"/>
+  </svg>Admin Kandiaru
+</div>
+
 <input type="file" id="imgUpload" accept="image/*" multiple onchange="handleImgUpload(event)"/>
 
 <script>
 const KEY='taskhub-v4';
+const NOTES_KEY='taskhub-notes-v1';
 const CAT_LABELS={quiz:'Quiz',project:'Project',assignment:'Assignment',exam:'Exam',study:'Study',review:'Review',output:'Output',online:'Online Class',other:'Other'};
 
 // ── VALID ADMIN CREDENTIALS ──
@@ -523,7 +629,7 @@ const ADMINS=[
   {username:'Kandiaru',password:'ONEABOVEALL'},
 ];
 
-let tasks=[], editId=null, uploadTargetId=null;
+let tasks=[], notes=[], editId=null, uploadTargetId=null;
 let activeFilter='all', currentRole='user', currentAdminName=null, isDark=false;
 
 // ─────────────────────────────────────────────
@@ -531,11 +637,19 @@ let activeFilter='all', currentRole='user', currentAdminName=null, isDark=false;
 // ─────────────────────────────────────────────
 function load(){
   try{const s=localStorage.getItem(KEY);if(s)tasks=JSON.parse(s);}catch(e){tasks=[];}
+  try{const n=localStorage.getItem(NOTES_KEY);if(n)notes=JSON.parse(n);}catch(e){notes=[];}
   if(!tasks.length)seed();
+  pruneExpiredNotes();
   renderAll();
 }
-function persist(){try{localStorage.setItem(KEY,JSON.stringify(tasks));}catch(e){}}
-
+function persist(){
+  try{localStorage.setItem(KEY,JSON.stringify(tasks));}catch(e){}
+  try{localStorage.setItem(NOTES_KEY,JSON.stringify(notes));}catch(e){}
+}
+function pruneExpiredNotes(){
+  const now=Date.now();
+  notes=notes.filter(n=>n.expiresAt>now);
+}
 function seed(){
   const today=new Date();
   const add=n=>{const d=new Date(today);d.setDate(d.getDate()+n);return d.toISOString().split('T')[0];};
@@ -553,6 +667,40 @@ function seed(){
 // ─────────────────────────────────────────────
 //  HELPERS
 // ─────────────────────────────────────────────
+//  ADMIN TITLES & ICONS
+// ─────────────────────────────────────────────
+const ADMIN_TITLES={
+  Francy:  'P.I.O. Francy',
+  Carina:  'Mayor Carina',
+  Kandiaru:'Admin Kandiaru',
+};
+function getAdminTitle(name){ return ADMIN_TITLES[name]||name; }
+
+// Returns menace SVG for Kandiaru, simple person for everyone else
+function getAdminIcon(name,size=10){
+  if(name==='Kandiaru'){
+    // ViewBox 0 0 24 30 — top 10 = eyes (1/3), bottom 20 = mouth (2/3)
+    return `<svg width="${size}" height="${size}" viewBox="0 0 24 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- LEFT EYE: slashed diamond -->
+      <polygon points="3,6 5.5,1 8,6 5.5,9" fill="currentColor"/>
+      <line x1="2" y1="2" x2="9" y2="8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      <!-- RIGHT EYE: slashed diamond -->
+      <polygon points="16,6 18.5,1 21,6 18.5,9" fill="currentColor"/>
+      <line x1="15" y1="2" x2="22" y2="8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      <!-- JAW FILL -->
+      <path d="M 0,13 Q 5,9 12,9 Q 19,9 24,13 Q 22,30 12,30 Q 2,30 0,13 Z" fill="currentColor" opacity="0.13"/>
+      <!-- UPPER LIP arc -->
+      <path d="M 0,13 Q 5,9 12,9 Q 19,9 24,13" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <!-- LOWER JAW arc -->
+      <path d="M 0,13 Q 2,30 12,30 Q 22,30 24,13" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <!-- ZIGZAG UPPER TEETH — sharp serrated row from lip -->
+      <polyline points="1,13 3,20 5,13 7,21 9,13 11,22.5 13,13 15,21 17,13 19,20 21,13 23,13"
+        stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="miter" stroke-linecap="square"/>
+    </svg>`;
+  }
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>`;
+}
+
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function isOverdue(t){return t.date&&!t.done&&new Date(t.date+'T'+(t.time||'23:59'))<new Date();}
 function isToday(t){
@@ -612,11 +760,15 @@ function updateRoleUI(){
     userBtn.style.opacity='1';
   }
 
-  document.getElementById('addBtn').style.display=isAdmin?'flex':'none';
+  document.getElementById('addBtn').style.display=isAdmin?'block':'none';
+  document.getElementById('addNoteBtn').classList.toggle('visible',isAdmin);
 
-  // admin name tag
-  document.getElementById('adminTag').classList.toggle('visible',isAdmin);
-  document.getElementById('adminTagName').textContent=currentAdminName||'';
+  // admin name tag with dynamic icon + title
+  const tag=document.getElementById('adminTag');
+  tag.classList.toggle('visible',isAdmin);
+  tag.classList.toggle('kandiaru-glow',isAdmin&&currentAdminName==='Kandiaru');
+  document.getElementById('adminTagName').textContent=isAdmin?getAdminTitle(currentAdminName):'';
+  document.getElementById('adminTagIcon').innerHTML=isAdmin?getAdminIcon(currentAdminName,11):'';
 }
 
 // ── LOGIN MODAL ──
@@ -669,7 +821,18 @@ function toggleSearch(){
   if(document.getElementById('searchBar').classList.contains('open'))
     setTimeout(()=>document.getElementById('searchInput').focus(),50);
 }
-function toggleTheme(){isDark=!isDark;document.body.classList.toggle('dark',isDark);}
+function toggleTheme(){
+  isDark=!isDark;
+  document.body.classList.toggle('dark',isDark);
+  const icon=document.getElementById('themeIcon');
+  if(isDark){
+    // Show sun icon (currently dark, click to go light)
+    icon.innerHTML='<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+  } else {
+    // Show moon icon (currently light, click to go dark)
+    icon.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  }
+}
 
 // ─────────────────────────────────────────────
 //  RENDER
@@ -688,6 +851,39 @@ function updateCounts(){
 }
 
 function renderFeatured(){
+  // Prune expired notes first
+  pruneExpiredNotes();
+
+  // ── RENDER NOTES (top) ──
+  const notesEl=document.getElementById('notesList');
+  if(notes.length){
+    let notesHTML=`<div class="feat-section-divider"><div class="feat-section-divider-line"></div><span class="feat-section-divider-label">📌 Notes (${notes.length})</span><div class="feat-section-divider-line"></div></div>`;
+    notesHTML+=notes.map(n=>{
+      const now=Date.now();
+      const msLeft=n.expiresAt-now;
+      const daysLeft=Math.ceil(msLeft/(1000*60*60*24));
+      const expiryLabel=daysLeft<=1?'Expires today':`Expires in ${daysLeft}d`;
+      // Show delete btn only to the admin who wrote it
+      const canDel=currentRole==='admin'&&currentAdminName===n.author;
+      const delBtn=canDel
+        ?`<button class="note-del-btn" onclick="deleteNote('${n.id}')" title="Delete note"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>`
+        :'';
+      return `<div class="note-card">
+        <div class="note-card-top">
+          <div class="note-card-text">${esc(n.text)}</div>
+          ${delBtn}
+        </div>
+        <div class="note-card-meta">
+          <span class="note-author${n.author==='Kandiaru'?' kandiaru-glow':''}">${getAdminIcon(n.author,9)}${esc(getAdminTitle(n.author))}</span>
+        </div>
+      </div>`;
+    }).join('');
+    notesEl.innerHTML=notesHTML;
+  } else {
+    notesEl.innerHTML='';
+  }
+
+  // ── RENDER FEATURED TASKS ──
   const el=document.getElementById('featuredList');
   const feat=tasks.filter(t=>!t.done&&(isOverdue(t)||isToday(t)||isDueSoon(t)))
     .sort((a,b)=>{
@@ -695,17 +891,37 @@ function renderFeatured(){
       const db=b.date?new Date(b.date+'T'+(b.time||'23:59')):new Date('9999');
       return da-db;
     }).slice(0,4);
-  if(!feat.length){
+
+  if(!feat.length&&!notes.length){
     el.innerHTML=`<div class="no-featured"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><p>All caught up!</p></div>`;
     return;
   }
-  el.innerHTML=feat.map(t=>{
-    const over=isOverdue(t),tod=isToday(t)&&!over,due=fmtDue(t.date,t.time);
-    return `<div class="featured-card ${over?'urgent':tod?'soon':''}" onclick="expandCard('${t.id}')">
-      <div class="fc-top"><span class="fc-name">${esc(t.name)}</span><span class="badge cat-${t.category}">${CAT_LABELS[t.category]}</span></div>
-      <div class="fc-meta">${due?`<span>${over?'<span class="due-dot"></span>':''} ${esc(due)}</span>`:''} ${over?'<span style="color:var(--red);font-weight:600;">Overdue</span>':tod?'<span style="color:var(--amber);font-weight:600;">Today</span>':''}</div>
-    </div>`;
-  }).join('');
+  if(!feat.length){el.innerHTML='';return;}
+
+  // Group by status: overdue → today → soon
+  const fOverdue=feat.filter(t=>isOverdue(t));
+  const fToday=feat.filter(t=>isToday(t)&&!isOverdue(t));
+  const fSoon=feat.filter(t=>isDueSoon(t));
+
+  let html='';
+  const buildFeatCards=(arr,labelText,labelColor)=>{
+    if(!arr.length)return '';
+    let out=`<div class="feat-section-divider"><div class="feat-section-divider-line" style="background:${labelColor}33"></div><span class="feat-section-divider-label" style="color:${labelColor}">${labelText}</span><div class="feat-section-divider-line" style="background:${labelColor}33"></div></div>`;
+    out+=arr.map(t=>{
+      const due=fmtDue(t.date,t.time);
+      const over=isOverdue(t),tod=isToday(t)&&!over;
+      return `<div class="featured-card ${over?'urgent':tod?'soon':''}" onclick="expandCard('${t.id}')">
+        <div class="fc-top"><span class="fc-name">${esc(t.name)}</span><span class="badge cat-${t.category}">${CAT_LABELS[t.category]}</span></div>
+        <div class="fc-meta">${due?`<span>${over?'<span class="due-dot"></span>':''} ${esc(due)}</span>`:''}</div>
+      </div>`;
+    }).join('');
+    return out;
+  };
+
+  html+=buildFeatCards(fOverdue,'Overdue','#dc2626');
+  html+=buildFeatCards(fToday,'Today','#ea6b0e');
+  html+=buildFeatCards(fSoon,'Soon','#c47a0a');
+  el.innerHTML=html;
 }
 
 function renderTasks(){
@@ -742,16 +958,18 @@ function renderTasks(){
   }
   let html=upcoming.map(t=>buildCard(t)).join('');
 
-  // Overdue section — own red divider at the bottom of active tasks
-  if(overdue.length){
-    html+=`<div class="done-divider overdue-divider"><div class="done-divider-line" style="background:rgba(220,38,38,0.3)"></div><span class="done-divider-label" style="color:var(--red)">⚠ Overdue (${overdue.length})</span><div class="done-divider-line" style="background:rgba(220,38,38,0.3)"></div></div>`;
-  }
-  html+=overdue.map(t=>buildCard(t)).join('');
-
+  // Completed section
   if(done.length){
     html+=`<div class="done-divider"><div class="done-divider-line"></div><span class="done-divider-label">Completed (${done.length})</span><div class="done-divider-line"></div></div>`;
     html+=done.map(t=>buildCard(t)).join('');
   }
+
+  // Overdue section — below completed, red divider
+  if(overdue.length){
+    html+=`<div class="done-divider overdue-divider"><div class="done-divider-line" style="background:rgba(220,38,38,0.3)"></div><span class="done-divider-label" style="color:var(--red)">⚠ Overdue (${overdue.length})</span><div class="done-divider-line" style="background:rgba(220,38,38,0.3)"></div></div>`;
+    html+=overdue.map(t=>buildCard(t)).join('');
+  }
+
   el.innerHTML=html;
 }
 
@@ -775,7 +993,7 @@ function buildCard(t){
 
   // Creator byline — shown in footer left of View/Close
   const creatorChip=t.createdBy
-    ? `<span class="footer-creator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>${esc(t.createdBy)}</span>`
+    ? `<span class="footer-creator${t.createdBy==='Kandiaru'?' kandiaru-glow':''}">${getAdminIcon(t.createdBy,10)}${esc(getAdminTitle(t.createdBy))}</span>`
     : '';
 
   const imgHTML=imgs.map((src,i)=>`<div class="card-img-thumb" onclick="openLightbox('${t.id}',${i})"><img src="${esc(src)}" alt=""/></div>`).join('');
@@ -994,6 +1212,48 @@ function saveTask(){
 }
 
 // ─────────────────────────────────────────────
+//  NOTES
+// ─────────────────────────────────────────────
+function openNoteModal(){
+  if(currentRole!=='admin')return;
+  document.getElementById('nText').value='';
+  document.getElementById('nExpiry').value='3';
+  document.getElementById('noteOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('nText').focus(),100);
+}
+function closeNoteModal(){
+  document.getElementById('noteOverlay').classList.remove('open');
+}
+function handleNoteOverlay(e){
+  if(e.target===document.getElementById('noteOverlay'))closeNoteModal();
+}
+function saveNote(){
+  const text=document.getElementById('nText').value.trim();
+  if(!text){
+    document.getElementById('nText').style.borderColor='var(--red)';
+    document.getElementById('nText').focus();
+    return;
+  }
+  document.getElementById('nText').style.borderColor='';
+  const days=parseInt(document.getElementById('nExpiry').value)||3;
+  notes.push({
+    id:Date.now().toString(36)+Math.random().toString(36).slice(2,4),
+    text,
+    author:currentAdminName,
+    createdAt:Date.now(),
+    expiresAt:Date.now()+(days*24*60*60*1000)
+  });
+  closeNoteModal();
+  persist();
+  renderFeatured();
+}
+function deleteNote(id){
+  notes=notes.filter(n=>n.id!==id);
+  persist();
+  renderFeatured();
+}
+
+// ─────────────────────────────────────────────
 //  KEYBOARD SHORTCUTS
 // ─────────────────────────────────────────────
 document.addEventListener('keydown',e=>{
@@ -1002,10 +1262,12 @@ document.addEventListener('keydown',e=>{
     closeLightbox();
     closeLoginModal();
     closeDelModal();
+    closeNoteModal();
   }
   if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){
     if(document.getElementById('overlay').classList.contains('open'))saveTask();
     if(document.getElementById('loginOverlay').classList.contains('open'))attemptLogin();
+    if(document.getElementById('noteOverlay').classList.contains('open'))saveNote();
   }
 });
 
