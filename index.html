@@ -264,7 +264,7 @@ body.dark .filter-btn.active .filter-count{background:rgba(255,255,255,0.12);}
 /* NOTES in featured */
 .notes-section-label{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--sub);display:flex;align-items:center;gap:6px;margin-top:2px;}
 .notes-section-label::after{content:'';flex:1;height:1px;background:var(--border);}
-.note-card{background:linear-gradient(135deg,rgba(255,214,0,0.10),rgba(255,180,0,0.06));border:1px solid rgba(196,122,10,0.25);border-left:3px solid var(--amber);border-radius:10px;padding:10px 12px;position:relative;animation:fadeUp 0.2s ease;box-shadow:0 1px 6px rgba(196,122,10,0.08);}
+.note-card{background:linear-gradient(135deg,rgba(255,214,0,0.10),rgba(255,180,0,0.06));border:1px solid rgba(196,122,10,0.25);border-left:3px solid var(--amber);border-radius:10px;padding:10px 12px;position:relative;box-shadow:0 1px 6px rgba(196,122,10,0.08);}
 body.dark .note-card{background:rgba(245,166,35,0.07);border-color:rgba(245,166,35,0.2);}
 .note-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:5px;}
 .note-card-text{font-size:12px;color:var(--text);line-height:1.55;word-break:break-word;overflow-wrap:anywhere;flex:1;}
@@ -991,7 +991,9 @@ function setFilter(f){
   activeFilter=f;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   document.querySelector('.f-'+f).classList.add('active');
-  renderAll();
+  // Only update counts + task list — Featured stays frozen
+  updateCounts();
+  renderTasks();
 }
 function toggleSearch(){
   document.getElementById('searchBar').classList.toggle('open');
@@ -1002,7 +1004,10 @@ function toggleSearch(){
 // ─────────────────────────────────────────────
 //  RENDER
 // ─────────────────────────────────────────────
+// Full render — used when data actually changes (add/edit/delete/done)
 function renderAll(){updateCounts();renderFeatured();renderTasks();}
+// Filter-only render — no Featured refresh, no flicker
+function renderFiltered(){updateCounts();renderTasks();}
 
 function updateCounts(){
   const setBadge=(id,val)=>{
