@@ -176,7 +176,7 @@ body.dark @keyframes overdueGlow{
 .done-divider-label{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;}
 
 /* TASK CARD */
-.task-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s;animation:fadeUp 0.22s ease;box-shadow:var(--shadow);}
+.task-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s;animation:fadeUp 0.22s ease;box-shadow:var(--shadow);min-width:0;width:100%;}
 .task-card:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(0,0,0,0.10);}
 .task-card.expanded{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent);}
 .task-card.done-card{opacity:0.52;}
@@ -184,7 +184,7 @@ body.dark @keyframes overdueGlow{
 
 /* TOP ROW */
 .card-top{display:flex;align-items:center;gap:10px;padding:13px 14px 10px;}
-.card-name{flex:1;min-width:0;font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card-name{flex:1;min-width:0;font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;word-break:break-word;}
 .task-card.done-card .card-name{text-decoration:line-through;color:var(--sub);}
 
 /* badge */
@@ -221,7 +221,7 @@ body.dark .cat-other     {background:rgba(90,100,116,0.22);color:#94a3b8;}
 body.dark .status-chip.today{background:rgba(234,107,14,0.18);color:#fb923c;}
 
 /* collapsed description */
-.card-desc-collapsed{margin:0 14px 10px;background:var(--surf3);border-radius:8px;padding:9px 11px;cursor:pointer;font-size:12px;color:var(--sub);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;transition:background 0.15s;border:1px solid transparent;}
+.card-desc-collapsed{margin:0 14px 10px;background:var(--surf3);border-radius:8px;padding:9px 11px;cursor:pointer;font-size:12px;color:var(--sub);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;transition:background 0.15s;border:1px solid transparent;word-break:break-word;overflow-wrap:break-word;white-space:pre-wrap;}
 .card-desc-collapsed:hover{background:var(--border);color:var(--text);border-color:var(--accent);}
 .card-desc-collapsed.no-desc{font-style:italic;opacity:0.6;}
 
@@ -244,7 +244,7 @@ body.dark .status-chip.today{background:rgba(234,107,14,0.18);color:#fb923c;}
 .task-card.expanded .card-expanded-body{display:flex;}
 .task-card.expanded .card-desc-collapsed{display:none;}
 .task-card.expanded .card-footer{display:none;}
-.card-desc-full{margin:0 14px 12px;background:var(--surf3);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text);line-height:1.65;max-height:160px;overflow-y:auto;border:1px solid var(--border);}
+.card-desc-full{margin:0 14px 12px;background:var(--surf3);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text);line-height:1.65;max-height:160px;overflow-y:auto;overflow-x:hidden;border:1px solid var(--border);word-break:break-word;overflow-wrap:break-word;white-space:pre-wrap;}
 .card-desc-full::-webkit-scrollbar{width:3px;}
 .card-desc-full::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 
@@ -324,6 +324,20 @@ textarea.form-control{resize:vertical;min-height:70px;}
 .lightbox img{max-width:90vw;max-height:90vh;border-radius:10px;}
 .lb-close{position:absolute;top:20px;right:24px;background:none;border:none;color:#fff;font-size:26px;cursor:pointer;opacity:0.7;}
 .lb-close:hover{opacity:1;}
+
+/* ── DELETE CONFIRM MODAL ── */
+.del-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:400;backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.del-overlay.open{opacity:1;pointer-events:all;}
+.del-modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px 26px 24px;width:calc(100% - 40px);max-width:320px;text-align:center;transform:scale(0.92) translateY(8px);transition:transform 0.22s ease;box-shadow:0 20px 60px rgba(0,0,0,0.22);}
+.del-overlay.open .del-modal{transform:scale(1) translateY(0);}
+.del-icon{width:52px;height:52px;border-radius:14px;background:var(--red-lt);border:1.5px solid rgba(220,38,38,0.25);display:flex;align-items:center;justify-content:center;color:var(--red);margin:0 auto 14px;}
+.del-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.del-sub{font-size:12px;color:var(--sub);margin-bottom:22px;line-height:1.5;}
+.del-actions{display:flex;gap:10px;}
+.del-btn-cancel{flex:1;background:var(--surf2);border:1.5px solid var(--border);border-radius:10px;padding:10px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:var(--sub);cursor:pointer;transition:all 0.15s;}
+.del-btn-cancel:hover{color:var(--text);border-color:var(--text);}
+.del-btn-confirm{flex:1;background:var(--red);border:none;border-radius:10px;padding:10px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer;transition:opacity 0.15s;}
+.del-btn-confirm:hover{opacity:0.85;}
 
 input[type=file]{display:none;}
 </style>
@@ -477,6 +491,23 @@ input[type=file]{display:none;}
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <button class="lb-close" onclick="closeLightbox()">✕</button>
   <img id="lightboxImg" src="" alt=""/>
+</div>
+
+<!-- ── DELETE CONFIRM MODAL ── -->
+<div class="del-overlay" id="delOverlay">
+  <div class="del-modal" id="delModal">
+    <div class="del-icon">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+      </svg>
+    </div>
+    <div class="del-title">Delete Task?</div>
+    <div class="del-sub" id="delSubText">This action cannot be undone.</div>
+    <div class="del-actions">
+      <button class="del-btn-cancel" onclick="closeDelModal()">Cancel</button>
+      <button class="del-btn-confirm" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
 </div>
 
 <input type="file" id="imgUpload" accept="image/*" multiple onchange="handleImgUpload(event)"/>
@@ -851,10 +882,27 @@ function toggleDone(id){
 // ─────────────────────────────────────────────
 //  DELETE
 // ─────────────────────────────────────────────
+let pendingDeleteId=null;
+
 function deleteTask(id){
   if(currentRole!=='admin')return;
-  if(!confirm('Delete this task?'))return;
-  tasks=tasks.filter(t=>t.id!==id);persist();renderAll();
+  const t=tasks.find(x=>x.id===id);
+  if(!t)return;
+  pendingDeleteId=id;
+  document.getElementById('delSubText').textContent=`"${t.name}" will be permanently removed.`;
+  document.getElementById('delOverlay').classList.add('open');
+}
+function confirmDelete(){
+  if(!pendingDeleteId)return;
+  tasks=tasks.filter(t=>t.id!==pendingDeleteId);
+  pendingDeleteId=null;
+  closeDelModal();
+  persist();
+  renderAll();
+}
+function closeDelModal(){
+  document.getElementById('delOverlay').classList.remove('open');
+  pendingDeleteId=null;
 }
 
 // ─────────────────────────────────────────────
@@ -953,6 +1001,7 @@ document.addEventListener('keydown',e=>{
     closeModal();
     closeLightbox();
     closeLoginModal();
+    closeDelModal();
   }
   if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){
     if(document.getElementById('overlay').classList.contains('open'))saveTask();
