@@ -59,6 +59,20 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .icon-top{width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:var(--surf2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sub);transition:all 0.15s;}
 .icon-top:hover{border-color:var(--accent);color:var(--accent);background:var(--acc-lt);}
 
+/* ADMIN NAME TAG */
+.admin-tag{font-size:11px;font-weight:700;color:var(--accent);background:var(--acc-lt);border:1px solid var(--accent);padding:4px 10px;border-radius:20px;display:none;align-items:center;gap:5px;}
+.admin-tag svg{width:11px;height:11px;}
+.admin-tag.visible{display:flex;}
+
+/* footer creator chip */
+.footer-creator{font-size:10px;font-weight:700;letter-spacing:0.03em;color:var(--accent);background:var(--acc-lt);border:1px solid rgba(91,82,232,0.2);padding:4px 10px;border-radius:20px;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;}
+.footer-creator svg{width:10px;height:10px;opacity:0.7;}
+body.dark .footer-creator{border-color:rgba(108,99,255,0.3);}
+
+/* USER BTN becomes LOGOUT when admin is active */
+.role-btn.logout{background:var(--red-lt);color:var(--red);border:1.5px solid var(--red);}
+.role-btn.logout:hover{background:var(--red);color:#fff;opacity:1;}
+
 /* DATE BAR */
 .date-bar{text-align:center;padding:9px 20px;background:var(--surface);border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--sub);letter-spacing:0.05em;}
 .date-bar span{color:var(--text);}
@@ -69,7 +83,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 /* TOP PANEL */
 .top-panel{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;height:255px;}
 
-/* SIDEBAR — now shows categories + due soon */
+/* SIDEBAR */
 .sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;gap:6px;padding:12px 8px;}
 .filter-btn{display:flex;align-items:center;gap:7px;padding:9px 10px;border-radius:10px;background:var(--surf2);border:1.5px solid transparent;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;transition:all 0.18s;text-align:left;width:100%;}
 .f-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
@@ -119,7 +133,7 @@ body.dark .filter-btn.active .filter-count{background:rgba(255,255,255,0.12);}
 /* TASK LIST AREA */
 .task-area{padding:12px 14px;display:flex;flex-direction:column;gap:10px;}
 
-/* ── DONE SECTION DIVIDER ── */
+/* DONE SECTION DIVIDER */
 .done-divider{display:flex;align-items:center;gap:10px;padding:4px 0 2px;color:var(--sub);}
 .done-divider-line{flex:1;height:1px;background:var(--border);}
 .done-divider-label{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;}
@@ -131,7 +145,7 @@ body.dark .filter-btn.active .filter-count{background:rgba(255,255,255,0.12);}
 .task-card.done-card{opacity:0.52;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
 
-/* TOP ROW — no status dot */
+/* TOP ROW */
 .card-top{display:flex;align-items:center;gap:10px;padding:13px 14px 10px;}
 .card-name{flex:1;min-width:0;font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .task-card.done-card .card-name{text-decoration:line-through;color:var(--sub);}
@@ -160,7 +174,6 @@ body.dark .cat-other     {background:rgba(90,100,116,0.22);color:#94a3b8;}
 /* overdue red border */
 .task-card.overdue-card{border-color:var(--red) !important;}
 .task-card.overdue-card:hover{border-color:var(--red) !important;box-shadow:0 4px 20px rgba(220,38,38,0.18);}
-body.dark .task-card.overdue-card{border-color:var(--red) !important;}
 
 /* due meta */
 .card-due-meta{font-size:11px;color:var(--sub);padding:0 14px 6px;display:flex;align-items:center;gap:5px;}
@@ -171,30 +184,18 @@ body.dark .task-card.overdue-card{border-color:var(--red) !important;}
 .card-desc-collapsed:hover{background:var(--border);color:var(--text);border-color:var(--accent);}
 .card-desc-collapsed.no-desc{font-style:italic;opacity:0.6;}
 
-/* ── CARD FOOTER ── */
+/* CARD FOOTER */
 .card-footer{display:flex;align-items:center;padding:0 14px 12px;gap:8px;}
 .cfb{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;padding:5px 12px;border-radius:6px;border:1.5px solid var(--border);background:transparent;color:var(--sub);cursor:pointer;transition:all 0.15s;}
 .cfb:hover{background:var(--surf3);color:var(--text);}
-
-/* view = centered pill */
 .cfb.view{border-radius:20px;border-color:var(--accent);color:var(--accent);padding:5px 20px;}
 .cfb.view:hover{background:var(--acc-lt);}
-
-/* del */
 .cfb.del:hover{border-color:var(--red);color:var(--red);}
-
-/* edit */
 .cfb.edit:hover{border-color:var(--accent);color:var(--accent);}
-
-/* mark as done — green pill */
 .cfb.mark-done{border-radius:20px;border-color:var(--green);color:var(--green);padding:5px 16px;}
 .cfb.mark-done:hover{background:var(--grn-lt);}
-
-/* undo done — amber */
 .cfb.undo-done{border-radius:20px;border-color:var(--amber);color:var(--amber);padding:5px 16px;}
 .cfb.undo-done:hover{background:var(--amb-lt);}
-
-/* push view to far right */
 .cfb-spacer{flex:1;}
 
 /* expanded body */
@@ -202,8 +203,6 @@ body.dark .task-card.overdue-card{border-color:var(--red) !important;}
 .task-card.expanded .card-expanded-body{display:flex;}
 .task-card.expanded .card-desc-collapsed{display:none;}
 .task-card.expanded .card-footer{display:none;}
-
-/* expanded description full */
 .card-desc-full{margin:0 14px 12px;background:var(--surf3);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text);line-height:1.65;max-height:160px;overflow-y:auto;border:1px solid var(--border);}
 .card-desc-full::-webkit-scrollbar{width:3px;}
 .card-desc-full::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
@@ -217,8 +216,6 @@ body.dark .task-card.overdue-card{border-color:var(--red) !important;}
 .card-img-thumb img{width:100%;height:100%;object-fit:cover;}
 .add-img-btn{width:80px;height:66px;border-radius:8px;flex-shrink:0;background:transparent;border:1.5px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--sub);font-size:9px;font-weight:600;cursor:pointer;gap:3px;transition:border-color 0.15s;}
 .add-img-btn:hover{border-color:var(--accent);color:var(--accent);}
-
-/* expanded footer */
 .card-footer-exp{display:flex;align-items:center;gap:8px;margin:0 14px;padding:10px 0 12px;border-top:1px solid var(--border);}
 
 /* empty */
@@ -236,7 +233,7 @@ body.dark .task-card.overdue-card{border-color:var(--red) !important;}
 .completion-chk svg{width:22px;height:22px;stroke:#0f1a12;stroke-width:3;fill:none;}
 .conf-p{position:absolute;width:6px;height:6px;border-radius:50%;animation:confPop 0.65s ease forwards;pointer-events:none;z-index:9;}
 
-/* MODAL */
+/* ADD/EDIT MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:flex-end;justify-content:center;z-index:200;backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity 0.2s;}
 .overlay.open{opacity:1;pointer-events:all;}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:22px 22px 30px;width:100%;max-width:520px;transform:translateY(40px);transition:transform 0.25s ease;max-height:92vh;overflow-y:auto;box-shadow:0 -8px 40px rgba(0,0,0,0.15);}
@@ -256,6 +253,30 @@ textarea.form-control{resize:vertical;min-height:70px;}
 .btn-save{flex:2;background:var(--accent);border:none;border-radius:10px;padding:11px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;color:#fff;cursor:pointer;transition:opacity 0.15s;}
 .btn-save:hover{opacity:0.88;}
 
+/* ── ADMIN LOGIN MODAL ── */
+.login-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:300;backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity 0.25s;}
+.login-overlay.open{opacity:1;pointer-events:all;}
+.login-modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px 28px 26px;width:calc(100% - 32px);max-width:380px;transform:scale(0.95) translateY(8px);transition:transform 0.25s ease,opacity 0.25s;box-shadow:0 20px 60px rgba(0,0,0,0.25);}
+.login-overlay.open .login-modal{transform:scale(1) translateY(0);}
+.login-header{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:24px;}
+.login-icon{width:52px;height:52px;border-radius:16px;background:var(--acc-lt);border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;color:var(--accent);}
+.login-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);}
+.login-sub{font-size:12px;color:var(--sub);text-align:center;}
+.login-form-group{margin-bottom:12px;}
+.login-label{display:block;font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--sub);margin-bottom:5px;}
+.login-input{width:100%;background:var(--surf2);border:1.5px solid var(--border);border-radius:10px;padding:10px 13px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--text);outline:none;transition:border-color 0.15s;}
+.login-input:focus{border-color:var(--accent);}
+.login-input::placeholder{color:var(--sub);}
+.login-error{font-size:11px;color:var(--red);background:var(--red-lt);border:1px solid rgba(220,38,38,0.2);border-radius:8px;padding:8px 12px;margin-bottom:12px;display:none;align-items:center;gap:6px;}
+.login-error.show{display:flex;}
+.login-actions{display:flex;gap:10px;margin-top:16px;}
+.btn-login-cancel{flex:1;background:var(--surf2);border:1.5px solid var(--border);border-radius:10px;padding:11px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;color:var(--sub);cursor:pointer;transition:all 0.15s;}
+.btn-login-cancel:hover{color:var(--text);border-color:var(--text);}
+.btn-login-go{flex:2;background:var(--accent);border:none;border-radius:10px;padding:11px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;color:#fff;cursor:pointer;transition:opacity 0.15s;}
+.btn-login-go:hover{opacity:0.88;}
+.shake{animation:shake 0.38s ease;}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+
 /* LIGHTBOX */
 .lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
 .lightbox.open{opacity:1;pointer-events:all;}
@@ -272,8 +293,15 @@ input[type=file]{display:none;}
 <header class="topbar">
   <div class="logo">Task<span>Hub</span></div>
   <div class="topbar-right">
-    <button class="role-btn admin" id="adminBtn" onclick="setRole('admin')">Admin</button>
-    <button class="role-btn user"  id="userBtn"  onclick="setRole('user')">User</button>
+    <!-- Admin name tag (shown when logged in) -->
+    <div class="admin-tag" id="adminTag">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+      <span id="adminTagName"></span>
+    </div>
+
+    <button class="role-btn admin" id="adminBtn" onclick="clickAdminBtn()">Admin</button>
+    <!-- This button is "User" normally, becomes "Logout" when admin is logged in -->
+    <button class="role-btn user" id="userBtn" onclick="userBtnClick()">User</button>
     <button class="icon-top" onclick="toggleTheme()" title="Theme">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
@@ -335,7 +363,7 @@ input[type=file]{display:none;}
 
 </div>
 
-<!-- ADD/EDIT MODAL -->
+<!-- ADD/EDIT TASK MODAL -->
 <div class="overlay" id="overlay" onclick="handleOverlay(event)">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -369,6 +397,41 @@ input[type=file]{display:none;}
   </div>
 </div>
 
+<!-- ── ADMIN LOGIN MODAL ── -->
+<div class="login-overlay" id="loginOverlay" onclick="handleLoginOverlay(event)">
+  <div class="login-modal" id="loginModal">
+    <div class="login-header">
+      <div class="login-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <div class="login-title">Admin Access</div>
+      <div class="login-sub">Enter your credentials to manage tasks</div>
+    </div>
+
+    <div class="login-error" id="loginError">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="loginErrorMsg">Invalid username or password.</span>
+    </div>
+
+    <div class="login-form-group">
+      <label class="login-label">Username</label>
+      <input class="login-input" id="loginUser" type="text" placeholder="Enter username" autocomplete="username"/>
+    </div>
+    <div class="login-form-group">
+      <label class="login-label">Password</label>
+      <input class="login-input" id="loginPass" type="password" placeholder="Enter password" autocomplete="current-password" onkeydown="if(event.key==='Enter')attemptLogin()"/>
+    </div>
+
+    <div class="login-actions">
+      <button class="btn-login-cancel" onclick="closeLoginModal()">Cancel</button>
+      <button class="btn-login-go" onclick="attemptLogin()">Login →</button>
+    </div>
+  </div>
+</div>
+
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <button class="lb-close" onclick="closeLightbox()">✕</button>
@@ -381,9 +444,19 @@ input[type=file]{display:none;}
 const KEY='taskhub-v4';
 const CAT_LABELS={quiz:'Quiz',project:'Project',assignment:'Assignment',exam:'Exam',study:'Study',review:'Review',output:'Output',online:'Online Class',other:'Other'};
 
-let tasks=[], editId=null, uploadTargetId=null;
-let activeFilter='all', currentRole='admin', isDark=false;
+// ── VALID ADMIN CREDENTIALS ──
+const ADMINS=[
+  {username:'Francy',  password:'123BSCS1B'},
+  {username:'Carina',  password:'321BSCS1B'},
+  {username:'Kandiaru',password:'ONEABOVEALL'},
+];
 
+let tasks=[], editId=null, uploadTargetId=null;
+let activeFilter='all', currentRole='user', currentAdminName=null, isDark=false;
+
+// ─────────────────────────────────────────────
+//  DATA
+// ─────────────────────────────────────────────
 function load(){
   try{const s=localStorage.getItem(KEY);if(s)tasks=JSON.parse(s);}catch(e){tasks=[];}
   if(!tasks.length)seed();
@@ -395,16 +468,19 @@ function seed(){
   const today=new Date();
   const add=n=>{const d=new Date(today);d.setDate(d.getDate()+n);return d.toISOString().split('T')[0];};
   tasks=[
-    {id:'1',name:'Ethics Essay Submission',category:'assignment',date:add(2),time:'23:59',done:false,notes:'Topic: AI in Education. Minimum 1500 words. Include at least 5 references in APA format.',images:[],_expanded:false,created:Date.now()-5000},
-    {id:'2',name:'Discrete Math Quiz',category:'quiz',date:add(1),time:'10:00',done:false,notes:'Cover Chapters 4–6. Focus on proofs and set theory. Bring a scientific calculator.',images:[],_expanded:false,created:Date.now()-4000},
-    {id:'3',name:'Group Project Slides',category:'project',date:add(5),time:'14:00',done:false,notes:'8 slides minimum. Submit on Google Classroom before the deadline. All group members must contribute.',images:[],_expanded:false,created:Date.now()-3000},
-    {id:'4',name:'Pathfit Activity Output',category:'output',date:add(0),time:'08:00',done:true,notes:'Video output uploaded to the class portal.',images:[],_expanded:false,created:Date.now()-2000},
-    {id:'5',name:'Calculus Problem Set',category:'assignment',date:add(-1),time:'23:59',done:false,notes:'Chapter 7, items 1–25. Show complete solutions with all steps.',images:[],_expanded:false,created:Date.now()-1000},
-    {id:'6',name:'Midterm Exam Review',category:'exam',date:add(3),time:'09:00',done:false,notes:'Review all lecture notes from Week 1 to Week 8. Focus on formulas.',images:[],_expanded:false,created:Date.now()-500},
+    {id:'1',name:'Ethics Essay Submission',category:'assignment',date:add(2),time:'23:59',done:false,notes:'Topic: AI in Education. Minimum 1500 words. Include at least 5 references in APA format.',images:[],_expanded:false,created:Date.now()-5000,createdBy:null},
+    {id:'2',name:'Discrete Math Quiz',category:'quiz',date:add(1),time:'10:00',done:false,notes:'Cover Chapters 4–6. Focus on proofs and set theory. Bring a scientific calculator.',images:[],_expanded:false,created:Date.now()-4000,createdBy:null},
+    {id:'3',name:'Group Project Slides',category:'project',date:add(5),time:'14:00',done:false,notes:'8 slides minimum. Submit on Google Classroom before the deadline. All group members must contribute.',images:[],_expanded:false,created:Date.now()-3000,createdBy:null},
+    {id:'4',name:'Pathfit Activity Output',category:'output',date:add(0),time:'08:00',done:true,notes:'Video output uploaded to the class portal.',images:[],_expanded:false,created:Date.now()-2000,createdBy:null},
+    {id:'5',name:'Calculus Problem Set',category:'assignment',date:add(-1),time:'23:59',done:false,notes:'Chapter 7, items 1–25. Show complete solutions with all steps.',images:[],_expanded:false,created:Date.now()-1000,createdBy:null},
+    {id:'6',name:'Midterm Exam Review',category:'exam',date:add(3),time:'09:00',done:false,notes:'Review all lecture notes from Week 1 to Week 8. Focus on formulas.',images:[],_expanded:false,created:Date.now()-500,createdBy:null},
   ];
   persist();
 }
 
+// ─────────────────────────────────────────────
+//  HELPERS
+// ─────────────────────────────────────────────
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function isOverdue(t){return t.date&&!t.done&&new Date(t.date+'T'+(t.time||'23:59'))<new Date();}
 function isToday(t){
@@ -425,31 +501,107 @@ function fmtDue(date,time){
   return `${lbl} ${(hr%12)||12}:${m}${hr>=12?'pm':'am'}`;
 }
 
-function setRole(r){
-  currentRole=r;
-  document.getElementById('adminBtn').style.opacity=r==='admin'?'1':'0.4';
-  document.getElementById('userBtn').style.opacity =r==='user' ?'1':'0.4';
-  document.getElementById('addBtn').style.display  =r==='admin'?'flex':'none';
+// ─────────────────────────────────────────────
+//  ROLE / AUTH
+// ─────────────────────────────────────────────
+function clickAdminBtn(){
+  if(currentRole==='admin')return; // already admin
+  openLoginModal();
+}
+
+// The User button calls this — acts as User switcher OR Logout depending on state
+function userBtnClick(){
+  if(currentRole==='admin'){
+    logout();
+  }
+  // if already user, do nothing
+}
+
+function logout(){
+  currentRole='user';
+  currentAdminName=null;
+  updateRoleUI();
   renderAll();
 }
 
+function updateRoleUI(){
+  const isAdmin=currentRole==='admin';
+  // Admin button: full opacity when active, faded when not
+  document.getElementById('adminBtn').style.opacity=isAdmin?'1':'0.4';
+
+  // User button morphs into Logout when admin is active
+  const userBtn=document.getElementById('userBtn');
+  if(isAdmin){
+    userBtn.textContent='Logout';
+    userBtn.className='role-btn logout';
+  } else {
+    userBtn.textContent='User';
+    userBtn.className='role-btn user';
+    userBtn.style.opacity='1';
+  }
+
+  document.getElementById('addBtn').style.display=isAdmin?'flex':'none';
+
+  // admin name tag
+  document.getElementById('adminTag').classList.toggle('visible',isAdmin);
+  document.getElementById('adminTagName').textContent=currentAdminName||'';
+}
+
+// ── LOGIN MODAL ──
+function openLoginModal(){
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+  document.getElementById('loginError').classList.remove('show');
+  document.getElementById('loginOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('loginUser').focus(),120);
+}
+function closeLoginModal(){
+  document.getElementById('loginOverlay').classList.remove('open');
+}
+function handleLoginOverlay(e){
+  if(e.target===document.getElementById('loginOverlay'))closeLoginModal();
+}
+
+function attemptLogin(){
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
+  const match=ADMINS.find(a=>a.username===u&&a.password===p);
+  if(match){
+    currentRole='admin';
+    currentAdminName=match.username;
+    closeLoginModal();
+    updateRoleUI();
+    renderAll();
+  } else {
+    const errEl=document.getElementById('loginError');
+    errEl.classList.add('show');
+    document.getElementById('loginErrorMsg').textContent='Invalid username or password.';
+    document.getElementById('loginModal').classList.add('shake');
+    setTimeout(()=>document.getElementById('loginModal').classList.remove('shake'),400);
+    document.getElementById('loginPass').value='';
+    document.getElementById('loginPass').focus();
+  }
+}
+
+// ─────────────────────────────────────────────
+//  FILTER / SEARCH
+// ─────────────────────────────────────────────
 function setFilter(f){
   activeFilter=f;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   document.querySelector('.f-'+f).classList.add('active');
   renderAll();
 }
-
 function toggleSearch(){
   document.getElementById('searchBar').classList.toggle('open');
   if(document.getElementById('searchBar').classList.contains('open'))
     setTimeout(()=>document.getElementById('searchInput').focus(),50);
 }
-function toggleTheme(){
-  isDark=!isDark;
-  document.body.classList.toggle('dark',isDark);
-}
+function toggleTheme(){isDark=!isDark;document.body.classList.toggle('dark',isDark);}
 
+// ─────────────────────────────────────────────
+//  RENDER
+// ─────────────────────────────────────────────
 function renderAll(){updateCounts();renderFeatured();renderTasks();}
 
 function updateCounts(){
@@ -483,7 +635,6 @@ function renderFeatured(){
 
 function renderTasks(){
   const search=(document.getElementById('searchInput').value||'').toLowerCase();
-
   let list=tasks.filter(t=>{
     if(activeFilter==='done'   &&!t.done)return false;
     if(activeFilter==='today'  &&(!isToday(t)||t.done))return false;
@@ -492,8 +643,6 @@ function renderTasks(){
     if(search&&!t.name.toLowerCase().includes(search)&&!(t.notes||'').toLowerCase().includes(search))return false;
     return true;
   });
-
-  // Split: not done sorted by due, done at bottom
   const notDone=list.filter(t=>!t.done).sort((a,b)=>{
     const da=a.date?new Date(a.date+'T'+(a.time||'23:59')):new Date('9999');
     const db=b.date?new Date(b.date+'T'+(b.time||'23:59')):new Date('9999');
@@ -504,44 +653,45 @@ function renderTasks(){
     const db=b.date?new Date(b.date+'T'+(b.time||'23:59')):new Date('9999');
     return da-db;
   });
-
   document.getElementById('taskCountBadge').textContent=list.length;
   const el=document.getElementById('taskArea');
-
   if(!list.length){
     el.innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 12h6M12 9v6"/></svg><h3>${tasks.length?'No tasks match':'Nothing here yet'}</h3><p>${tasks.length?'Try a different filter.':'Tap + to add your first task.'}</p></div>`;
     return;
   }
-
   let html=notDone.map(t=>buildCard(t)).join('');
-
-  // Done divider + done cards
   if(done.length){
     html+=`<div class="done-divider"><div class="done-divider-line"></div><span class="done-divider-label">Completed (${done.length})</span><div class="done-divider-line"></div></div>`;
     html+=done.map(t=>buildCard(t)).join('');
   }
-
   el.innerHTML=html;
 }
 
+// ─────────────────────────────────────────────
+//  BUILD CARD
+// ─────────────────────────────────────────────
 function buildCard(t){
   const over=isOverdue(t);
   const due=fmtDue(t.date,t.time);
   const notes=t.notes||'';
   const imgs=t.images||[];
 
+  // Creator byline — shown in footer left of View/Close
+  const creatorChip=t.createdBy
+    ? `<span class="footer-creator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>${esc(t.createdBy)}</span>`
+    : '';
+
   const imgHTML=imgs.map((src,i)=>`<div class="card-img-thumb" onclick="openLightbox('${t.id}',${i})"><img src="${esc(src)}" alt=""/></div>`).join('');
   const addImgBtn=currentRole==='admin'?`<button class="add-img-btn" onclick="triggerImgUpload('${t.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>`:'';
 
-  // ── COLLAPSED FOOTER ──
-  // ADMIN: EDIT | DELETE | [spacer] | VIEW
-  // USER:  MARK AS DONE / UNDO | [spacer] | VIEW
+  // COLLAPSED FOOTER
   let collapsedFooter;
   if(currentRole==='admin'){
     collapsedFooter=`<div class="card-footer">
       <button class="cfb edit" onclick="event.stopPropagation();openModal('${t.id}')">Edit</button>
       <button class="cfb del"  onclick="event.stopPropagation();deleteTask('${t.id}')">Delete</button>
       <span class="cfb-spacer"></span>
+      ${creatorChip}
       <button class="cfb view" onclick="event.stopPropagation();expandCard('${t.id}')">View</button>
     </div>`;
   } else {
@@ -551,19 +701,19 @@ function buildCard(t){
     collapsedFooter=`<div class="card-footer">
       ${doneBtn}
       <span class="cfb-spacer"></span>
+      ${creatorChip}
       <button class="cfb view" onclick="event.stopPropagation();expandCard('${t.id}')">View</button>
     </div>`;
   }
 
-  // ── EXPANDED FOOTER ──
-  // ADMIN: EDIT | DELETE | [spacer] | CLOSE
-  // USER:  MARK AS DONE / UNDO | [spacer] | CLOSE
+  // EXPANDED FOOTER
   let expandedFooter;
   if(currentRole==='admin'){
     expandedFooter=`<div class="card-footer-exp">
       <button class="cfb edit" onclick="event.stopPropagation();openModal('${t.id}')">Edit</button>
       <button class="cfb del"  onclick="event.stopPropagation();deleteTask('${t.id}')">Delete</button>
       <span class="cfb-spacer"></span>
+      ${creatorChip}
       <button class="cfb view" onclick="event.stopPropagation();collapseCard('${t.id}')">Close</button>
     </div>`;
   } else {
@@ -573,13 +723,13 @@ function buildCard(t){
     expandedFooter=`<div class="card-footer-exp">
       ${doneBtn}
       <span class="cfb-spacer"></span>
+      ${creatorChip}
       <button class="cfb view" onclick="event.stopPropagation();collapseCard('${t.id}')">Close</button>
     </div>`;
   }
 
   return `
   <div class="task-card ${t.done?'done-card':''} ${over&&!t.done?'overdue-card':''} ${t._expanded?'expanded':''}" id="card-${t.id}" data-id="${t.id}">
-
     <div class="card-top">
       <div class="card-name">${esc(t.name)}</div>
       <span class="badge cat-${t.category}">${CAT_LABELS[t.category]||t.category}</span>
@@ -601,11 +751,12 @@ function buildCard(t){
       ${(imgHTML||addImgBtn)?`<div class="card-images">${imgHTML}${addImgBtn}</div>`:''}
       ${expandedFooter}
     </div>
-
   </div>`;
 }
 
-// ── EXPAND / COLLAPSE ──
+// ─────────────────────────────────────────────
+//  EXPAND / COLLAPSE
+// ─────────────────────────────────────────────
 function expandCard(id){
   tasks.forEach(x=>x._expanded=false);
   const t=tasks.find(x=>x.id===id);if(t)t._expanded=true;
@@ -617,28 +768,31 @@ function collapseCard(id){
   renderTasks();
 }
 
-// ── TOGGLE DONE ──
+// ─────────────────────────────────────────────
+//  TOGGLE DONE
+// ─────────────────────────────────────────────
 function toggleDone(id){
   const t=tasks.find(x=>x.id===id);if(!t)return;
   if(!t.done){
-    // marking done — play animation
     const card=document.getElementById('card-'+id);
     playCompletion(card,()=>{t.done=true;persist();renderAll();});
   } else {
-    // undo
-    t.done=false;
-    persist();renderAll();
+    t.done=false;persist();renderAll();
   }
 }
 
-// ── DELETE (admin only) ──
+// ─────────────────────────────────────────────
+//  DELETE
+// ─────────────────────────────────────────────
 function deleteTask(id){
   if(currentRole!=='admin')return;
   if(!confirm('Delete this task?'))return;
   tasks=tasks.filter(t=>t.id!==id);persist();renderAll();
 }
 
-// ── IMAGES ──
+// ─────────────────────────────────────────────
+//  IMAGES
+// ─────────────────────────────────────────────
 function triggerImgUpload(id){uploadTargetId=id;document.getElementById('imgUpload').click();}
 function handleImgUpload(e){
   const files=[...e.target.files];
@@ -653,7 +807,9 @@ function handleImgUpload(e){
   e.target.value='';
 }
 
-// ── LIGHTBOX ──
+// ─────────────────────────────────────────────
+//  LIGHTBOX
+// ─────────────────────────────────────────────
 function openLightbox(id,idx){
   const t=tasks.find(x=>x.id===id);if(!t||!t.images[idx])return;
   document.getElementById('lightboxImg').src=t.images[idx];
@@ -661,7 +817,9 @@ function openLightbox(id,idx){
 }
 function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
 
-// ── COMPLETION ANIMATION ──
+// ─────────────────────────────────────────────
+//  COMPLETION ANIMATION
+// ─────────────────────────────────────────────
 function playCompletion(el,cb){
   if(!el){cb();return;}
   el.classList.add('task-completing');
@@ -672,7 +830,9 @@ function playCompletion(el,cb){
   setTimeout(()=>{chk.remove();el.querySelectorAll('.conf-p').forEach(p=>p.remove());el.classList.remove('task-completing');cb();},580);
 }
 
-// ── MODAL (admin only) ──
+// ─────────────────────────────────────────────
+//  MODAL (admin only)
+// ─────────────────────────────────────────────
 function openModal(id){
   if(currentRole!=='admin')return;
   editId=id||null;
@@ -699,18 +859,48 @@ function saveTask(){
   if(!name){document.getElementById('fName').style.borderColor='var(--red)';document.getElementById('fName').focus();return;}
   document.getElementById('fName').style.borderColor='';
   const data={name,category:document.getElementById('fCat').value,date:document.getElementById('fDate').value,time:document.getElementById('fTime').value,notes:document.getElementById('fNotes').value.trim()};
-  if(editId){const idx=tasks.findIndex(t=>t.id===editId);tasks[idx]={...tasks[idx],...data};}
-  else{tasks.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),created:Date.now(),images:[],done:false,_expanded:false,...data});}
+  if(editId){
+    const idx=tasks.findIndex(t=>t.id===editId);
+    tasks[idx]={...tasks[idx],...data};
+    // update createdBy if editing (keep original creator)
+  } else {
+    // NEW task — stamp the current admin's name
+    tasks.push({
+      id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+      created:Date.now(),
+      images:[],
+      done:false,
+      _expanded:false,
+      createdBy: currentAdminName,   // ← admin name saved here
+      ...data
+    });
+  }
   closeModal();persist();renderAll();
 }
 
+// ─────────────────────────────────────────────
+//  KEYBOARD SHORTCUTS
+// ─────────────────────────────────────────────
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeModal();closeLightbox();}
-  if((e.ctrlKey||e.metaKey)&&e.key==='Enter')saveTask();
+  if(e.key==='Escape'){
+    closeModal();
+    closeLightbox();
+    closeLoginModal();
+  }
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){
+    if(document.getElementById('overlay').classList.contains('open'))saveTask();
+    if(document.getElementById('loginOverlay').classList.contains('open'))attemptLogin();
+  }
 });
 
+// ─────────────────────────────────────────────
+//  INIT — default to USER on page load
+// ─────────────────────────────────────────────
 document.getElementById('dateBar').innerHTML=`<span>${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</span>`;
-setRole('admin');
+
+// Start as USER (page loads in user mode)
+currentRole='user';
+updateRoleUI();
 load();
 </script>
 </body>
