@@ -54,12 +54,15 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .topbar-right{display:flex;align-items:center;gap:8px;}
 .role-btn{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:6px 14px;border-radius:20px;border:none;cursor:pointer;transition:all 0.15s;}
 .role-btn.admin{background:var(--accent);color:#fff;}
+.role-btn.admin-active{background:var(--accent);color:#fff;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .role-btn.user{background:var(--green);color:#0f1a12;}
 .role-btn:hover{opacity:0.85;}
-.icon-top{width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:var(--surf2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sub);transition:all 0.15s;}
-.icon-top:hover{border-color:var(--accent);color:var(--accent);background:var(--acc-lt);}
 
-/* ADMIN NAME TAG */
+/* USER BTN becomes LOGOUT when admin is active */
+.role-btn.logout{background:var(--red-lt);color:var(--red);border:1.5px solid var(--red);}
+.role-btn.logout:hover{background:var(--red);color:#fff;opacity:1;}
+
+/* ADMIN NAME TAG — kept but hidden visually (tag is now the button itself) */
 .admin-tag{font-size:11px;font-weight:700;color:var(--accent);background:var(--acc-lt);border:1px solid var(--accent);padding:4px 10px;border-radius:20px;display:none;align-items:center;gap:5px;}
 .admin-tag svg{width:11px;height:11px;}
 .admin-tag.visible{display:flex;}
@@ -80,12 +83,20 @@ body.dark .admin-tag.kandiaru-glow{
   border-color:#a78bfa;
 }
 
+/* Kandiaru glow on admin button when active */
+.role-btn.admin-active.kandiaru-btn{
+  background: linear-gradient(135deg,#7c3aed,#5b52e8);
+  color:#fff;
+  box-shadow:0 0 8px 2px rgba(139,92,246,0.45),0 0 20px 4px rgba(139,92,246,0.2);
+  animation:kandiGlow 2.2s ease-in-out infinite;
+}
+
 /* footer creator chip */
 .footer-creator{font-size:10px;font-weight:700;letter-spacing:0.03em;color:var(--accent);background:var(--acc-lt);border:1px solid rgba(91,82,232,0.2);padding:4px 10px;border-radius:20px;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;}
 .footer-creator svg{width:10px;height:10px;opacity:0.7;}
 body.dark .footer-creator{border-color:rgba(108,99,255,0.3);}
 
-/* Shared Kandiaru glow — applies to any chip/tag showing Kandiaru */
+/* Shared Kandiaru glow */
 .kandiaru-glow{
   color:#a78bfa !important;
   background:rgba(139,92,246,0.15) !important;
@@ -99,13 +110,51 @@ body.dark .kandiaru-glow{
   border-color:#a78bfa !important;
 }
 
-/* USER BTN becomes LOGOUT when admin is active */
-.role-btn.logout{background:var(--red-lt);color:var(--red);border:1.5px solid var(--red);}
-.role-btn.logout:hover{background:var(--red);color:#fff;opacity:1;}
-
 /* DATE BAR */
-.date-bar{text-align:center;padding:9px 20px;background:var(--surface);border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--sub);letter-spacing:0.05em;}
-.date-bar span{color:var(--text);}
+.date-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:6px 12px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  font-size:12px;
+  font-weight:600;
+  color:var(--sub);
+  letter-spacing:0.05em;
+  position:sticky;
+  top:57px;
+  z-index:99;
+}
+.date-bar-center{
+  flex:1;
+  text-align:center;
+}
+.date-bar-center span{color:var(--text);}
+.date-bar-side{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  width:80px;
+}
+.date-bar-side.right{justify-content:flex-end;}
+
+/* Date bar icon buttons */
+.icon-bar{
+  width:30px;
+  height:30px;
+  border-radius:9px;
+  border:1px solid var(--border);
+  background:var(--surf2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  color:var(--sub);
+  transition:all 0.15s;
+  flex-shrink:0;
+}
+.icon-bar:hover{border-color:var(--accent);color:var(--accent);background:var(--acc-lt);}
 
 /* APP BODY */
 .app-body{display:flex;flex-direction:column;min-height:calc(100vh - 96px);}
@@ -129,30 +178,6 @@ body.dark .kandiaru-glow{
 .filter-btn.active.f-overdue{background:var(--red-lt);border-color:var(--red);color:var(--red);}
 .filter-btn.active.f-done   {background:var(--grn-lt);border-color:var(--green);color:var(--green);}
 
-/* OVERDUE GLOW — pulses when there are overdue tasks */
-@keyframes overdueGlow{
-  0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,0);}
-  50%    {box-shadow:0 0 0 4px rgba(220,38,38,0.28),0 0 12px 2px rgba(220,38,38,0.18);}
-}
-body.dark @keyframes overdueGlow{
-  50%{box-shadow:0 0 0 4px rgba(255,91,91,0.3),0 0 14px 3px rgba(255,91,91,0.2);}
-}
-.f-overdue.has-overdue{
-  animation:overdueGlow 1.8s ease-in-out infinite;
-  border-color:rgba(220,38,38,0.5) !important;
-  color:var(--red) !important;
-}
-.f-overdue.has-overdue .f-dot{
-  box-shadow:0 0 0 3px rgba(220,38,38,0.25);
-}
-.f-overdue.has-overdue .filter-count{
-  background:var(--red);color:#fff;
-}
-.filter-count{margin-left:auto;font-size:10px;font-weight:700;background:var(--surf3);color:var(--sub);padding:1px 6px;border-radius:20px;}
-.filter-btn.active .filter-count{background:rgba(0,0,0,0.10);color:inherit;}
-body.dark .filter-btn.active .filter-count{background:rgba(255,255,255,0.12);}
-
-/* OVERDUE GLOW — pulses when there are overdue tasks */
 @keyframes overdueGlow{
   0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,0);background:var(--surf2);}
   50%{box-shadow:0 0 0 4px rgba(220,38,38,0.18),0 0 14px rgba(220,38,38,0.22);background:var(--red-lt);}
@@ -168,6 +193,10 @@ body.dark @keyframes overdueGlow{
 }
 .f-overdue.has-overdue .f-dot{background:var(--red);animation:none;}
 .f-overdue.has-overdue .filter-count{background:var(--red);color:#fff;}
+
+.filter-count{margin-left:auto;font-size:10px;font-weight:700;background:var(--surf3);color:var(--sub);padding:1px 6px;border-radius:20px;}
+.filter-btn.active .filter-count{background:rgba(0,0,0,0.10);color:inherit;}
+body.dark .filter-btn.active .filter-count{background:rgba(255,255,255,0.12);}
 
 /* FEATURED */
 .featured-panel{flex:1;background:var(--surface);padding:12px 14px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;}
@@ -208,7 +237,7 @@ body.dark .note-card{background:rgba(245,166,35,0.07);border-color:rgba(245,166,
 .no-featured p{font-size:11px;}
 
 /* ALL TASK HEADER */
-.all-task-header{display:flex;align-items:center;padding:9px 16px;background:var(--surface);border-bottom:1px solid var(--border);border-top:1px solid var(--border);flex-shrink:0;gap:8px;position:sticky;top:57px;z-index:90;}
+.all-task-header{display:flex;align-items:center;padding:9px 16px;background:var(--surface);border-bottom:1px solid var(--border);border-top:1px solid var(--border);flex-shrink:0;gap:8px;}
 .all-task-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap;}
 .task-count-badge{background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
 .header-right{display:flex;align-items:center;gap:6px;margin-left:auto;}
@@ -349,7 +378,7 @@ textarea.form-control{resize:vertical;min-height:70px;}
 .btn-save{flex:2;background:var(--accent);border:none;border-radius:10px;padding:11px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;color:#fff;cursor:pointer;transition:opacity 0.15s;}
 .btn-save:hover{opacity:0.88;}
 
-/* ── ADMIN LOGIN MODAL ── */
+/* ADMIN LOGIN MODAL */
 .login-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:300;backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity 0.25s;}
 .login-overlay.open{opacity:1;pointer-events:all;}
 .login-modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px 28px 26px;width:calc(100% - 32px);max-width:380px;transform:scale(0.95) translateY(8px);transition:transform 0.25s ease,opacity 0.25s;box-shadow:0 20px 60px rgba(0,0,0,0.25);}
@@ -380,7 +409,7 @@ textarea.form-control{resize:vertical;min-height:70px;}
 .lb-close{position:absolute;top:20px;right:24px;background:none;border:none;color:#fff;font-size:26px;cursor:pointer;opacity:0.7;}
 .lb-close:hover{opacity:1;}
 
-/* ── DELETE CONFIRM MODAL ── */
+/* DELETE CONFIRM MODAL */
 .del-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:400;backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity 0.2s;}
 .del-overlay.open{opacity:1;pointer-events:all;}
 .del-modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px 26px 24px;width:calc(100% - 40px);max-width:320px;text-align:center;transform:scale(0.92) translateY(8px);transition:transform 0.22s ease;box-shadow:0 20px 60px rgba(0,0,0,0.22);}
@@ -407,23 +436,45 @@ input[type=file]{display:none;}
 <header class="topbar">
   <div class="logo">BSC<span>S1B</span></div>
   <div class="topbar-right">
-    <!-- Admin name tag (shown when logged in) -->
-    <div class="admin-tag" id="adminTag">
+    <!-- Admin name tag (kept for legacy, hidden) -->
+    <div class="admin-tag" id="adminTag" style="display:none!important;">
       <span id="adminTagIcon"></span>
       <span id="adminTagName"></span>
     </div>
 
+    <!-- Admin button: shows title+name when logged in -->
     <button class="role-btn admin" id="adminBtn" onclick="clickAdminBtn()">Admin</button>
-    <!-- This button is "User" normally, becomes "Logout" when admin is logged in -->
+    <!-- User button → becomes Logout when admin active -->
     <button class="role-btn user" id="userBtn" onclick="userBtnClick()">User</button>
-    <button class="icon-top" onclick="toggleTheme()" title="Theme" id="themeBtn">
-      <svg id="themeIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-    </button>
   </div>
 </header>
 
-<!-- DATE BAR -->
-<div class="date-bar" id="dateBar"></div>
+<!-- DATE BAR (with fullscreen left, dark mode right) -->
+<div class="date-bar" id="dateBar">
+  <!-- LEFT: Fullscreen -->
+  <div class="date-bar-side">
+    <button class="icon-bar" id="fullscreenBtn" onclick="toggleFullscreen()" title="Fullscreen">
+      <svg id="fsIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+        <path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+        <path d="M3 16v3a2 2 0 0 0 2 2h3"/>
+        <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- CENTER: Date -->
+  <div class="date-bar-center" id="dateBarText"></div>
+
+  <!-- RIGHT: Dark mode -->
+  <div class="date-bar-side right">
+    <button class="icon-bar" onclick="toggleTheme()" title="Toggle Theme" id="themeBtn">
+      <svg id="themeIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+  </div>
+</div>
 
 <!-- APP BODY -->
 <div class="app-body">
@@ -518,7 +569,7 @@ input[type=file]{display:none;}
   </div>
 </div>
 
-<!-- ── ADMIN LOGIN MODAL ── -->
+<!-- ADMIN LOGIN MODAL -->
 <div class="login-overlay" id="loginOverlay" onclick="handleLoginOverlay(event)">
   <div class="login-modal" id="loginModal">
     <div class="login-header">
@@ -559,7 +610,7 @@ input[type=file]{display:none;}
   <img id="lightboxImg" src="" alt=""/>
 </div>
 
-<!-- ── DELETE CONFIRM MODAL ── -->
+<!-- DELETE CONFIRM MODAL -->
 <div class="del-overlay" id="delOverlay">
   <div class="del-modal" id="delModal">
     <div class="del-icon">
@@ -576,7 +627,7 @@ input[type=file]{display:none;}
   </div>
 </div>
 
-<!-- ── ADD NOTE MODAL ── -->
+<!-- ADD NOTE MODAL -->
 <div class="overlay" id="noteOverlay" onclick="handleNoteOverlay(event)">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -622,78 +673,36 @@ const KEY='taskhub-v4';
 const NOTES_KEY='taskhub-notes-v1';
 const CAT_LABELS={quiz:'Quiz',project:'Project',assignment:'Assignment',exam:'Exam',study:'Study',review:'Review',output:'Output',online:'Online Class',other:'Other'};
 
-// ── VALID ADMIN CREDENTIALS ──
 const ADMINS=[
-  {username:'Francy',  password:'123BSCS1B'},
-  {username:'Carina',  password:'321BSCS1B'},
-  {username:'Kandiaru',password:'ONEABOVEALL'},
+  {username:'Francy',   password:'123BSCS1B'},
+  {username:'Carina',   password:'321BSCS1B'},
+  {username:'Kandiaru', password:'ONEABOVEALL'},
 ];
 
-let tasks=[], notes=[], editId=null, uploadTargetId=null;
-let activeFilter='all', currentRole='user', currentAdminName=null, isDark=false;
-
-// ─────────────────────────────────────────────
-//  DATA
-// ─────────────────────────────────────────────
-function load(){
-  try{const s=localStorage.getItem(KEY);if(s)tasks=JSON.parse(s);}catch(e){tasks=[];}
-  try{const n=localStorage.getItem(NOTES_KEY);if(n)notes=JSON.parse(n);}catch(e){notes=[];}
-  if(!tasks.length)seed();
-  pruneExpiredNotes();
-  renderAll();
-}
-function persist(){
-  try{localStorage.setItem(KEY,JSON.stringify(tasks));}catch(e){}
-  try{localStorage.setItem(NOTES_KEY,JSON.stringify(notes));}catch(e){}
-}
-function pruneExpiredNotes(){
-  const now=Date.now();
-  notes=notes.filter(n=>n.expiresAt>now);
-}
-function seed(){
-  const today=new Date();
-  const add=n=>{const d=new Date(today);d.setDate(d.getDate()+n);return d.toISOString().split('T')[0];};
-  tasks=[
-    {id:'1',name:'Ethics Essay Submission',category:'assignment',date:add(2),time:'23:59',done:false,notes:'Topic: AI in Education. Minimum 1500 words. Include at least 5 references in APA format.',images:[],_expanded:false,created:Date.now()-5000,createdBy:null},
-    {id:'2',name:'Discrete Math Quiz',category:'quiz',date:add(1),time:'10:00',done:false,notes:'Cover Chapters 4–6. Focus on proofs and set theory. Bring a scientific calculator.',images:[],_expanded:false,created:Date.now()-4000,createdBy:null},
-    {id:'3',name:'Group Project Slides',category:'project',date:add(5),time:'14:00',done:false,notes:'8 slides minimum. Submit on Google Classroom before the deadline. All group members must contribute.',images:[],_expanded:false,created:Date.now()-3000,createdBy:null},
-    {id:'4',name:'Pathfit Activity Output',category:'output',date:add(0),time:'08:00',done:true,notes:'Video output uploaded to the class portal.',images:[],_expanded:false,created:Date.now()-2000,createdBy:null},
-    {id:'5',name:'Calculus Problem Set',category:'assignment',date:add(-1),time:'23:59',done:false,notes:'Chapter 7, items 1–25. Show complete solutions with all steps.',images:[],_expanded:false,created:Date.now()-1000,createdBy:null},
-    {id:'6',name:'Midterm Exam Review',category:'exam',date:add(3),time:'09:00',done:false,notes:'Review all lecture notes from Week 1 to Week 8. Focus on formulas.',images:[],_expanded:false,created:Date.now()-500,createdBy:null},
-  ];
-  persist();
-}
-
-// ─────────────────────────────────────────────
-//  HELPERS
-// ─────────────────────────────────────────────
-//  ADMIN TITLES & ICONS
-// ─────────────────────────────────────────────
 const ADMIN_TITLES={
   Francy:  'P.I.O. Francy',
   Carina:  'Mayor Carina',
   Kandiaru:'Admin Kandiaru',
 };
+
+let tasks=[], notes=[], editId=null, uploadTargetId=null;
+let activeFilter='all', currentRole='user', currentAdminName=null, isDark=false;
+
+// ─────────────────────────────────────────────
+//  HELPERS
+// ─────────────────────────────────────────────
 function getAdminTitle(name){ return ADMIN_TITLES[name]||name; }
 
-// Returns menace SVG for Kandiaru, simple person for everyone else
 function getAdminIcon(name,size=10){
   if(name==='Kandiaru'){
-    // ViewBox 0 0 24 30 — top 10 = eyes (1/3), bottom 20 = mouth (2/3)
     return `<svg width="${size}" height="${size}" viewBox="0 0 24 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- LEFT EYE: slashed diamond -->
       <polygon points="3,6 5.5,1 8,6 5.5,9" fill="currentColor"/>
       <line x1="2" y1="2" x2="9" y2="8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-      <!-- RIGHT EYE: slashed diamond -->
       <polygon points="16,6 18.5,1 21,6 18.5,9" fill="currentColor"/>
       <line x1="15" y1="2" x2="22" y2="8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-      <!-- JAW FILL -->
       <path d="M 0,13 Q 5,9 12,9 Q 19,9 24,13 Q 22,30 12,30 Q 2,30 0,13 Z" fill="currentColor" opacity="0.13"/>
-      <!-- UPPER LIP arc -->
       <path d="M 0,13 Q 5,9 12,9 Q 19,9 24,13" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-      <!-- LOWER JAW arc -->
       <path d="M 0,13 Q 2,30 12,30 Q 22,30 24,13" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-      <!-- ZIGZAG UPPER TEETH — sharp serrated row from lip -->
       <polyline points="1,13 3,20 5,13 7,21 9,13 11,22.5 13,13 15,21 17,13 19,20 21,13 23,13"
         stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="miter" stroke-linecap="square"/>
     </svg>`;
@@ -722,19 +731,33 @@ function fmtDue(date,time){
 }
 
 // ─────────────────────────────────────────────
+//  DATA
+// ─────────────────────────────────────────────
+function load(){
+  try{const s=localStorage.getItem(KEY);if(s)tasks=JSON.parse(s);}catch(e){tasks=[];}
+  try{const n=localStorage.getItem(NOTES_KEY);if(n)notes=JSON.parse(n);}catch(e){notes=[];}
+  pruneExpiredNotes();
+  renderAll();
+}
+function persist(){
+  try{localStorage.setItem(KEY,JSON.stringify(tasks));}catch(e){}
+  try{localStorage.setItem(NOTES_KEY,JSON.stringify(notes));}catch(e){}
+}
+function pruneExpiredNotes(){
+  const now=Date.now();
+  notes=notes.filter(n=>n.expiresAt>now);
+}
+
+// ─────────────────────────────────────────────
 //  ROLE / AUTH
 // ─────────────────────────────────────────────
 function clickAdminBtn(){
-  if(currentRole==='admin')return; // already admin
+  if(currentRole==='admin')return;
   openLoginModal();
 }
 
-// The User button calls this — acts as User switcher OR Logout depending on state
 function userBtnClick(){
-  if(currentRole==='admin'){
-    logout();
-  }
-  // if already user, do nothing
+  if(currentRole==='admin') logout();
 }
 
 function logout(){
@@ -746,10 +769,27 @@ function logout(){
 
 function updateRoleUI(){
   const isAdmin=currentRole==='admin';
-  // Admin button: full opacity when active, faded when not
-  document.getElementById('adminBtn').style.opacity=isAdmin?'1':'0.4';
+  const adminBtn=document.getElementById('adminBtn');
 
-  // User button morphs into Logout when admin is active
+  if(isAdmin){
+    // Show title + name on the Admin button, icon + text
+    const title=getAdminTitle(currentAdminName);
+    const icon=getAdminIcon(currentAdminName,11);
+    adminBtn.innerHTML=`${icon}<span style="margin-left:4px;">${title}</span>`;
+    adminBtn.className='role-btn admin-active'+(currentAdminName==='Kandiaru'?' kandiaru-btn':'');
+    adminBtn.style.display='flex';
+    adminBtn.style.alignItems='center';
+    adminBtn.style.gap='4px';
+  } else {
+    adminBtn.innerHTML='Admin';
+    adminBtn.className='role-btn admin';
+    adminBtn.style.opacity='0.4';
+    adminBtn.style.display='';
+    adminBtn.style.alignItems='';
+    adminBtn.style.gap='';
+  }
+
+  // User button → Logout when admin active
   const userBtn=document.getElementById('userBtn');
   if(isAdmin){
     userBtn.textContent='Logout';
@@ -762,16 +802,9 @@ function updateRoleUI(){
 
   document.getElementById('addBtn').style.display=isAdmin?'block':'none';
   document.getElementById('addNoteBtn').classList.toggle('visible',isAdmin);
-
-  // admin name tag with dynamic icon + title
-  const tag=document.getElementById('adminTag');
-  tag.classList.toggle('visible',isAdmin);
-  tag.classList.toggle('kandiaru-glow',isAdmin&&currentAdminName==='Kandiaru');
-  document.getElementById('adminTagName').textContent=isAdmin?getAdminTitle(currentAdminName):'';
-  document.getElementById('adminTagIcon').innerHTML=isAdmin?getAdminIcon(currentAdminName,11):'';
 }
 
-// ── LOGIN MODAL ──
+// LOGIN MODAL
 function openLoginModal(){
   document.getElementById('loginUser').value='';
   document.getElementById('loginPass').value='';
@@ -808,6 +841,42 @@ function attemptLogin(){
 }
 
 // ─────────────────────────────────────────────
+//  FULLSCREEN
+// ─────────────────────────────────────────────
+function toggleFullscreen(){
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen().catch(()=>{});
+  } else {
+    document.exitFullscreen().catch(()=>{});
+  }
+}
+
+document.addEventListener('fullscreenchange',()=>{
+  const icon=document.getElementById('fsIcon');
+  if(document.fullscreenElement){
+    // Show compress/exit icon
+    icon.innerHTML=`<path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/>`;
+  } else {
+    // Show expand icon
+    icon.innerHTML=`<path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/>`;
+  }
+});
+
+// ─────────────────────────────────────────────
+//  THEME
+// ─────────────────────────────────────────────
+function toggleTheme(){
+  isDark=!isDark;
+  document.body.classList.toggle('dark',isDark);
+  const icon=document.getElementById('themeIcon');
+  if(isDark){
+    icon.innerHTML='<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+  } else {
+    icon.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  }
+}
+
+// ─────────────────────────────────────────────
 //  FILTER / SEARCH
 // ─────────────────────────────────────────────
 function setFilter(f){
@@ -821,18 +890,6 @@ function toggleSearch(){
   if(document.getElementById('searchBar').classList.contains('open'))
     setTimeout(()=>document.getElementById('searchInput').focus(),50);
 }
-function toggleTheme(){
-  isDark=!isDark;
-  document.body.classList.toggle('dark',isDark);
-  const icon=document.getElementById('themeIcon');
-  if(isDark){
-    // Show sun icon (currently dark, click to go light)
-    icon.innerHTML='<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-  } else {
-    // Show moon icon (currently light, click to go dark)
-    icon.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
-  }
-}
 
 // ─────────────────────────────────────────────
 //  RENDER
@@ -840,21 +897,23 @@ function toggleTheme(){
 function renderAll(){updateCounts();renderFeatured();renderTasks();}
 
 function updateCounts(){
-  document.getElementById('cnt-all').textContent    =tasks.length;
-  document.getElementById('cnt-today').textContent  =tasks.filter(t=>isToday(t)).length;
-  document.getElementById('cnt-soon').textContent   =tasks.filter(t=>isDueSoon(t)).length;
+  const setBadge=(id,val)=>{
+    const el=document.getElementById(id);
+    el.textContent=val;
+    el.style.display=val>0?'':'none';
+  };
+  setBadge('cnt-all',    tasks.length);
+  setBadge('cnt-today',  tasks.filter(t=>isToday(t)).length);
+  setBadge('cnt-soon',   tasks.filter(t=>isDueSoon(t)).length);
   const overdueCount=tasks.filter(t=>isOverdue(t)).length;
-  document.getElementById('cnt-overdue').textContent=overdueCount;
-  document.getElementById('cnt-done').textContent   =tasks.filter(t=>t.done).length;
-  // Glow the overdue button when there's at least 1 overdue task
-  document.querySelector('.f-overdue').classList.toggle('has-overdue', overdueCount>0);
+  setBadge('cnt-overdue',overdueCount);
+  setBadge('cnt-done',   tasks.filter(t=>t.done).length);
+  document.querySelector('.f-overdue').classList.toggle('has-overdue',overdueCount>0);
 }
 
 function renderFeatured(){
-  // Prune expired notes first
   pruneExpiredNotes();
 
-  // ── RENDER NOTES (top) ──
   const notesEl=document.getElementById('notesList');
   if(notes.length){
     let notesHTML=`<div class="feat-section-divider"><div class="feat-section-divider-line"></div><span class="feat-section-divider-label">📌 Notes (${notes.length})</span><div class="feat-section-divider-line"></div></div>`;
@@ -863,7 +922,6 @@ function renderFeatured(){
       const msLeft=n.expiresAt-now;
       const daysLeft=Math.ceil(msLeft/(1000*60*60*24));
       const expiryLabel=daysLeft<=1?'Expires today':`Expires in ${daysLeft}d`;
-      // Show delete btn only to the admin who wrote it
       const canDel=currentRole==='admin'&&currentAdminName===n.author;
       const delBtn=canDel
         ?`<button class="note-del-btn" onclick="deleteNote('${n.id}')" title="Delete note"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>`
@@ -883,7 +941,6 @@ function renderFeatured(){
     notesEl.innerHTML='';
   }
 
-  // ── RENDER FEATURED TASKS ──
   const el=document.getElementById('featuredList');
   const feat=tasks.filter(t=>!t.done&&(isOverdue(t)||isToday(t)||isDueSoon(t)))
     .sort((a,b)=>{
@@ -898,7 +955,6 @@ function renderFeatured(){
   }
   if(!feat.length){el.innerHTML='';return;}
 
-  // Group by status: overdue → today → soon
   const fOverdue=feat.filter(t=>isOverdue(t));
   const fToday=feat.filter(t=>isToday(t)&&!isOverdue(t));
   const fSoon=feat.filter(t=>isDueSoon(t));
@@ -934,7 +990,7 @@ function renderTasks(){
     if(search&&!t.name.toLowerCase().includes(search)&&!(t.notes||'').toLowerCase().includes(search))return false;
     return true;
   });
-  // Split: upcoming (not overdue, not done) → overdue → done
+
   const upcoming=list.filter(t=>!t.done&&!isOverdue(t)).sort((a,b)=>{
     const da=a.date?new Date(a.date+'T'+(a.time||'23:59')):new Date('9999');
     const db=b.date?new Date(b.date+'T'+(b.time||'23:59')):new Date('9999');
@@ -950,21 +1006,24 @@ function renderTasks(){
     const db=b.date?new Date(b.date+'T'+(b.time||'23:59')):new Date('9999');
     return da-db;
   });
-  document.getElementById('taskCountBadge').textContent=list.length;
+
+  const tb=document.getElementById('taskCountBadge');
+  tb.textContent=list.length;
+  tb.style.display=list.length>0?'':'none';
   const el=document.getElementById('taskArea');
+
   if(!list.length){
     el.innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 12h6M12 9v6"/></svg><h3>${tasks.length?'No tasks match':'Nothing here yet'}</h3><p>${tasks.length?'Try a different filter.':'Tap + to add your first task.'}</p></div>`;
     return;
   }
+
   let html=upcoming.map(t=>buildCard(t)).join('');
 
-  // Completed section
   if(done.length){
     html+=`<div class="done-divider"><div class="done-divider-line"></div><span class="done-divider-label">Completed (${done.length})</span><div class="done-divider-line"></div></div>`;
     html+=done.map(t=>buildCard(t)).join('');
   }
 
-  // Overdue section — below completed, red divider
   if(overdue.length){
     html+=`<div class="done-divider overdue-divider"><div class="done-divider-line" style="background:rgba(220,38,38,0.3)"></div><span class="done-divider-label" style="color:var(--red)">⚠ Overdue (${overdue.length})</span><div class="done-divider-line" style="background:rgba(220,38,38,0.3)"></div></div>`;
     html+=overdue.map(t=>buildCard(t)).join('');
@@ -984,14 +1043,12 @@ function buildCard(t){
   const notes=t.notes||'';
   const imgs=t.images||[];
 
-  // Determine status chip
   let statusChip='';
   if(t.done)                       statusChip=`<span class="status-chip done">Done</span>`;
   else if(over)                    statusChip=`<span class="status-chip overdue">Overdue</span>`;
   else if(tod)                     statusChip=`<span class="status-chip today">Today</span>`;
   else if(soon)                    statusChip=`<span class="status-chip soon">Soon</span>`;
 
-  // Creator byline — shown in footer left of View/Close
   const creatorChip=t.createdBy
     ? `<span class="footer-creator${t.createdBy==='Kandiaru'?' kandiaru-glow':''}">${getAdminIcon(t.createdBy,10)}${esc(getAdminTitle(t.createdBy))}</span>`
     : '';
@@ -999,7 +1056,6 @@ function buildCard(t){
   const imgHTML=imgs.map((src,i)=>`<div class="card-img-thumb" onclick="openLightbox('${t.id}',${i})"><img src="${esc(src)}" alt=""/></div>`).join('');
   const addImgBtn=currentRole==='admin'?`<button class="add-img-btn" onclick="triggerImgUpload('${t.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>`:'';
 
-  // COLLAPSED FOOTER
   let collapsedFooter;
   if(currentRole==='admin'){
     collapsedFooter=`<div class="card-footer">
@@ -1021,7 +1077,6 @@ function buildCard(t){
     </div>`;
   }
 
-  // EXPANDED FOOTER
   let expandedFooter;
   if(currentRole==='admin'){
     expandedFooter=`<div class="card-footer-exp">
@@ -1164,7 +1219,7 @@ function playCompletion(el,cb){
 }
 
 // ─────────────────────────────────────────────
-//  MODAL (admin only)
+//  MODAL
 // ─────────────────────────────────────────────
 function openModal(id){
   if(currentRole!=='admin')return;
@@ -1195,16 +1250,14 @@ function saveTask(){
   if(editId){
     const idx=tasks.findIndex(t=>t.id===editId);
     tasks[idx]={...tasks[idx],...data};
-    // update createdBy if editing (keep original creator)
   } else {
-    // NEW task — stamp the current admin's name
     tasks.push({
       id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),
       created:Date.now(),
       images:[],
       done:false,
       _expanded:false,
-      createdBy: currentAdminName,   // ← admin name saved here
+      createdBy: currentAdminName,
       ...data
     });
   }
@@ -1221,19 +1274,11 @@ function openNoteModal(){
   document.getElementById('noteOverlay').classList.add('open');
   setTimeout(()=>document.getElementById('nText').focus(),100);
 }
-function closeNoteModal(){
-  document.getElementById('noteOverlay').classList.remove('open');
-}
-function handleNoteOverlay(e){
-  if(e.target===document.getElementById('noteOverlay'))closeNoteModal();
-}
+function closeNoteModal(){document.getElementById('noteOverlay').classList.remove('open');}
+function handleNoteOverlay(e){if(e.target===document.getElementById('noteOverlay'))closeNoteModal();}
 function saveNote(){
   const text=document.getElementById('nText').value.trim();
-  if(!text){
-    document.getElementById('nText').style.borderColor='var(--red)';
-    document.getElementById('nText').focus();
-    return;
-  }
+  if(!text){document.getElementById('nText').style.borderColor='var(--red)';document.getElementById('nText').focus();return;}
   document.getElementById('nText').style.borderColor='';
   const days=parseInt(document.getElementById('nExpiry').value)||3;
   notes.push({
@@ -1243,14 +1288,11 @@ function saveNote(){
     createdAt:Date.now(),
     expiresAt:Date.now()+(days*24*60*60*1000)
   });
-  closeNoteModal();
-  persist();
-  renderFeatured();
+  closeNoteModal();persist();renderFeatured();
 }
 function deleteNote(id){
   notes=notes.filter(n=>n.id!==id);
-  persist();
-  renderFeatured();
+  persist();renderFeatured();
 }
 
 // ─────────────────────────────────────────────
@@ -1258,11 +1300,7 @@ function deleteNote(id){
 // ─────────────────────────────────────────────
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
-    closeModal();
-    closeLightbox();
-    closeLoginModal();
-    closeDelModal();
-    closeNoteModal();
+    closeModal();closeLightbox();closeLoginModal();closeDelModal();closeNoteModal();
   }
   if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){
     if(document.getElementById('overlay').classList.contains('open'))saveTask();
@@ -1272,11 +1310,10 @@ document.addEventListener('keydown',e=>{
 });
 
 // ─────────────────────────────────────────────
-//  INIT — default to USER on page load
+//  INIT
 // ─────────────────────────────────────────────
-document.getElementById('dateBar').innerHTML=`<span>${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</span>`;
+document.getElementById('dateBarText').innerHTML=`<span>${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</span>`;
 
-// Start as USER (page loads in user mode)
 currentRole='user';
 updateRoleUI();
 load();
