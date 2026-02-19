@@ -25,6 +25,10 @@
   --radius:  14px;
   --sidebar-w: 128px;
   --shadow:  0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.05);
+  /* Sticky layer heights */
+  --h-topbar:  57px;
+  --h-datebar: 43px;
+  --h-taskhdr: 40px;
 }
 body.dark {
   --bg:      #0f0f13;
@@ -62,52 +66,107 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .role-btn.logout{background:var(--red-lt);color:var(--red);border:1.5px solid var(--red);}
 .role-btn.logout:hover{background:var(--red);color:#fff;opacity:1;}
 
-/* ADMIN NAME TAG — kept but hidden visually (tag is now the button itself) */
-.admin-tag{font-size:11px;font-weight:700;color:var(--accent);background:var(--acc-lt);border:1px solid var(--accent);padding:4px 10px;border-radius:20px;display:none;align-items:center;gap:5px;}
-.admin-tag svg{width:11px;height:11px;}
-.admin-tag.visible{display:flex;}
-.admin-tag.kandiaru-glow{
-  color:#a78bfa;
+/* ADMIN TAG (hidden — button is the tag now) */
+.admin-tag{display:none!important;}
+
+/* ── GLOW KEYFRAME — Kandiaru purple ── */
+@keyframes glowKandiaru{
+  0%,100%{box-shadow:0 0 6px 1px rgba(139,92,246,0.32),0 0 16px 3px rgba(139,92,246,0.14);}
+  50%    {box-shadow:0 0 14px 5px rgba(139,92,246,0.58),0 0 32px 8px rgba(139,92,246,0.22);}
+}
+
+/* ── GLOW KEYFRAME — Amber/orange (Kandiaru inside notes only) ── */
+@keyframes glowAmber{
+  0%,100%{box-shadow:0 0 5px 1px rgba(196,122,10,0.38),0 0 14px 3px rgba(196,122,10,0.16);}
+  50%    {box-shadow:0 0 12px 4px rgba(196,122,10,0.65),0 0 26px 7px rgba(196,122,10,0.28);}
+}
+
+/* ── ADMIN BUTTON — base: purple bg white text (Francy, Carina) ── */
+.role-btn.admin-active{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  font-size:11px;
+  font-weight:700;
+  padding:6px 13px;
+  border-radius:20px;
+  border:none;
+  background:var(--accent);
+  color:#fff;
+  cursor:pointer;
+  white-space:nowrap;
+  max-width:180px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  transition:opacity 0.15s;
+}
+.role-btn.admin-active:hover{opacity:0.85;}
+
+/* ── KANDIARU admin button — purple glow ── */
+.role-btn.admin-active.admin-kandiaru{
   background:rgba(139,92,246,0.15);
-  border-color:#8b5cf6;
-  box-shadow:0 0 8px 2px rgba(139,92,246,0.35),0 0 20px 4px rgba(139,92,246,0.15);
-  animation:kandiGlow 2.2s ease-in-out infinite;
+  color:#a78bfa;
+  border:1.5px solid #8b5cf6;
+  animation:glowKandiaru 2.2s ease-in-out infinite;
 }
-@keyframes kandiGlow{
-  0%,100%{box-shadow:0 0 6px 1px rgba(139,92,246,0.3),0 0 14px 3px rgba(139,92,246,0.12);}
-  50%    {box-shadow:0 0 12px 4px rgba(139,92,246,0.55),0 0 28px 8px rgba(139,92,246,0.2);}
-}
-body.dark .admin-tag.kandiaru-glow{
-  color:#c4b5fd;
+body.dark .role-btn.admin-active.admin-kandiaru{
   background:rgba(139,92,246,0.2);
+  color:#c4b5fd;
   border-color:#a78bfa;
 }
 
-/* Kandiaru glow on admin button when active */
-.role-btn.admin-active.kandiaru-btn{
-  background: linear-gradient(135deg,#7c3aed,#5b52e8);
-  color:#fff;
-  box-shadow:0 0 8px 2px rgba(139,92,246,0.45),0 0 20px 4px rgba(139,92,246,0.2);
-  animation:kandiGlow 2.2s ease-in-out infinite;
+/* ── FOOTER CREATOR CHIP — base accent ── */
+.footer-creator{
+  font-size:10px;font-weight:700;letter-spacing:0.03em;
+  color:var(--accent);background:var(--acc-lt);
+  border:1px solid rgba(91,82,232,0.25);
+  padding:3px 9px;border-radius:20px;
+  display:inline-flex;align-items:center;gap:4px;
+  white-space:nowrap;flex-shrink:0;
+}
+.footer-creator svg{width:10px;height:10px;}
+
+/* Kandiaru footer chip — purple glow */
+.footer-creator.chip-kandiaru{
+  color:#a78bfa;background:rgba(139,92,246,0.13);border-color:#8b5cf6;
+  animation:glowKandiaru 2.2s ease-in-out infinite;
+}
+body.dark .footer-creator.chip-kandiaru{
+  color:#c4b5fd;background:rgba(139,92,246,0.2);border-color:#a78bfa;
+}
+/* Francy + Carina footer chips — plain accent, no glow */
+.footer-creator.chip-francy,
+.footer-creator.chip-carina{
+  color:var(--accent);background:var(--acc-lt);border-color:rgba(91,82,232,0.25);
 }
 
-/* footer creator chip */
-.footer-creator{font-size:10px;font-weight:700;letter-spacing:0.03em;color:var(--accent);background:var(--acc-lt);border:1px solid rgba(91,82,232,0.2);padding:4px 10px;border-radius:20px;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;}
-.footer-creator svg{width:10px;height:10px;opacity:0.7;}
-body.dark .footer-creator{border-color:rgba(108,99,255,0.3);}
+/* ── NOTE AUTHOR CHIP — all admins: amber/gold style ── */
+/* Base note-author is already amber from original CSS */
+/* Kandiaru inside notes: amber/orange GLOW */
+.note-author.chip-kandiaru{
+  color:var(--amber);
+  background:var(--amb-lt);
+  border:1px solid rgba(196,122,10,0.4);
+  animation:glowAmber 2.2s ease-in-out infinite;
+}
+body.dark .note-author.chip-kandiaru{
+  color:var(--amber);
+  background:var(--amb-lt);
+  border-color:rgba(245,166,35,0.45);
+}
+/* Francy + Carina inside notes: amber/gold static, no glow */
+.note-author.chip-francy,
+.note-author.chip-carina{
+  color:var(--amber);
+  background:var(--amb-lt);
+  border:1px solid rgba(196,122,10,0.3);
+}
 
-/* Shared Kandiaru glow */
+/* Legacy kandiaru-glow class */
 .kandiaru-glow{
-  color:#a78bfa !important;
-  background:rgba(139,92,246,0.15) !important;
-  border-color:#8b5cf6 !important;
-  box-shadow:0 0 8px 2px rgba(139,92,246,0.35),0 0 20px 4px rgba(139,92,246,0.15) !important;
-  animation:kandiGlow 2.2s ease-in-out infinite !important;
-}
-body.dark .kandiaru-glow{
-  color:#c4b5fd !important;
-  background:rgba(139,92,246,0.2) !important;
-  border-color:#a78bfa !important;
+  color:#a78bfa!important;background:rgba(139,92,246,0.13)!important;
+  border-color:#8b5cf6!important;
+  animation:glowKandiaru 2.2s ease-in-out infinite!important;
 }
 
 /* DATE BAR */
@@ -123,7 +182,7 @@ body.dark .kandiaru-glow{
   color:var(--sub);
   letter-spacing:0.05em;
   position:sticky;
-  top:57px;
+  top:var(--h-topbar);
   z-index:99;
 }
 .date-bar-center{
@@ -237,7 +296,17 @@ body.dark .note-card{background:rgba(245,166,35,0.07);border-color:rgba(245,166,
 .no-featured p{font-size:11px;}
 
 /* ALL TASK HEADER */
-.all-task-header{display:flex;align-items:center;padding:9px 16px;background:var(--surface);border-bottom:1px solid var(--border);border-top:1px solid var(--border);flex-shrink:0;gap:8px;}
+.all-task-header{
+  display:flex;align-items:center;
+  padding:9px 16px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  border-top:1px solid var(--border);
+  flex-shrink:0;gap:8px;
+  position:sticky;
+  top:calc(var(--h-topbar) + var(--h-datebar));
+  z-index:90;
+}
 .all-task-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap;}
 .task-count-badge{background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
 .header-right{display:flex;align-items:center;gap:6px;margin-left:auto;}
@@ -245,7 +314,15 @@ body.dark .note-card{background:rgba(245,166,35,0.07);border-color:rgba(245,166,
 .search-btn:hover{border-color:var(--accent);color:var(--accent);}
 .add-task-btn{font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.04em;padding:7px 14px;border-radius:20px;border:1.5px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
 .add-task-btn:hover{opacity:0.85;}
-.search-bar{display:none;padding:0 16px 10px;background:var(--surface);border-bottom:1px solid var(--border);}
+.search-bar{
+  display:none;
+  padding:0 16px 10px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:calc(var(--h-topbar) + var(--h-datebar) + var(--h-taskhdr));
+  z-index:89;
+}
 .search-bar.open{display:block;}
 .search-input{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color 0.15s;}
 .search-input:focus{border-color:var(--accent);}
@@ -358,10 +435,40 @@ body.dark .status-chip.today{background:rgba(234,107,14,0.18);color:#fb923c;}
 .completion-chk svg{width:22px;height:22px;stroke:#0f1a12;stroke-width:3;fill:none;}
 .conf-p{position:absolute;width:6px;height:6px;border-radius:50%;animation:confPop 0.65s ease forwards;pointer-events:none;z-index:9;}
 
-/* ADD/EDIT MODAL */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:flex-end;justify-content:center;z-index:200;backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity 0.2s;}
-.overlay.open{opacity:1;pointer-events:all;}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:22px 22px 30px;width:100%;max-width:520px;transform:translateY(40px);transition:transform 0.25s ease;max-height:92vh;overflow-y:auto;box-shadow:0 -8px 40px rgba(0,0,0,0.15);}
+/* ADD/EDIT MODAL — bottom sheet, keyboard-aware on mobile */
+.overlay{
+  position:fixed;
+  /* Use dvh so it respects the visual viewport (above keyboard) */
+  top:0; left:0; right:0;
+  bottom:0;
+  background:rgba(0,0,0,0);
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  z-index:200;
+  pointer-events:none;
+  transition:background 0.28s ease;
+}
+.overlay.open{
+  background:rgba(0,0,0,0.45);
+  pointer-events:all;
+  backdrop-filter:blur(5px);
+}
+.modal{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px 20px 0 0;
+  padding:22px 22px 36px;
+  width:100%;
+  max-width:520px;
+  transform:translateY(100%);
+  transition:transform 0.35s cubic-bezier(0.22,1,0.36,1);
+  /* Default max-height — JS will shrink this when keyboard opens */
+  max-height:92vh;
+  overflow-y:auto;
+  box-shadow:0 -12px 40px rgba(0,0,0,0.22);
+  will-change:transform;
+}
 .overlay.open .modal{transform:translateY(0);}
 .modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 18px;}
 .modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:18px;color:var(--text);}
@@ -710,6 +817,12 @@ function getAdminIcon(name,size=10){
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>`;
 }
 
+// Returns the CSS chip class for a given admin name
+function getAdminChipClass(name){
+  if(!name) return '';
+  return 'chip-'+name.toLowerCase();
+}
+
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function isOverdue(t){return t.date&&!t.done&&new Date(t.date+'T'+(t.time||'23:59'))<new Date();}
 function isToday(t){
@@ -772,21 +885,16 @@ function updateRoleUI(){
   const adminBtn=document.getElementById('adminBtn');
 
   if(isAdmin){
-    // Show title + name on the Admin button, icon + text
     const title=getAdminTitle(currentAdminName);
     const icon=getAdminIcon(currentAdminName,11);
     adminBtn.innerHTML=`${icon}<span style="margin-left:4px;">${title}</span>`;
-    adminBtn.className='role-btn admin-active'+(currentAdminName==='Kandiaru'?' kandiaru-btn':'');
-    adminBtn.style.display='flex';
-    adminBtn.style.alignItems='center';
-    adminBtn.style.gap='4px';
+    const nameClass='admin-'+currentAdminName.toLowerCase();
+    adminBtn.className=`role-btn admin-active ${nameClass}`;
+    adminBtn.style.opacity='1';
   } else {
     adminBtn.innerHTML='Admin';
     adminBtn.className='role-btn admin';
     adminBtn.style.opacity='0.4';
-    adminBtn.style.display='';
-    adminBtn.style.alignItems='';
-    adminBtn.style.gap='';
   }
 
   // User button → Logout when admin active
@@ -932,7 +1040,7 @@ function renderFeatured(){
           ${delBtn}
         </div>
         <div class="note-card-meta">
-          <span class="note-author${n.author==='Kandiaru'?' kandiaru-glow':''}">${getAdminIcon(n.author,9)}${esc(getAdminTitle(n.author))}</span>
+          <span class="note-author ${getAdminChipClass(n.author)}">${getAdminIcon(n.author,9)}${esc(getAdminTitle(n.author))}</span>
         </div>
       </div>`;
     }).join('');
@@ -1050,7 +1158,7 @@ function buildCard(t){
   else if(soon)                    statusChip=`<span class="status-chip soon">Soon</span>`;
 
   const creatorChip=t.createdBy
-    ? `<span class="footer-creator${t.createdBy==='Kandiaru'?' kandiaru-glow':''}">${getAdminIcon(t.createdBy,10)}${esc(getAdminTitle(t.createdBy))}</span>`
+    ? `<span class="footer-creator ${getAdminChipClass(t.createdBy)}">${getAdminIcon(t.createdBy,10)}${esc(getAdminTitle(t.createdBy))}</span>`
     : '';
 
   const imgHTML=imgs.map((src,i)=>`<div class="card-img-thumb" onclick="openLightbox('${t.id}',${i})"><img src="${esc(src)}" alt=""/></div>`).join('');
@@ -1308,6 +1416,82 @@ document.addEventListener('keydown',e=>{
     if(document.getElementById('noteOverlay').classList.contains('open'))saveNote();
   }
 });
+
+// ─────────────────────────────────────────────
+//  MOBILE KEYBOARD — keep modals above keyboard
+// ─────────────────────────────────────────────
+(function(){
+  // Overlays that contain a sliding .modal bottom sheet
+  const SHEET_OVERLAYS=['overlay','noteOverlay'];
+
+  function applyViewport(){
+    const vv=window.visualViewport;
+    if(!vv) return;
+
+    const vvHeight=vv.height;          // visible area height (shrinks when keyboard opens)
+    const vvOffsetTop=vv.offsetTop;    // how far down the visual viewport starts
+    const vvOffsetLeft=vv.offsetLeft;
+
+    SHEET_OVERLAYS.forEach(id=>{
+      const el=document.getElementById(id);
+      if(!el) return;
+      // Reposition overlay to match visual viewport exactly
+      el.style.top    = vvOffsetTop  + 'px';
+      el.style.left   = vvOffsetLeft + 'px';
+      el.style.right  = '0px';
+      el.style.height = vvHeight + 'px';
+      el.style.bottom = 'auto';
+
+      // Shrink modal max-height so it fits in visible area
+      const modal=el.querySelector('.modal');
+      if(modal){
+        // Reserve 10% headroom above the sheet so user sees page behind
+        modal.style.maxHeight = Math.floor(vvHeight * 0.9) + 'px';
+      }
+    });
+  }
+
+  function resetViewport(){
+    SHEET_OVERLAYS.forEach(id=>{
+      const el=document.getElementById(id);
+      if(!el) return;
+      el.style.top='0'; el.style.left='0';
+      el.style.right='0'; el.style.height='';
+      el.style.bottom='0';
+      const modal=el.querySelector('.modal');
+      if(modal) modal.style.maxHeight='';
+    });
+  }
+
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize', applyViewport);
+    window.visualViewport.addEventListener('scroll', applyViewport);
+  }
+
+  // Also reapply whenever a modal opens (keyboard may already be up)
+  const _openModal=window.openModal;
+  window.openModal=function(...args){
+    if(_openModal) _openModal(...args);
+    setTimeout(applyViewport, 50);
+  };
+  const _openNoteModal=window.openNoteModal;
+  window.openNoteModal=function(...args){
+    if(_openNoteModal) _openNoteModal(...args);
+    setTimeout(applyViewport, 50);
+  };
+
+  // Reset when modals close
+  const _closeModal=window.closeModal;
+  window.closeModal=function(...args){
+    if(_closeModal) _closeModal(...args);
+    resetViewport();
+  };
+  const _closeNoteModal=window.closeNoteModal;
+  window.closeNoteModal=function(...args){
+    if(_closeNoteModal) _closeNoteModal(...args);
+    resetViewport();
+  };
+})();
 
 // ─────────────────────────────────────────────
 //  INIT
