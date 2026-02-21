@@ -1,863 +1,1147 @@
-/* ══════════════════════════════════════════
-   TASK HUB — app.js
-   ══════════════════════════════════════════ */
+// ============================================================
+//  BSCS1B TaskHub — app.js
+//  Supabase backend + realtime sync
+//  ✅ Done state is LOCAL (per-device) — each user tracks their own
+// ============================================================
 
-// ── CONSTANTS & STATE ─────────────────────────────────────────
-const STORAGE_KEY      = 'taskhub-v2-tasks';
-const HIDDEN_CARDS_KEY = 'taskhub-v2-hidden';
-const ARCHIVE_KEY      = 'taskhub-v2-archive';
-const THEME_KEY        = 'taskhub-v2-theme';
+// ─── SUPABASE CONFIG ────────────────────────────────────────
+const SUPABASE_URL = 'https://znoveznysqwmolhftxfy.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpub3Zlem55c3F3bW9saGZ0eGZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MjM3MjQsImV4cCI6MjA4NzE5OTcyNH0.1jlJuRk-7vAVtEZFDvwdV2ZH3UkqUYwlyK-w2PSbl-A'; 
 
-let tasks        = [];
-let archivedTasks = [];
-let editId       = null;
-let activePeriod = 'twomonths';
-let hiddenCards  = new Set();
-let activeSortMode = 'due';  // due or do (default: due)
-let isFullscreen = false;
-let isDarkMode   = false;
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// ─── CONSTANTS ──────────────────────────────────────────────
 const CAT_LABELS = {
-  quiz:       'Quiz',
-  project:    'Project',
-  assignment: 'Assignment',
-  review:     'Review',
-  output:     'Output',
-  online:     'Online Appt.',
-  facetoface: 'Face-to-face',
-  other:      'Other',
+  quiz:'Quiz', project:'Project', assignment:'Assignment', exam:'Exam',
+  study:'Study', review:'Review', output:'Output', online:'Online Class',
+  other:'Other', info:'Info', fees:'Fees', suspension:'Suspension',
+  noclasses:'No Classes', event:'Event', fillup:'Fill Up', learning:'Learning Task'
 };
 
-const PRI_ORDER    = { high: 0, medium: 1, low: 2 };
-const STATUS_ORDER = { todo: 0, inprog: 1, done: 2 };
+const ADMINS = [
+  { username:'Francy',   password:'123BSCS1B' },
+  { username:'Carina',   password:'321BSCS1B' },
+  { username:'Kandiaru', password:'ONEABOVEALL' },
+];
 
+const ADMIN_TITLES = {
+  Francy:'P.I.O. Francy', Carina:'Mayor Carina', Kandiaru:'Admin Kandiaru',
+};
 
-// ══════════════════════════════════════════
-// STORAGE (using localStorage)
-// ══════════════════════════════════════════
+// ─── STATE ──────────────────────────────────────────────────
+let tasks = [], notes = [], editId = null, uploadTargetId = null;
+let activeFilter = 'all', currentRole = 'user', currentAdminName = null, isDark = false;
+let _statusCache = null;
+let _filterBtns = null;
+let _searchTimer = null;
+let pendingDeleteId = null;
+let _lbTaskId = null, _lbIdx = 0;
+let _realtimeChannel = null;
+let _isLoading = true;
 
-function loadTasks() {
+// ─── LOCAL DONE STATE ────────────────────────────────────────
+// Done state is stored per-device in localStorage.
+// Each user/device independently tracks what they've completed.
+const LOCAL_DONE_KEY = 'taskhub-done-v1';
+
+function getLocalDone() {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) tasks = JSON.parse(stored);
-  } catch (e) {
-    tasks = [];
+    const s = localStorage.getItem(LOCAL_DONE_KEY);
+    return s ? JSON.parse(s) : {};
+  } catch(e) { return {}; }
+}
+
+function setLocalDone(id, isDoneVal) {
+  const done = getLocalDone();
+  if (isDoneVal) {
+    done[id] = true;
+  } else {
+    delete done[id];
   }
+  try { localStorage.setItem(LOCAL_DONE_KEY, JSON.stringify(done)); } catch(e) {}
+}
 
+function applyLocalDone(taskList) {
+  const done = getLocalDone();
+  taskList.forEach(t => { t.done = !!done[t.id]; });
+  return taskList;
+}
+
+// ─── SYNC INDICATOR ─────────────────────────────────────────
+function setSyncStatus(status, label) {
+  const el = document.getElementById('syncIndicator');
+  const lb = document.getElementById('syncLabel');
+  if (!el || !lb) return;
+  el.className = 'sync-indicator ' + status;
+  lb.textContent = label;
+}
+
+// ─── SUPABASE: LOAD DATA ─────────────────────────────────────
+async function loadFromSupabase() {
+  setSyncStatus('syncing', 'Loading…');
   try {
-    const storedHidden = localStorage.getItem(HIDDEN_CARDS_KEY);
-    if (storedHidden) hiddenCards = new Set(JSON.parse(storedHidden));
-  } catch (e) {
-    hiddenCards = new Set();
+    const [{ data: taskData, error: tErr }, { data: noteData, error: nErr }] =
+      await Promise.all([
+        _sb.from('tasks').select('*').order('created_at', { ascending: true }),
+        _sb.from('notes').select('*').order('created_at', { ascending: true }),
+      ]);
+
+    if (tErr) throw tErr;
+    if (nErr) throw nErr;
+
+    tasks = applyLocalDone((taskData || []).map(dbToTask));
+    notes = (noteData || []).map(dbToNote);
+    pruneExpiredNotes();
+    _isLoading = false;
+    setSyncStatus('connected', 'Live');
+    renderAll();
+    subscribeRealtime();
+  } catch (err) {
+    console.error('Supabase load error:', err);
+    setSyncStatus('error', 'Offline');
+    _isLoading = false;
+    // Fallback to localStorage
+    loadFromLocalStorage();
+    renderAll();
   }
+}
 
-  try {
-    const storedArchive = localStorage.getItem(ARCHIVE_KEY);
-    if (storedArchive) archivedTasks = JSON.parse(storedArchive);
-  } catch (e) {
-    archivedTasks = [];
-  }
+// ─── SUPABASE: REALTIME ──────────────────────────────────────
+function subscribeRealtime() {
+  if (_realtimeChannel) _sb.removeChannel(_realtimeChannel);
 
-  try {
-    const storedTheme = localStorage.getItem(THEME_KEY);
-    if (storedTheme) {
-      isDarkMode = storedTheme === 'dark';
-      if (isDarkMode) {
-        document.body.classList.add('dark-mode');
-        updateThemeIcon();
-      }
+  _realtimeChannel = _sb
+    .channel('db-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, handleTaskChange)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'notes' }, handleNoteChange)
+    .subscribe((status) => {
+      if (status === 'SUBSCRIBED') setSyncStatus('connected', 'Live');
+      if (status === 'CLOSED' || status === 'CHANNEL_ERROR') setSyncStatus('error', 'Reconnecting…');
+    });
+}
+
+function handleTaskChange(payload) {
+  const { eventType, new: newRow, old: oldRow } = payload;
+  if (eventType === 'INSERT') {
+    if (!tasks.find(t => t.id === newRow.id)) {
+      const t = dbToTask(newRow);
+      // Preserve local done state for newly synced tasks
+      t.done = !!getLocalDone()[t.id];
+      tasks.push(t);
     }
-  } catch (e) {
-    isDarkMode = false;
+  } else if (eventType === 'UPDATE') {
+    const idx = tasks.findIndex(t => t.id === newRow.id);
+    if (idx !== -1) {
+      const expanded = tasks[idx]._expanded;
+      const localDone = tasks[idx].done; // preserve local done state
+      tasks[idx] = { ...dbToTask(newRow), _expanded: expanded, done: localDone };
+    }
+  } else if (eventType === 'DELETE') {
+    tasks = tasks.filter(t => t.id !== oldRow.id);
   }
+  _invalidateCache();
+  updateCounts();
+  renderFeatured();
+  renderTasks();
+}
 
+function handleNoteChange(payload) {
+  const { eventType, new: newRow, old: oldRow } = payload;
+  if (eventType === 'INSERT') {
+    if (!notes.find(n => n.id === newRow.id)) {
+      notes.push(dbToNote(newRow));
+    }
+  } else if (eventType === 'DELETE') {
+    notes = notes.filter(n => n.id !== oldRow.id);
+  }
+  pruneExpiredNotes();
+  renderFeatured();
+}
+
+// ─── DB ↔ APP MAPPERS ────────────────────────────────────────
+function dbToTask(row) {
+  return {
+    id:         row.id,
+    name:       row.name,
+    category:   row.category,
+    date:       row.date || '',
+    time:       row.time || '',
+    notes:      row.notes || '',
+    done:       false, // always start as not done; local done state applied separately
+    images:     Array.isArray(row.images) ? row.images : [],
+    createdBy:  row.created_by || null,
+    created:    row.created_at || Date.now(),
+    _expanded:  false,
+  };
+}
+
+function taskToDb(t) {
+  return {
+    id:         t.id,
+    name:       t.name,
+    category:   t.category,
+    date:       t.date || null,
+    time:       t.time || null,
+    notes:      t.notes || null,
+    // ✅ done is intentionally NOT saved to Supabase — it's per-device
+    images:     t.images || [],
+    created_by: t.createdBy || null,
+    created_at: t.created || Date.now(),
+  };
+}
+
+function dbToNote(row) {
+  return {
+    id:        row.id,
+    text:      row.text,
+    author:    row.author,
+    createdAt: row.created_at,
+    expiresAt: row.expires_at,
+  };
+}
+
+// ─── LOCAL STORAGE FALLBACK ──────────────────────────────────
+const LS_KEY = 'taskhub-v4';
+const LS_NOTES_KEY = 'taskhub-notes-v1';
+
+function loadFromLocalStorage() {
+  try { const s = localStorage.getItem(LS_KEY); if (s) tasks = JSON.parse(s); } catch(e) { tasks = []; }
+  try { const n = localStorage.getItem(LS_NOTES_KEY); if (n) notes = JSON.parse(n); } catch(e) { notes = []; }
+  // Still apply local done state even in offline mode
+  applyLocalDone(tasks);
+}
+
+function persistToLocalStorage() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(tasks)); } catch(e) {}
+  try { localStorage.setItem(LS_NOTES_KEY, JSON.stringify(notes)); } catch(e) {}
+}
+
+// ─── PERSIST (Supabase + localStorage backup) ────────────────
+async function persistTask(task, isNew = false) {
+  setSyncStatus('syncing', 'Saving…');
+  try {
+    if (isNew) {
+      const { error } = await _sb.from('tasks').insert(taskToDb(task));
+      if (error) throw error;
+    } else {
+      const { error } = await _sb.from('tasks').update(taskToDb(task)).eq('id', task.id);
+      if (error) throw error;
+    }
+    setSyncStatus('connected', 'Live');
+  } catch (err) {
+    console.error('Save task error:', err);
+    setSyncStatus('error', 'Sync failed');
+    persistToLocalStorage();
+  }
+}
+
+async function deleteTaskFromDb(id) {
+  // Also clean up local done state when a task is deleted
+  setLocalDone(id, false);
+  setSyncStatus('syncing', 'Deleting…');
+  try {
+    const { error } = await _sb.from('tasks').delete().eq('id', id);
+    if (error) throw error;
+    setSyncStatus('connected', 'Live');
+  } catch (err) {
+    console.error('Delete task error:', err);
+    setSyncStatus('error', 'Sync failed');
+    tasks = tasks.filter(t => t.id !== id);
+    persistToLocalStorage();
+    renderAll();
+  }
+}
+
+async function persistNote(note) {
+  setSyncStatus('syncing', 'Saving…');
+  try {
+    const { error } = await _sb.from('notes').insert({
+      id:         note.id,
+      text:       note.text,
+      author:     note.author,
+      created_at: note.createdAt,
+      expires_at: note.expiresAt,
+    });
+    if (error) throw error;
+    setSyncStatus('connected', 'Live');
+  } catch (err) {
+    console.error('Save note error:', err);
+    setSyncStatus('error', 'Sync failed');
+    persistToLocalStorage();
+  }
+}
+
+async function deleteNoteFromDb(id) {
+  try {
+    const { error } = await _sb.from('notes').delete().eq('id', id);
+    if (error) throw error;
+  } catch (err) {
+    console.error('Delete note error:', err);
+    notes = notes.filter(n => n.id !== id);
+    persistToLocalStorage();
+    renderFeatured();
+  }
+}
+
+// ─── STATUS CACHE ────────────────────────────────────────────
+function _invalidateCache() { _statusCache = null; }
+function _getStatus(t) {
+  if (!_statusCache) _buildCache();
+  return _statusCache.get(t.id) || { over:false, today:false, soon:false };
+}
+function _buildCache() {
+  _statusCache = new Map();
+  const now = new Date();
+  const todayY = now.getFullYear(), todayM = now.getMonth(), todayD = now.getDate();
+  const nowMs = now.getTime();
+  const nowDay = new Date(todayY, todayM, todayD).getTime();
+  tasks.forEach(t => {
+    if (!t.date) { _statusCache.set(t.id, { over:false, today:false, soon:false }); return; }
+    const dueMs = new Date(t.date + 'T' + (t.time || '23:59')).getTime();
+    const over = !t.done && dueMs < nowMs;
+    const due0 = new Date(t.date + 'T00:00');
+    const sameDay = !t.done && !over && due0.getFullYear() === todayY && due0.getMonth() === todayM && due0.getDate() === todayD;
+    let soon = false;
+    if (!t.done && !over && !sameDay) {
+      const dueDay = new Date(due0.getFullYear(), due0.getMonth(), due0.getDate()).getTime();
+      const diff = Math.round((dueDay - nowDay) / 86400000);
+      soon = diff >= 1 && diff <= 3;
+    }
+    _statusCache.set(t.id, { over, today:sameDay, soon });
+  });
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────
+function _getFilterBtns() {
+  if (!_filterBtns) _filterBtns = document.querySelectorAll('.filter-btn');
+  return _filterBtns;
+}
+function getAdminTitle(name) { return ADMIN_TITLES[name] || name; }
+function getAdminChipClass(name) { return name ? 'chip-' + name.toLowerCase() : ''; }
+
+function getAdminIcon(name, size = 10) {
+  if (name === 'Kandiaru') {
+    return `<svg width="${size}" height="${size}" viewBox="0 0 24 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="3,6 5.5,1 8,6 5.5,9" fill="currentColor"/>
+      <line x1="2" y1="2" x2="9" y2="8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      <polygon points="16,6 18.5,1 21,6 18.5,9" fill="currentColor"/>
+      <line x1="15" y1="2" x2="22" y2="8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M 0,13 Q 5,9 12,9 Q 19,9 24,13 Q 22,30 12,30 Q 2,30 0,13 Z" fill="currentColor" opacity="0.13"/>
+      <path d="M 0,13 Q 5,9 12,9 Q 19,9 24,13" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <path d="M 0,13 Q 2,30 12,30 Q 22,30 24,13" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <polyline points="1,13 3,20 5,13 7,21 9,13 11,22.5 13,13 15,21 17,13 19,20 21,13 23,13"
+        stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="miter" stroke-linecap="square"/>
+    </svg>`;
+  }
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>`;
+}
+
+function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function isOverdue(t) { return _getStatus(t).over; }
+function isToday(t) { return _getStatus(t).today; }
+function isDueSoon(t) { return _getStatus(t).soon; }
+
+function fmtDue(date, time) {
+  if (!date) return null;
+  const lbl = new Date(date + 'T00:00').toLocaleDateString('en-US', { month:'short', day:'numeric' });
+  if (!time) return lbl;
+  const [h, m] = time.split(':'); const hr = +h;
+  return `${lbl} ${(hr % 12) || 12}:${m}${hr >= 12 ? 'pm' : 'am'}`;
+}
+
+function pruneExpiredNotes() {
+  const now = Date.now();
+  notes = notes.filter(n => n.expiresAt > now);
+}
+
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+}
+
+// ─── ROLE / AUTH ─────────────────────────────────────────────
+function clickAdminBtn() { if (currentRole !== 'admin') openLoginModal(); }
+function userBtnClick() { if (currentRole === 'admin') openLogoutModal(); }
+
+function openLogoutModal() {
+  lockScroll();
+  document.getElementById('logoutOverlay').classList.add('open');
+}
+function closeLogoutModal() {
+  document.getElementById('logoutOverlay').classList.remove('open');
+  unlockScroll();
+}
+function confirmLogout() {
+  closeLogoutModal();
+  currentRole = 'user';
+  currentAdminName = null;
+  updateRoleUI();
   renderAll();
 }
 
-function persistTasks() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-  } catch (e) { 
-    console.error('Failed to save tasks:', e);
+function updateRoleUI() {
+  const isAdmin = currentRole === 'admin';
+  const adminBtn = document.getElementById('adminBtn');
+  if (isAdmin) {
+    const title = getAdminTitle(currentAdminName);
+    const icon = getAdminIcon(currentAdminName, 11);
+    adminBtn.innerHTML = `${icon}<span style="margin-left:4px;">${currentAdminName}</span>`;
+    adminBtn.className = `role-btn admin-active admin-${currentAdminName.toLowerCase()}`;
+    adminBtn.style.opacity = '1';
+  } else {
+    adminBtn.innerHTML = 'Admin';
+    adminBtn.className = 'role-btn admin';
+    adminBtn.style.opacity = '0.4';
   }
-  renderAll();
-}
-
-function persistHidden() {
-  try {
-    localStorage.setItem(HIDDEN_CARDS_KEY, JSON.stringify([...hiddenCards]));
-  } catch (e) { 
-    console.error('Failed to save hidden cards:', e);
+  const userBtn = document.getElementById('userBtn');
+  if (isAdmin) {
+    userBtn.textContent = 'Logout';
+    userBtn.className = 'role-btn logout';
+  } else {
+    userBtn.textContent = 'User';
+    userBtn.className = 'role-btn user';
+    userBtn.style.opacity = '1';
   }
-  applyHiddenCards();
+  document.getElementById('addBtn').style.display = isAdmin ? 'block' : 'none';
+  document.getElementById('addNoteBtn').classList.toggle('visible', isAdmin);
 }
 
-function persistArchive() {
-  try {
-    localStorage.setItem(ARCHIVE_KEY, JSON.stringify(archivedTasks));
-  } catch (e) {
-    console.error('Failed to save archive:', e);
+// ─── SCROLL LOCK ─────────────────────────────────────────────
+function lockScroll() { document.body.classList.add('modal-open'); }
+function unlockScroll() {
+  const anyOpen = ['overlay','noteOverlay','loginOverlay','delOverlay','lightbox','logoutOverlay','photoDelOverlay']
+    .some(id => { const el = document.getElementById(id); return el && el.classList.contains('open'); });
+  if (!anyOpen) document.body.classList.remove('modal-open');
+}
+
+// ─── LOGIN ───────────────────────────────────────────────────
+function openLoginModal() {
+  lockScroll();
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').classList.remove('show');
+  document.getElementById('loginOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('loginUser').focus(), 120);
+}
+function closeLoginModal() {
+  document.getElementById('loginOverlay').classList.remove('open');
+  unlockScroll();
+}
+function handleLoginOverlay(e) {
+  if (e.target === document.getElementById('loginOverlay')) closeLoginModal();
+}
+function attemptLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const match = ADMINS.find(a => a.username === u && a.password === p);
+  if (match) {
+    currentRole = 'admin';
+    currentAdminName = match.username;
+    closeLoginModal();
+    updateRoleUI();
+    renderAll();
+  } else {
+    const errEl = document.getElementById('loginError');
+    errEl.classList.add('show');
+    document.getElementById('loginErrorMsg').textContent = 'Invalid username or password.';
+    document.getElementById('loginModal').classList.add('shake');
+    setTimeout(() => document.getElementById('loginModal').classList.remove('shake'), 400);
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginPass').focus();
   }
 }
 
-function persistTheme() {
-  try {
-    localStorage.setItem(THEME_KEY, isDarkMode ? 'dark' : 'light');
-  } catch (e) {
-    console.error('Failed to save theme:', e);
-  }
-}
-
-
-// ══════════════════════════════════════════
-// FULLSCREEN FUNCTIONALITY
-// ══════════════════════════════════════════
-
-function isMobileDevice() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
-    || window.innerWidth <= 768;
-}
-
+// ─── FULLSCREEN ──────────────────────────────────────────────
 function toggleFullscreen() {
   if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen().catch(err => {
-      console.log('Fullscreen request failed:', err);
-    });
+    document.documentElement.requestFullscreen().catch(() => {});
   } else {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    }
+    document.exitFullscreen().catch(() => {});
   }
 }
-
-function updateFullscreenButton() {
-  const btn = document.getElementById('fullscreenBtn');
-  if (!btn) return;
-  
-  const icon = btn.querySelector('svg');
+document.addEventListener('fullscreenchange', () => {
+  const icon = document.getElementById('fsIcon');
   if (document.fullscreenElement) {
-    // Show exit fullscreen icon
-    icon.innerHTML = `<path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>`;
-    btn.title = 'Exit Fullscreen';
+    icon.innerHTML = `<path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/>`;
   } else {
-    // Show enter fullscreen icon
-    icon.innerHTML = `<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>`;
-    btn.title = 'Enter Fullscreen';
+    icon.innerHTML = `<path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/>`;
   }
-}
+});
 
-// Listen for fullscreen changes
-document.addEventListener('fullscreenchange', updateFullscreenButton);
-
-
-// ══════════════════════════════════════════
-// THEME TOGGLE
-// ══════════════════════════════════════════
-
+// ─── THEME ───────────────────────────────────────────────────
 function toggleTheme() {
-  isDarkMode = !isDarkMode;
-  document.body.classList.toggle('dark-mode', isDarkMode);
-  updateThemeIcon();
-  persistTheme();
-}
-
-function updateThemeIcon() {
-  const lightIcon = document.querySelector('.theme-icon-light');
-  const darkIcon = document.querySelector('.theme-icon-dark');
-  if (isDarkMode) {
-    lightIcon.style.display = 'none';
-    darkIcon.style.display = 'block';
+  isDark = !isDark;
+  document.body.classList.toggle('dark', isDark);
+  const icon = document.getElementById('themeIcon');
+  if (isDark) {
+    icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
   } else {
-    lightIcon.style.display = 'block';
-    darkIcon.style.display = 'none';
+    icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
   }
 }
 
-
-// ══════════════════════════════════════════
-// REFRESH PAGE
-// ══════════════════════════════════════════
-
-function refreshPage() {
-  location.reload();
+// ─── FILTER / SEARCH ─────────────────────────────────────────
+function setFilter(f) {
+  activeFilter = f;
+  _getFilterBtns().forEach(b => b.classList.remove('active'));
+  document.querySelector('.f-' + f).classList.add('active');
+  updateCounts();
+  renderTasks();
+}
+function toggleSearch() {
+  document.getElementById('searchBar').classList.toggle('open');
+  if (document.getElementById('searchBar').classList.contains('open'))
+    setTimeout(() => document.getElementById('searchInput').focus(), 50);
 }
 
+// ─── RENDER ──────────────────────────────────────────────────
+function renderAll() { _invalidateCache(); updateCounts(); renderFeatured(); renderTasks(); }
 
-// ══════════════════════════════════════════
-// EXPORT / IMPORT TASKS
-// ══════════════════════════════════════════
-
-function openDataModal() {
-  document.getElementById('dataOverlay').classList.add('open');
+function debouncedSearch() {
+  clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(renderTasks, 120);
 }
 
-function closeDataModal() {
-  document.getElementById('dataOverlay').classList.remove('open');
-}
-
-function handleDataOverlayClick(e) {
-  if (e.target === document.getElementById('dataOverlay')) closeDataModal();
-}
-
-function exportTasks() {
-  const data = {
-    tasks: tasks,
-    archivedTasks: archivedTasks,
-    exportDate: new Date().toISOString(),
-    version: 'v2'
+function updateCounts() {
+  _buildCache();
+  let cAll = 0, cToday = 0, cSoon = 0, cOver = 0, cDone = 0;
+  tasks.forEach(t => {
+    cAll++;
+    const s = _getStatus(t);
+    if (t.done) cDone++;
+    if (s.over) cOver++;
+    if (s.today) cToday++;
+    if (s.soon) cSoon++;
+  });
+  const setBadge = (id, val) => {
+    const el = document.getElementById(id);
+    el.textContent = val;
+    el.style.display = val > 0 ? '' : 'none';
   };
-  
-  const json = JSON.stringify(data, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `taskhub-backup-${new Date().toISOString().split('T')[0]}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-  
-  closeDataModal();
-  alert('Tasks exported successfully!');
+  setBadge('cnt-all', cAll);
+  setBadge('cnt-today', cToday);
+  setBadge('cnt-soon', cSoon);
+  setBadge('cnt-overdue', cOver);
+  setBadge('cnt-done', cDone);
+  document.querySelector('.f-overdue').classList.toggle('has-overdue', cOver > 0);
 }
 
-function importTasks() {
-  document.getElementById('importFile').click();
-}
-
-function importTasksFromFile(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target.result);
-      
-      if (!data.tasks) {
-        throw new Error('Invalid file format');
-      }
-      
-      if (confirm(`Import ${data.tasks.length} tasks? This will replace your current tasks.`)) {
-        tasks = data.tasks || [];
-        archivedTasks = data.archivedTasks || [];
-        persistTasks();
-        persistArchive();
-        closeDataModal();
-        alert('Tasks imported successfully!');
-      }
-    } catch (error) {
-      alert('Error importing tasks: ' + error.message);
-    }
-  };
-  reader.readAsText(file);
-  event.target.value = ''; // Reset file input
-}
-
-
-// ══════════════════════════════════════════
-// ARCHIVE
-// ══════════════════════════════════════════
-
-function openArchive() {
-  renderArchive();
-  document.getElementById('archiveOverlay').classList.add('open');
-}
-
-function closeArchive() {
-  document.getElementById('archiveOverlay').classList.remove('open');
-}
-
-function handleArchiveOverlayClick(e) {
-  if (e.target === document.getElementById('archiveOverlay')) closeArchive();
-}
-
-function renderArchive() {
-  const el = document.getElementById('archiveContent');
-  
-  if (!archivedTasks.length) {
-    el.innerHTML = `
-      <div class="empty-state">
-        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
-          <polyline points="21 8 21 21 3 21 3 8"/>
-          <rect x="1" y="3" width="22" height="5"/>
-          <line x1="10" y1="12" x2="14" y2="12"/>
-        </svg>
-        <h3>No archived tasks</h3>
-        <p>Deleted tasks will appear here.</p>
-      </div>`;
-    return;
-  }
-
-  el.innerHTML = archivedTasks.map(task => `
-    <div class="archive-task-card">
-      <div class="archive-task-info">
-        <div class="archive-task-name">${esc(task.name)}</div>
-        <div class="archive-task-meta">
-          <span class="badge cat-${task.category}">${CAT_LABELS[task.category]}</span>
-          ${task.date ? `<span class="archive-meta-text">Due: ${formatDue(task.date, task.time)}</span>` : ''}
+function renderFeatured() {
+  pruneExpiredNotes();
+  const notesEl = document.getElementById('notesList');
+  if (notes.length) {
+    let notesHTML = `<div class="feat-section-divider"><div class="feat-section-divider-line"></div><span class="feat-section-divider-label">📌 Notes (${notes.length})</span><div class="feat-section-divider-line"></div></div>`;
+    notesHTML += [...notes].reverse().map(n => {
+      const now = Date.now();
+      const msLeft = n.expiresAt - now;
+      const daysLeft = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
+      const expiryLabel = daysLeft <= 1 ? 'Expires today' : `Expires in ${daysLeft}d`;
+      const canDel = currentRole === 'admin' && currentAdminName === n.author;
+      const delBtn = canDel
+        ? `<button class="note-del-btn" onclick="deleteNote('${n.id}')" title="Delete note"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>`
+        : '';
+      return `<div class="note-card">
+        <div class="note-card-top"><div class="note-card-text">${esc(n.text)}</div>${delBtn}</div>
+        <div class="note-card-meta">
+          <span class="note-author ${getAdminChipClass(n.author)}">${getAdminIcon(n.author, 9)}${esc(getAdminTitle(n.author))}</span>
         </div>
-      </div>
-      <div class="archive-task-actions">
-        <button class="btn-restore" onclick="restoreTask('${task.id}')" title="Restore">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9 14 4 9 9 4"/>
-            <path d="M20 20v-7a4 4 0 0 0-4-4H4"/>
-          </svg>
-          Restore
-        </button>
-        <button class="btn-delete-permanent" onclick="deletePermanent('${task.id}')" title="Delete permanently">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="3 6 5 6 21 6"/>
-            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-            <path d="M10 11v6M14 11v6"/>
-          </svg>
-        </button>
-      </div>
-    </div>
-  `).join('');
-}
-
-function restoreTask(id) {
-  const idx = archivedTasks.findIndex(t => t.id === id);
-  if (idx === -1) return;
-  
-  const task = archivedTasks[idx];
-  tasks.push(task);
-  archivedTasks.splice(idx, 1);
-  
-  persistTasks();
-  persistArchive();
-  renderArchive();
-}
-
-function deletePermanent(id) {
-  if (!confirm('Permanently delete this task? This cannot be undone.')) return;
-  archivedTasks = archivedTasks.filter(t => t.id !== id);
-  persistArchive();
-  renderArchive();
-}
-
-
-// ══════════════════════════════════════════
-// PERIOD FILTER
-// ══════════════════════════════════════════
-
-function getPeriodRange(period) {
-  const now   = new Date();
-  const start = new Date(now);
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(now);
-  end.setHours(23, 59, 59, 999);
-
-  if (period === 'day') {
-    return { start, end, label: 'Today' };
+      </div>`;
+    }).join('');
+    notesEl.innerHTML = notesHTML;
+  } else {
+    notesEl.innerHTML = '';
   }
 
-  if (period === 'tomorrow') {
-    start.setDate(start.getDate() + 1);
-    end.setDate(end.getDate() + 1);
-    return {
-      start,
-      end,
-      label: start.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }),
-    };
-  }
-
-  if (period === 'week') {
-    const dayOfWeek = start.getDay();
-    start.setDate(start.getDate() - dayOfWeek);
-    end.setDate(end.getDate() + (6 - new Date().getDay()));
-    end.setHours(23, 59, 59, 999);
-    return {
-      start,
-      end,
-      label: formatShort(start) + ' – ' + formatShort(end),
-    };
-  }
-
-  if (period === 'month') {
-    start.setDate(1);
-    end.setMonth(end.getMonth() + 1, 0);
-    end.setHours(23, 59, 59, 999);
-    return {
-      start,
-      end,
-      label: now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-    };
-  }
-
-  if (period === 'twomonths') {
-    // Current month start
-    start.setDate(1);
-    // Next month end
-    end.setMonth(end.getMonth() + 2, 0);
-    end.setHours(23, 59, 59, 999);
-    const currentMonth = now.toLocaleDateString('en-US', { month: 'short' });
-    const nextMonthDate = new Date(now);
-    nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
-    const nextMonth = nextMonthDate.toLocaleDateString('en-US', { month: 'short' });
-    return {
-      start,
-      end,
-      label: currentMonth + ' – ' + nextMonth + ' ' + now.getFullYear(),
-    };
-  }
-
-  // all time
-  return { start: null, end: null, label: 'All time' };
-}
-
-function taskInPeriod(task) {
-  if (activePeriod === 'all') return true;
-  if (!task.date) return false;
-  const { start, end } = getPeriodRange(activePeriod);
-  const due = new Date(task.date + 'T' + (task.time || '00:00'));
-  return due >= start && due <= end;
-}
-
-function setPeriod(period) {
-  activePeriod = period;
-
-  document.querySelectorAll('.period-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.period === period);
-  });
-
-  const { label } = getPeriodRange(period);
-  
-  // Update the toggle button label
-  document.getElementById('periodToggleLabel').textContent = label;
-
-  renderAll();
-}
-
-
-// ══════════════════════════════════════════
-// HIDE / RESTORE STAT CARDS
-// ══════════════════════════════════════════
-
-function hideCard(id) {
-  hiddenCards.add(id);
-  persistHidden();
-}
-
-function restoreAllCards() {
-  hiddenCards.clear();
-  persistHidden();
-}
-
-function applyHiddenCards() {
-  const ids = ['total', 'todo', 'inprog', 'done', 'overdue'];
-
-  ids.forEach(id => {
-    const el = document.getElementById('card-' + id);
-    if (el) el.classList.toggle('hidden', hiddenCards.has(id));
-  });
-
-  const restoreBtn = document.getElementById('restoreBtn');
-  restoreBtn.classList.toggle('visible', hiddenCards.size > 0);
-}
-
-
-// ══════════════════════════════════════════
-// FILTER TOGGLE (MOBILE)
-// ══════════════════════════════════════════
-
-function toggleFilters() {
-  const filtersSection = document.getElementById('filtersSection');
-  const toggleBtn = document.getElementById('filterToggle');
-  filtersSection.classList.toggle('open');
-  toggleBtn.classList.toggle('active');
-}
-
-
-// ══════════════════════════════════════════
-// PERIOD TOGGLE
-// ══════════════════════════════════════════
-
-function togglePeriod() {
-  const periodContainer = document.getElementById('periodContainer');
-  const toggleBtn = document.getElementById('periodToggle');
-  const isVisible = periodContainer.style.display !== 'none';
-  
-  periodContainer.style.display = isVisible ? 'none' : 'flex';
-  toggleBtn.classList.toggle('expanded', !isVisible);
-  
-  // Update arrows
-  const arrows = toggleBtn.querySelectorAll('.toggle-arrow');
-  arrows.forEach(arrow => {
-    arrow.textContent = isVisible ? '▲' : '▼';
-  });
-}
-
-
-// ══════════════════════════════════════════
-// SORT MODE BUTTONS
-// ══════════════════════════════════════════
-
-function setSortMode(mode) {
-  activeSortMode = mode;
-  
-  // Update button states
-  document.querySelectorAll('.sort-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.sort === mode);
-  });
-  
-  renderTasks();
-}
-
-
-// ══════════════════════════════════════════
-// RENDER
-// ══════════════════════════════════════════
-
-function renderAll() {
-  const periodTasks = tasks.filter(taskInPeriod);
-  renderStats(periodTasks);
-  renderTasks();
-  applyHiddenCards();
-
-  const { label } = getPeriodRange(activePeriod);
-  document.getElementById('periodToggleLabel').textContent = label;
-  document.getElementById('summaryMeta').textContent =
-    periodTasks.length + ' task' + (periodTasks.length !== 1 ? 's' : '') + ' in this period';
-}
-
-function renderStats(periodTasks) {
-  document.getElementById('statTotal').textContent   = periodTasks.length;
-  document.getElementById('statTodo').textContent    = periodTasks.filter(t => t.status === 'todo').length;
-  document.getElementById('statInprog').textContent  = periodTasks.filter(t => t.status === 'inprog').length;
-  document.getElementById('statDone').textContent    = periodTasks.filter(t => t.status === 'done').length;
-  document.getElementById('statOverdue').textContent = periodTasks.filter(isOverdue).length;
-}
-
-function renderTasks() {
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  const fCat   = document.getElementById('filterCat').value;
-  const fSt    = document.getElementById('filterStatus').value;
-
-  let list = tasks.filter(task => {
-    if (!taskInPeriod(task))                          return false;
-    if (fCat && task.category !== fCat)               return false;
-    if (fSt  && task.status   !== fSt)                return false;
-    if (search &&
-        !task.name.toLowerCase().includes(search) &&
-        !(task.notes || '').toLowerCase().includes(search)) return false;
-    return true;
-  });
-
-  // Sort based on active sort mode (due or do)
-  if (activeSortMode === 'due') {
-    list.sort((a, b) => {
+  const el = document.getElementById('featuredList');
+  const feat = tasks
+    .filter(t => { if (t.done) return false; const s = _getStatus(t); return s.over || s.today || s.soon; })
+    .sort((a, b) => {
       const da = a.date ? new Date(a.date + 'T' + (a.time || '23:59')) : new Date('9999');
       const db = b.date ? new Date(b.date + 'T' + (b.time || '23:59')) : new Date('9999');
       return da - db;
     });
-  } else if (activeSortMode === 'do') {
-    list.sort((a, b) => {
-      const ta = a.targetDate ? new Date(a.targetDate + 'T' + (a.targetTime || '23:59')) : new Date('9999');
-      const tb = b.targetDate ? new Date(b.targetDate + 'T' + (b.targetTime || '23:59')) : new Date('9999');
-      return ta - tb;
-    });
+
+  const featBadge = document.getElementById('featCount');
+  if (featBadge) {
+    const totalFeatCount = feat.length + notes.length;
+    featBadge.textContent = totalFeatCount;
+    featBadge.style.display = totalFeatCount > 0 ? '' : 'none';
   }
 
-  const el = document.getElementById('taskList');
+  const featSlice = feat.slice(0, 4);
+  if (!feat.length && !notes.length) {
+    el.innerHTML = `<div class="no-featured"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><p>All caught up!</p></div>`;
+    return;
+  }
+  if (!feat.length) { el.innerHTML = ''; return; }
 
-  if (!list.length) {
-    el.innerHTML = `
-      <div class="empty-state">
-        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
-          <rect x="3" y="3" width="18" height="18" rx="3"/>
-          <path d="M9 12h6M12 9v6"/>
-        </svg>
-        <h3>${tasks.length ? 'No tasks in this period' : 'Nothing here yet'}</h3>
-        <p>${tasks.length
-          ? 'Try a different time range or clear your filters.'
-          : 'Click "+ Add Task" to get started.'}</p>
+  const fOverdue = featSlice.filter(t => _getStatus(t).over);
+  const fToday   = featSlice.filter(t => _getStatus(t).today);
+  const fSoon    = featSlice.filter(t => _getStatus(t).soon);
+
+  const buildFeatCards = (arr, labelText, labelColor) => {
+    if (!arr.length) return '';
+    let out = `<div class="feat-section-divider"><div class="feat-section-divider-line" style="background:${labelColor}33"></div><span class="feat-section-divider-label" style="color:${labelColor}">${labelText}</span><div class="feat-section-divider-line" style="background:${labelColor}33"></div></div>`;
+    out += arr.map(t => {
+      const due = fmtDue(t.date, t.time);
+      const s = _getStatus(t);
+      return `<div class="featured-card ${s.over ? 'urgent' : s.today ? 'soon' : ''}" onclick="expandCard('${t.id}')">
+        <div class="fc-top"><span class="fc-name">${esc(t.name)}</span><span class="badge cat-${t.category}">${CAT_LABELS[t.category]}</span></div>
+        <div class="fc-meta">${due ? `<span>${s.over ? '<span class="due-dot"></span>' : ''} ${esc(due)}</span>` : ''}</div>
       </div>`;
+    }).join('');
+    return out;
+  };
+
+  let html = '';
+  html += buildFeatCards(fOverdue, 'Overdue', '#dc2626');
+  html += buildFeatCards(fToday,   'Today',   '#ea6b0e');
+  html += buildFeatCards(fSoon,    'Soon',    '#c47a0a');
+  el.innerHTML = html;
+}
+
+function renderTasks() {
+  const el = document.getElementById('taskArea');
+
+  if (_isLoading) {
+    el.innerHTML = `<div class="loading-state"><div class="loading-spinner"></div><p style="font-size:13px;color:var(--sub);">Loading tasks…</p></div>`;
     return;
   }
 
-  el.innerHTML = list.map(buildTaskCardHTML).join('');
+  const search = (document.getElementById('searchInput').value || '').toLowerCase();
+  _buildCache();
+  let list = tasks.filter(t => {
+    const s = _getStatus(t);
+    if (activeFilter === 'done'    && !t.done) return false;
+    if (activeFilter === 'today'   && (!s.today || t.done)) return false;
+    if (activeFilter === 'soon'    && (!s.soon  || t.done)) return false;
+    if (activeFilter === 'overdue' && (!s.over  || t.done)) return false;
+    if (search && !t.name.toLowerCase().includes(search) && !(t.notes || '').toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  const sortByDate = (a, b) => {
+    const da = a.date ? new Date(a.date + 'T' + (a.time || '23:59')) : new Date('9999');
+    const db = b.date ? new Date(b.date + 'T' + (b.time || '23:59')) : new Date('9999');
+    return da - db;
+  };
+  const upcoming = list.filter(t => !t.done && !_getStatus(t).over).sort(sortByDate);
+  const overdue  = list.filter(t => !t.done &&  _getStatus(t).over).sort(sortByDate);
+  const done     = list.filter(t =>  t.done).sort(sortByDate);
+
+  const tb = document.getElementById('taskCountBadge');
+  tb.textContent = list.length;
+  tb.style.display = list.length > 0 ? '' : 'none';
+
+  if (!list.length) {
+    el.innerHTML = `<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 12h6M12 9v6"/></svg><h3>${tasks.length ? 'No tasks match' : 'Nothing here yet'}</h3><p>${tasks.length ? 'Try a different filter.' : 'Tap + to add your first task.'}</p></div>`;
+    return;
+  }
+
+  let html = upcoming.map(t => buildCard(t)).join('');
+  if (done.length) {
+    html += `<div class="done-divider"><div class="done-divider-line"></div><span class="done-divider-label">Completed (${done.length})</span><div class="done-divider-line"></div></div>`;
+    html += done.map(t => buildCard(t)).join('');
+  }
+  if (overdue.length) {
+    html += `<div class="done-divider overdue-divider"><div class="done-divider-line" style="background:rgba(220,38,38,0.3)"></div><span class="done-divider-label" style="color:var(--red)">⚠ Overdue (${overdue.length})</span><div class="done-divider-line" style="background:rgba(220,38,38,0.3)"></div></div>`;
+    html += overdue.map(t => buildCard(t)).join('');
+  }
+  el.innerHTML = html;
+  setTimeout(initStripNavs, 0);
 }
 
+// ─── BUILD CARD ──────────────────────────────────────────────
+function buildCard(t) {
+  const s = _getStatus(t);
+  const over = s.over, tod = s.today, soon = s.soon;
+  const due = fmtDue(t.date, t.time);
+  const notesText = t.notes || '';
+  const imgs = t.images || [];
 
-// ══════════════════════════════════════════
-// TASK CARD HTML
-// ══════════════════════════════════════════
+  let statusChip = '';
+  if (t.done)      statusChip = `<span class="status-chip done">Done</span>`;
+  else if (over)   statusChip = `<span class="status-chip overdue">Overdue</span>`;
+  else if (tod)    statusChip = `<span class="status-chip today">Today</span>`;
+  else if (soon)   statusChip = `<span class="status-chip soon">Soon</span>`;
 
-function buildTaskCardHTML(task) {
-  const over    = isOverdue(task);
-  const dueTxt  = formatDue(task.date, task.time);
-  const stLabel = { todo: 'To Do', inprog: 'In Progress', done: 'Done' }[task.status];
-
-  // Do Date: show only if different from due date
-  const doTxt      = formatDue(task.targetDate, task.targetTime);
-  const showDo     = doTxt && doTxt !== dueTxt;
-  const doOverdue  = task.targetDate && task.status !== 'done'
-    ? new Date(task.targetDate + 'T' + (task.targetTime || '23:59')) < new Date()
-    : false;
-
-  const dueMeta = dueTxt ? `
-    <span class="meta-item" style="${over ? 'color:var(--red)' : ''}">
-      ${over ? '<span class="overdue-dot"></span>' : ''}
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="3" y="4" width="18" height="18" rx="2"/>
-        <line x1="16" y1="2" x2="16" y2="6"/>
-        <line x1="8"  y1="2" x2="8"  y2="6"/>
-        <line x1="3"  y1="10" x2="21" y2="10"/>
-      </svg>
-      Due: ${esc(dueTxt)}${over ? ' &mdash; Overdue' : ''}
-    </span>` : '';
-
-  const doMeta = showDo ? `
-    <span class="meta-item" style="${doOverdue ? 'color:var(--red)' : ''}">
-      ${doOverdue ? '<span class="overdue-dot"></span>' : ''}
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"/>
-        <circle cx="12" cy="12" r="4"/>
-        <line x1="12" y1="2"  x2="12" y2="5"/>
-        <line x1="12" y1="19" x2="12" y2="22"/>
-        <line x1="2"  y1="12" x2="5"  y2="12"/>
-        <line x1="19" y1="12" x2="22" y2="12"/>
-      </svg>
-      Do: ${esc(doTxt)}${doOverdue ? ' &mdash; Overdue' : ''}
-    </span>` : '';
-
-  const noteHTML = task.notes
-    ? `<div class="task-notes">${esc(task.notes)}</div>`
+  const creatorChip = t.createdBy
+    ? `<span class="footer-creator ${getAdminChipClass(t.createdBy)}">${getAdminIcon(t.createdBy, 10)}${esc(getAdminTitle(t.createdBy))}</span>`
     : '';
 
+  const imgHTML = imgs.map((src, i) =>
+    `<div class="card-img-thumb" onclick="openLightbox('${t.id}',${i})"><img src="${esc(src)}" alt="" loading="lazy"/></div>`
+  ).join('');
+
+  const addImgBtn = currentRole === 'admin'
+    ? `<button class="add-img-btn" onclick="triggerImgUpload('${t.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>`
+    : '';
+
+  let collapsedFooter, expandedFooter;
+  if (currentRole === 'admin') {
+    const adminBtns = `
+      <button class="cfb-icon edit" onclick="event.stopPropagation();openModal('${t.id}')" title="Edit">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+      <button class="cfb-icon del" onclick="event.stopPropagation();deleteTask('${t.id}')" title="Delete">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </button>
+      <button class="cfb-icon copy" id="copy-c-${t.id}" onclick="event.stopPropagation();copyDesc('${t.id}','copy-c-${t.id}')" title="Copy description">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </button>`;
+    collapsedFooter = `<div class="card-footer">${adminBtns}<span class="cfb-spacer"></span>${creatorChip}<button class="cfb view" onclick="event.stopPropagation();expandCard('${t.id}')">View</button></div>`;
+    const adminBtnsExp = adminBtns.replace('copy-c-', 'copy-e-');
+    expandedFooter = `<div class="card-footer-exp">${adminBtnsExp}<span class="cfb-spacer"></span>${creatorChip}<button class="cfb view" onclick="event.stopPropagation();collapseCard('${t.id}')">Close</button></div>`;
+  } else {
+    const doneBtn = t.done
+      ? `<button class="cfb undo-done" onclick="event.stopPropagation();toggleDone('${t.id}')">↩ Undo</button>`
+      : `<button class="cfb mark-done" onclick="event.stopPropagation();toggleDone('${t.id}')">✓ Mark Done</button>`;
+    collapsedFooter = `<div class="card-footer">${doneBtn}<span class="cfb-spacer"></span>${creatorChip}<button class="cfb view" onclick="event.stopPropagation();expandCard('${t.id}')">View</button></div>`;
+    const doneBtnExp = t.done
+      ? `<button class="cfb undo-done" onclick="event.stopPropagation();toggleDone('${t.id}')">↩ Undo Done</button>`
+      : `<button class="cfb mark-done" onclick="event.stopPropagation();toggleDone('${t.id}')">✓ Mark Done</button>`;
+    expandedFooter = `<div class="card-footer-exp">${doneBtnExp}<span class="cfb-spacer"></span>${creatorChip}<button class="cfb view" onclick="event.stopPropagation();collapseCard('${t.id}')">Close</button></div>`;
+  }
+
   return `
-  <div class="task-card ${task.status === 'done' ? 'done-card' : ''}">
-
-    <div class="status-col">
-      <div class="status-dot ${task.status}"
-           title="Click to cycle status"
-           onclick="cycleStatus('${task.id}')"></div>
+  <div class="task-card ${t.done ? 'done-card' : ''} ${over && !t.done ? 'overdue-card' : ''} ${t._expanded ? 'expanded' : ''}" id="card-${t.id}" data-id="${t.id}">
+    <div class="card-top">
+      <div class="card-name">${esc(t.name)}</div>
+      <span class="badge cat-${t.category}">${CAT_LABELS[t.category] || t.category}</span>
     </div>
-
-    <div class="task-body">
-      <div class="task-top">
-        <span class="task-name">${esc(task.name)}</span>
-        <span class="badge cat-${task.category}">${CAT_LABELS[task.category]}</span>
-      </div>
-      <div class="task-meta">
-        ${dueMeta}
-        ${doMeta}
-      </div>
-      ${noteHTML}
+    ${due || statusChip ? `<div class="card-due-meta">${due ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>${esc(due)}</span>` : ''} ${statusChip}</div>` : ''}
+    <div class="card-desc-collapsed ${!notesText ? 'no-desc' : ''}" onclick="expandCard('${t.id}')">
+      ${esc(notesText) || 'No description — click to view.'}
     </div>
-
-    <div class="task-actions">
-      <button class="qs-btn qs-todo   ${task.status === 'todo'   ? 'active' : ''}"
-              onclick="setStatus('${task.id}', 'todo')"
-              title="Set To Do">Todo</button>
-      <button class="qs-btn qs-inprog ${task.status === 'inprog' ? 'active' : ''}"
-              onclick="setStatus('${task.id}', 'inprog')"
-              title="Set In Progress">In Progress</button>
-      <button class="qs-btn qs-done   ${task.status === 'done'   ? 'active' : ''}"
-              onclick="setStatus('${task.id}', 'done')"
-              title="Set Done">Done</button>
-
-      <button class="qs-btn-mobile qs-${task.status}"
-              onclick="cycleStatus('${task.id}')"
-              title="Click to change status">${stLabel}</button>
-
-      <div class="action-divider"></div>
-
-      <button class="icon-btn" title="Edit task" onclick="openModal('${task.id}')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-        </svg>
-      </button>
-      <button class="icon-btn del" title="Delete task" onclick="deleteTask('${task.id}')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="3 6 5 6 21 6"/>
-          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-          <path d="M10 11v6M14 11v6"/>
-          <path d="M9 6V4h6v2"/>
-        </svg>
-      </button>
+    ${collapsedFooter}
+    <div class="card-expanded-body">
+      <div class="card-desc-full">${esc(notesText) || '<em style="opacity:0.5">No description.</em>'}</div>
+      ${(imgHTML || addImgBtn) ? `<div class="card-images-wrap" id="imgwrap-${t.id}">
+        <button class="strip-nav prev" onclick="event.stopPropagation();stripScroll('${t.id}',-1)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <div class="card-images" id="imgstrip-${t.id}">${imgHTML}${addImgBtn}</div>
+        <button class="strip-nav next" onclick="event.stopPropagation();stripScroll('${t.id}',1)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
+      </div>` : ''}
+      ${expandedFooter}
     </div>
-
   </div>`;
 }
 
-
-// ══════════════════════════════════════════
-// TASK ACTIONS
-// ══════════════════════════════════════════
-
-function setStatus(id, status) {
-  const task = tasks.find(t => t.id === id);
-  if (!task) return;
-  task.status = status;
-  persistTasks();
+// ─── EXPAND / COLLAPSE ───────────────────────────────────────
+function expandCard(id) {
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  if (activeFilter !== 'all') {
+    const s = _getStatus(t);
+    const visible = (activeFilter === 'today' && s.today) || (activeFilter === 'soon' && s.soon) ||
+                    (activeFilter === 'overdue' && s.over) || (activeFilter === 'done' && t.done);
+    if (!visible) {
+      activeFilter = 'all';
+      _getFilterBtns().forEach(b => b.classList.remove('active'));
+      document.querySelector('.f-all').classList.add('active');
+    }
+  }
+  tasks.forEach(x => x._expanded = false);
+  t._expanded = true;
+  renderTasks();
+  setTimeout(() => {
+    const el = document.getElementById('card-' + id);
+    if (!el) return;
+    const topbar  = document.querySelector('.topbar')?.offsetHeight || 57;
+    const datebar = document.querySelector('.date-bar')?.offsetHeight || 43;
+    const taskhdr = document.querySelector('.all-task-header')?.offsetHeight || 44;
+    const offset  = topbar + datebar + taskhdr + 8;
+    const top = el.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }, 60);
 }
 
-function cycleStatus(id) {
-  const task = tasks.find(t => t.id === id);
-  if (!task) return;
-  const cycle = { todo: 'inprog', inprog: 'done', done: 'todo' };
-  task.status = cycle[task.status];
-  persistTasks();
+function collapseCard(id) {
+  const t = tasks.find(x => x.id === id);
+  if (t) t._expanded = false;
+  renderTasks();
 }
 
+// ─── COPY & TOGGLE DONE ──────────────────────────────────────
+function copyDesc(id, btnId) {
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  const text = (t.notes || '').trim() || t.name;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    const orig = btn.innerHTML;
+    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+    btn.classList.add('copied');
+    setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 1500);
+  }).catch(() => {});
+}
+
+async function toggleDone(id) {
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  if (!t.done) {
+    const card = document.getElementById('card-' + id);
+    playCompletion(card, () => {
+      t.done = true;
+      setLocalDone(id, true);   // ✅ Save to localStorage only — NOT Supabase
+      renderAll();
+    });
+  } else {
+    t.done = false;
+    setLocalDone(id, false);    // ✅ Remove from localStorage only
+    renderAll();
+  }
+}
+
+// ─── DELETE TASK ─────────────────────────────────────────────
 function deleteTask(id) {
-  if (!confirm('Move this task to archive?')) return;
-  const idx = tasks.findIndex(t => t.id === id);
-  if (idx === -1) return;
-  
-  const task = tasks[idx];
-  archivedTasks.push(task);
-  tasks.splice(idx, 1);
-  
-  persistTasks();
-  persistArchive();
+  if (currentRole !== 'admin') return;
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  lockScroll();
+  pendingDeleteId = id;
+  document.getElementById('delSubText').textContent = `"${t.name}" will be permanently removed.`;
+  document.getElementById('delOverlay').classList.add('open');
 }
 
+async function confirmDelete() {
+  if (!pendingDeleteId) return;
+  const id = pendingDeleteId;
+  tasks = tasks.filter(t => t.id !== id);
+  pendingDeleteId = null;
+  closeDelModal();
+  renderAll();
+  await deleteTaskFromDb(id);
+}
 
-// ══════════════════════════════════════════
-// MODAL
-// ══════════════════════════════════════════
+function closeDelModal() {
+  document.getElementById('delOverlay').classList.remove('open');
+  pendingDeleteId = null;
+  unlockScroll();
+}
 
+// ─── IMAGES ──────────────────────────────────────────────────
+function triggerImgUpload(id) { uploadTargetId = id; document.getElementById('imgUpload').click(); }
+
+function stripScroll(id, dir) {
+  const strip = document.getElementById('imgstrip-' + id);
+  if (!strip) return;
+  strip.scrollBy({ left: dir * 180, behavior: 'smooth' });
+  setTimeout(() => stripUpdateNav(id), 320);
+}
+function stripUpdateNav(id) {
+  const strip = document.getElementById('imgstrip-' + id);
+  const wrap  = document.getElementById('imgwrap-' + id);
+  if (!strip || !wrap) return;
+  const prev = wrap.querySelector('.strip-nav.prev');
+  const next = wrap.querySelector('.strip-nav.next');
+  if (prev) prev.classList.toggle('hidden', strip.scrollLeft <= 4);
+  if (next) next.classList.toggle('hidden', strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 4);
+}
+function initStripNavs() {
+  document.querySelectorAll('[id^="imgstrip-"]').forEach(strip => {
+    const id = strip.id.replace('imgstrip-', '');
+    stripUpdateNav(id);
+    strip.addEventListener('scroll', () => stripUpdateNav(id), { passive: true });
+  });
+}
+
+async function handleImgUpload(e) {
+  const files = [...e.target.files];
+  const t = tasks.find(x => x.id === uploadTargetId);
+  if (!t) return;
+  if (!t.images) t.images = [];
+  let loaded = 0;
+  files.forEach(f => {
+    const reader = new FileReader();
+    reader.onload = async ev => {
+      t.images.push(ev.target.result);
+      loaded++;
+      if (loaded === files.length) {
+        renderTasks();
+        await persistTask(t, false);
+      }
+    };
+    reader.readAsDataURL(f);
+  });
+  e.target.value = '';
+}
+
+// ─── LIGHTBOX ────────────────────────────────────────────────
+function openLightbox(id, idx) {
+  const t = tasks.find(x => x.id === id);
+  if (!t || !t.images[idx]) return;
+  lockScroll();
+  _lbTaskId = id; _lbIdx = idx;
+  _lbUpdate();
+  document.getElementById('lightbox').classList.add('open');
+}
+function _lbUpdate() {
+  const t = tasks.find(x => x.id === _lbTaskId);
+  if (!t) return;
+  const imgs = t.images || [];
+  document.getElementById('lightboxImg').src = imgs[_lbIdx] || '';
+  const ctr = document.getElementById('lbCounter');
+  ctr.textContent = imgs.length > 1 ? `${_lbIdx + 1} / ${imgs.length}` : '';
+  document.getElementById('lbPrev').style.display = imgs.length > 1 ? 'flex' : 'none';
+  document.getElementById('lbNext').style.display = imgs.length > 1 ? 'flex' : 'none';
+  const wrap = document.getElementById('lbDelWrap');
+  wrap.className = 'lb-del-wrap' + (currentRole === 'admin' ? ' admin-visible' : '');
+}
+function lbNav(dir) {
+  const t = tasks.find(x => x.id === _lbTaskId);
+  if (!t) return;
+  const total = (t.images || []).length;
+  _lbIdx = (_lbIdx + dir + total) % total;
+  _lbUpdate();
+}
+function lbDeleteImg() {
+  lockScroll();
+  document.getElementById('photoDelOverlay').classList.add('open');
+}
+function closePhotoDelModal() {
+  document.getElementById('photoDelOverlay').classList.remove('open');
+  unlockScroll();
+}
+async function confirmPhotoDelete() {
+  closePhotoDelModal();
+  const t = tasks.find(x => x.id === _lbTaskId);
+  if (!t) return;
+  t.images.splice(_lbIdx, 1);
+  if (t.images.length === 0) { closeLightbox(); renderTasks(); }
+  else { _lbIdx = Math.min(_lbIdx, t.images.length - 1); _lbUpdate(); renderTasks(); }
+  await persistTask(t, false);
+}
+function handleLightboxClick(e) {
+  if (e.target === document.getElementById('lightbox') || e.target === document.getElementById('lightboxImg'))
+    closeLightbox();
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  unlockScroll();
+  _lbTaskId = null;
+}
+
+// ─── COMPLETION ANIMATION ────────────────────────────────────
+function playCompletion(el, cb) {
+  if (!el) { cb(); return; }
+  el.classList.add('task-completing');
+  const chk = document.createElement('div');
+  chk.className = 'completion-chk';
+  chk.innerHTML = `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`;
+  el.appendChild(chk);
+  const cols = ['var(--green)', 'var(--amber)', 'var(--accent)', 'var(--red)'];
+  for (let i = 0; i < 7; i++) {
+    const p = document.createElement('div');
+    p.className = 'conf-p';
+    p.style.background = cols[Math.floor(Math.random() * cols.length)];
+    p.style.left = `${50 + (Math.random() - .5) * 60}%`;
+    p.style.top = '50%';
+    el.appendChild(p);
+  }
+  setTimeout(() => {
+    chk.remove();
+    el.querySelectorAll('.conf-p').forEach(p => p.remove());
+    el.classList.remove('task-completing');
+    cb();
+  }, 580);
+}
+
+// ─── ADD/EDIT MODAL ──────────────────────────────────────────
 function openModal(id) {
+  if (currentRole !== 'admin') return;
+  lockScroll();
   editId = id || null;
   document.getElementById('modalTitle').textContent = editId ? 'Edit Task' : 'Add Task';
-
   if (editId) {
-    const task = tasks.find(t => t.id === editId);
-    document.getElementById('fName').value       = task.name;
-    document.getElementById('fCat').value        = task.category;
-    document.getElementById('fDate').value       = task.date        || '';
-    document.getElementById('fTime').value       = task.time        || '';
-    document.getElementById('fTargetDate').value = task.targetDate  || '';
-    document.getElementById('fTargetTime').value = task.targetTime  || '';
-    document.getElementById('fStatus').value     = task.status;
-    document.getElementById('fNotes').value      = task.notes       || '';
+    const t = tasks.find(x => x.id === editId);
+    document.getElementById('fName').value  = t.name;
+    document.getElementById('fCat').value   = t.category;
+    document.getElementById('fDate').value  = t.date || '';
+    document.getElementById('fTime').value  = t.time || '';
+    document.getElementById('fNotes').value = t.notes || '';
   } else {
-    ['fName', 'fDate', 'fTime', 'fTargetDate', 'fTargetTime', 'fNotes'].forEach(id => {
-      document.getElementById(id).value = '';
-    });
-    document.getElementById('fCat').value    = 'quiz';
-    document.getElementById('fStatus').value = 'todo';
+    ['fName','fDate','fTime','fNotes'].forEach(i => document.getElementById(i).value = '');
+    document.getElementById('fCat').value = 'quiz';
   }
-
-  document.getElementById('modalOverlay').classList.add('open');
-  setTimeout(() => document.getElementById('fName').focus(), 120);
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(() => document.getElementById('fName').focus(), 100);
 }
-
 function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
   editId = null;
+  unlockScroll();
 }
+function handleOverlay(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
 
-function handleOverlayClick(e) {
-  if (e.target === document.getElementById('modalOverlay')) closeModal();
-}
-
-function saveTask() {
-  const nameInput = document.getElementById('fName');
-  const name = nameInput.value.trim();
-
+async function saveTask() {
+  const name = document.getElementById('fName').value.trim();
   if (!name) {
-    nameInput.style.borderColor = 'var(--red)';
-    nameInput.focus();
+    document.getElementById('fName').style.borderColor = 'var(--red)';
+    document.getElementById('fName').focus();
     return;
   }
-  nameInput.style.borderColor = '';
+  document.getElementById('fName').style.borderColor = '';
 
   const data = {
     name,
-    category:   document.getElementById('fCat').value,
-    date:       document.getElementById('fDate').value,
-    time:       document.getElementById('fTime').value,
-    targetDate: document.getElementById('fTargetDate').value,
-    targetTime: document.getElementById('fTargetTime').value,
-    status:     document.getElementById('fStatus').value,
-    notes:      document.getElementById('fNotes').value.trim(),
+    category: document.getElementById('fCat').value,
+    date:     document.getElementById('fDate').value,
+    time:     document.getElementById('fTime').value,
+    notes:    document.getElementById('fNotes').value.trim(),
   };
+
+  let isNew = false;
+  let taskObj;
 
   if (editId) {
     const idx = tasks.findIndex(t => t.id === editId);
     tasks[idx] = { ...tasks[idx], ...data };
+    taskObj = tasks[idx];
   } else {
-    tasks.push({
-      id:      Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      created: Date.now(),
+    isNew = true;
+    taskObj = {
+      id:        genId(),
+      created:   Date.now(),
+      images:    [],
+      done:      false,
+      _expanded: false,
+      createdBy: currentAdminName,
       ...data,
-    });
+    };
+    tasks.push(taskObj);
   }
 
   closeModal();
-  persistTasks();
+  renderAll();
+  await persistTask(taskObj, isNew);
 }
 
+// ─── NOTES ───────────────────────────────────────────────────
+function openNoteModal() {
+  if (currentRole !== 'admin') return;
+  lockScroll();
+  document.getElementById('nText').value = '';
+  document.getElementById('nExpiry').value = '3';
+  document.getElementById('noteOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('nText').focus(), 100);
+}
+function closeNoteModal() {
+  document.getElementById('noteOverlay').classList.remove('open');
+  unlockScroll();
+}
+function handleNoteOverlay(e) { if (e.target === document.getElementById('noteOverlay')) closeNoteModal(); }
 
-// ══════════════════════════════════════════
-// UTILITY HELPERS
-// ══════════════════════════════════════════
-
-function isOverdue(task) {
-  if (!task.date || task.status === 'done') return false;
-  return new Date(task.date + 'T' + (task.time || '23:59')) < new Date();
+async function saveNote() {
+  const text = document.getElementById('nText').value.trim();
+  if (!text) {
+    document.getElementById('nText').style.borderColor = 'var(--red)';
+    document.getElementById('nText').focus();
+    return;
+  }
+  document.getElementById('nText').style.borderColor = '';
+  const days = parseInt(document.getElementById('nExpiry').value) || 3;
+  const note = {
+    id:        genId(),
+    text,
+    author:    currentAdminName,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + (days * 24 * 60 * 60 * 1000),
+  };
+  notes.push(note);
+  closeNoteModal();
+  renderFeatured();
+  await persistNote(note);
 }
 
-function formatDue(date, time) {
-  if (!date) return null;
-  const label = new Date(date + 'T00:00').toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-  });
-  if (!time) return label;
-  const [h, m] = time.split(':');
-  const hr   = +h;
-  const ampm = hr >= 12 ? 'PM' : 'AM';
-  return label + ' at ' + ((hr % 12) || 12) + ':' + m + ' ' + ampm;
+async function deleteNote(id) {
+  notes = notes.filter(n => n.id !== id);
+  renderFeatured();
+  await deleteNoteFromDb(id);
 }
 
-function formatShort(date) {
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}
-
-function esc(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-function setDateLabel() {
-  const dateText = new Date().toLocaleDateString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-  });
-  document.getElementById('dateLabelInline').textContent = dateText;
-}
-
-
-// ══════════════════════════════════════════
-// KEYBOARD SHORTCUTS
-// ══════════════════════════════════════════
-
+// ─── KEYBOARD SHORTCUTS ──────────────────────────────────────
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape')                         closeModal();
-  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') saveTask();
+  if (e.key === 'Escape') {
+    closeModal(); closeLightbox(); closeLoginModal();
+    closeDelModal(); closeNoteModal(); closeLogoutModal(); closePhotoDelModal();
+  }
+  if (document.getElementById('lightbox').classList.contains('open')) {
+    if (e.key === 'ArrowLeft')  lbNav(-1);
+    if (e.key === 'ArrowRight') lbNav(+1);
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    if (document.getElementById('overlay').classList.contains('open'))      saveTask();
+    if (document.getElementById('loginOverlay').classList.contains('open')) attemptLogin();
+    if (document.getElementById('noteOverlay').classList.contains('open'))  saveNote();
+  }
 });
 
-
-// ══════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════
-
-setDateLabel();
-loadTasks();
-
-// Auto-fullscreen on mobile devices
-if (isMobileDevice()) {
-  setTimeout(() => {
-    document.documentElement.requestFullscreen().catch(err => {
-      console.log('Auto-fullscreen failed:', err);
+// ─── MOBILE KEYBOARD ─────────────────────────────────────────
+(function () {
+  const SHEET_OVERLAYS = ['overlay', 'noteOverlay'];
+  function applyViewport() {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    SHEET_OVERLAYS.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.top = vv.offsetTop + 'px'; el.style.left = vv.offsetLeft + 'px';
+      el.style.right = '0px'; el.style.height = vv.height + 'px'; el.style.bottom = 'auto';
+      const modal = el.querySelector('.modal');
+      if (modal) modal.style.maxHeight = Math.floor(vv.height * 0.9) + 'px';
     });
-  }, 500);
-}
+  }
+  function resetViewport() {
+    SHEET_OVERLAYS.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.top = '0'; el.style.left = '0'; el.style.right = '0';
+      el.style.height = ''; el.style.bottom = '0';
+      const modal = el.querySelector('.modal');
+      if (modal) modal.style.maxHeight = '';
+    });
+  }
+  function applyLoginViewport() {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const el = document.getElementById('loginOverlay');
+    if (!el) return;
+    el.style.position = 'fixed'; el.style.top = vv.offsetTop + 'px'; el.style.left = vv.offsetLeft + 'px';
+    el.style.width = vv.width + 'px'; el.style.height = vv.height + 'px';
+    el.style.bottom = 'auto'; el.style.right = 'auto';
+    const lm = el.querySelector('.login-modal');
+    if (lm) { lm.style.maxHeight = Math.floor(vv.height * 0.92) + 'px'; lm.style.overflowY = 'auto'; }
+  }
+  function resetLoginViewport() {
+    const el = document.getElementById('loginOverlay');
+    if (!el) return;
+    el.style.position = ''; el.style.top = ''; el.style.left = '';
+    el.style.width = ''; el.style.height = ''; el.style.bottom = ''; el.style.right = '';
+    const lm = el.querySelector('.login-modal');
+    if (lm) { lm.style.maxHeight = ''; lm.style.overflowY = ''; }
+  }
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => { applyViewport(); applyLoginViewport(); });
+    window.visualViewport.addEventListener('scroll', () => { applyViewport(); applyLoginViewport(); });
+  }
+  const _openModal = window.openModal;
+  window.openModal = function (...args) { if (_openModal) _openModal(...args); setTimeout(applyViewport, 50); };
+  const _openNoteModal = window.openNoteModal;
+  window.openNoteModal = function (...args) { if (_openNoteModal) _openNoteModal(...args); setTimeout(applyViewport, 50); };
+  const _openLoginModal = window.openLoginModal;
+  window.openLoginModal = function (...args) { if (_openLoginModal) _openLoginModal(...args); setTimeout(applyLoginViewport, 50); };
+  const _closeModal = window.closeModal;
+  window.closeModal = function (...args) { if (_closeModal) _closeModal(...args); resetViewport(); };
+  const _closeNoteModal = window.closeNoteModal;
+  window.closeNoteModal = function (...args) { if (_closeNoteModal) _closeNoteModal(...args); resetViewport(); };
+  const _closeLoginModal = window.closeLoginModal;
+  window.closeLoginModal = function (...args) { if (_closeLoginModal) _closeLoginModal(...args); resetLoginViewport(); };
+})();
+
+// ─── INIT ────────────────────────────────────────────────────
+document.getElementById('dateBarText').innerHTML =
+  `<span>${new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' })}</span>`;
+
+currentRole = 'user';
+updateRoleUI();
+loadFromSupabase();
