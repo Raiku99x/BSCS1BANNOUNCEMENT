@@ -415,14 +415,19 @@ body.dark .status-chip.today{background:rgba(234,107,14,0.18);color:#fb923c;}
 .card-desc-full::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 
 /* image strip */
-.card-images{display:flex;gap:8px;padding:0 14px 12px;overflow-x:auto;}
-.card-images::-webkit-scrollbar{height:3px;}
-.card-images::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.card-images-wrap{position:relative;margin:0 0 12px;}
+.card-images{display:flex;gap:8px;padding:0 14px;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none;}
+.card-images::-webkit-scrollbar{display:none;}
 .card-img-thumb{width:80px;height:66px;border-radius:8px;flex-shrink:0;background:var(--surf3);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:10px;font-weight:600;overflow:hidden;cursor:pointer;transition:border-color 0.15s;}
 .card-img-thumb:hover{border-color:var(--accent);}
 .card-img-thumb img{width:100%;height:100%;object-fit:cover;}
 .add-img-btn{width:80px;height:66px;border-radius:8px;flex-shrink:0;background:transparent;border:1.5px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--sub);font-size:9px;font-weight:600;cursor:pointer;gap:3px;transition:border-color 0.15s;}
 .add-img-btn:hover{border-color:var(--accent);color:var(--accent);}
+.strip-nav{position:absolute;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;background:var(--surface);border:1.5px solid var(--border);color:var(--sub);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:all 0.15s;box-shadow:var(--shadow);}
+.strip-nav:hover{border-color:var(--accent);color:var(--accent);}
+.strip-nav.prev{left:2px;}
+.strip-nav.next{right:2px;}
+.strip-nav.hidden{display:none;}
 .card-footer-exp{display:flex;align-items:center;gap:8px;margin:0 14px;padding:10px 0 12px;border-top:1px solid var(--border);}
 
 /* empty */
@@ -515,15 +520,26 @@ textarea.form-control{resize:vertical;min-height:70px;}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 
 /* LIGHTBOX */
-.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
 .lightbox.open{opacity:1;pointer-events:all;}
-.lightbox img{max-width:90vw;max-height:90vh;border-radius:10px;}
-.lb-close{position:absolute;top:20px;right:24px;background:none;border:none;color:#fff;font-size:26px;cursor:pointer;opacity:0.7;}
-.lb-close:hover{opacity:1;}
+.lightbox img{max-width:88vw;max-height:82vh;border-radius:10px;object-fit:contain;user-select:none;}
+.lb-close{position:absolute;top:16px;right:18px;background:rgba(255,255,255,0.12);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s;z-index:10;}
+.lb-close:hover{background:rgba(255,255,255,0.25);}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.12);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s;z-index:10;}
+.lb-nav:hover{background:rgba(255,255,255,0.28);}
+.lb-prev{left:16px;}
+.lb-next{right:16px;}
+.lb-counter{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.75);font-size:12px;font-weight:700;letter-spacing:0.05em;pointer-events:none;}
+.lb-del{position:absolute;top:16px;left:18px;background:rgba(220,38,38,0.7);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s;z-index:10;}
+.lb-del:hover{background:rgba(220,38,38,1);}
+.lb-del-wrap{display:none;}
+.lb-del-wrap.admin-visible{display:block;}
 
 /* DELETE CONFIRM MODAL */
 .del-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:400;backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity 0.2s;}
 .del-overlay.open{opacity:1;pointer-events:all;}
+/* Photo delete sits above lightbox (z-index 500) */
+#photoDelOverlay{z-index:600;}
 .del-modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px 26px 24px;width:calc(100% - 40px);max-width:320px;text-align:center;transform:scale(0.92) translateY(8px);transition:transform 0.22s ease;box-shadow:0 20px 60px rgba(0,0,0,0.22);}
 .del-overlay.open .del-modal{transform:scale(1) translateY(0);}
 .del-icon{width:52px;height:52px;border-radius:14px;background:var(--red-lt);border:1.5px solid rgba(220,38,38,0.25);display:flex;align-items:center;justify-content:center;color:var(--red);margin:0 auto 14px;}
@@ -612,7 +628,7 @@ input[type=file]{display:none;}
     </div>
     <div class="featured-panel">
       <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div class="featured-label">Featured</div>
+        <div class="featured-label">Featured <span id="featCount" style="font-size:10px;background:var(--accent);color:#fff;border-radius:20px;padding:1px 7px;margin-left:4px;display:none;vertical-align:middle;"></span></div>
         <button class="add-note-btn" id="addNoteBtn" onclick="openNoteModal()">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Add Note
@@ -721,9 +737,23 @@ input[type=file]{display:none;}
 </div>
 
 <!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <button class="lb-close" onclick="closeLightbox()">✕</button>
+<div class="lightbox" id="lightbox" onclick="handleLightboxClick(event)">
+  <button class="lb-close" onclick="closeLightbox()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <div class="lb-del-wrap" id="lbDelWrap">
+    <button class="lb-del" id="lbDelBtn" onclick="lbDeleteImg()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+    </button>
+  </div>
+  <button class="lb-nav lb-prev" id="lbPrev" onclick="lbNav(-1)">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
   <img id="lightboxImg" src="" alt=""/>
+  <button class="lb-nav lb-next" id="lbNext" onclick="lbNav(+1)">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <div class="lb-counter" id="lbCounter"></div>
 </div>
 
 <!-- DELETE CONFIRM MODAL -->
@@ -739,6 +769,40 @@ input[type=file]{display:none;}
     <div class="del-actions">
       <button class="del-btn-cancel" onclick="closeDelModal()">Cancel</button>
       <button class="del-btn-confirm" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGOUT CONFIRM MODAL -->
+<div class="del-overlay" id="logoutOverlay">
+  <div class="del-modal" id="logoutModal">
+    <div class="del-icon" style="background:var(--red-lt);border-color:var(--red);">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2.2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+    </div>
+    <div class="del-title">Log Out?</div>
+    <div class="del-sub">You'll need to log in again to make changes.</div>
+    <div class="del-actions">
+      <button class="del-btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+      <button class="del-btn-confirm" onclick="confirmLogout()">Log Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- PHOTO DELETE CONFIRM MODAL -->
+<div class="del-overlay" id="photoDelOverlay">
+  <div class="del-modal" id="photoDelModal">
+    <div class="del-icon">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+      </svg>
+    </div>
+    <div class="del-title">Delete Photo?</div>
+    <div class="del-sub">This photo will be permanently removed.</div>
+    <div class="del-actions">
+      <button class="del-btn-cancel" onclick="closePhotoDelModal()">Cancel</button>
+      <button class="del-btn-confirm" onclick="confirmPhotoDelete()">Delete</button>
     </div>
   </div>
 </div>
@@ -890,10 +954,18 @@ function clickAdminBtn(){
 }
 
 function userBtnClick(){
-  if(currentRole==='admin') logout();
+  if(currentRole==='admin') openLogoutModal();
 }
-
-function logout(){
+function openLogoutModal(){
+  lockScroll();
+  document.getElementById('logoutOverlay').classList.add('open');
+}
+function closeLogoutModal(){
+  document.getElementById('logoutOverlay').classList.remove('open');
+  unlockScroll();
+}
+function confirmLogout(){
+  closeLogoutModal();
   currentRole='user';
   currentAdminName=null;
   updateRoleUI();
@@ -937,7 +1009,7 @@ function updateRoleUI(){
 // ─────────────────────────────────────────────
 function lockScroll(){ document.body.classList.add('modal-open'); }
 function unlockScroll(){
-  const anyOpen=['overlay','noteOverlay','loginOverlay','delOverlay','lightbox']
+  const anyOpen=['overlay','noteOverlay','loginOverlay','delOverlay','lightbox','logoutOverlay','photoDelOverlay']
     .some(id=>{const el=document.getElementById(id);return el&&el.classList.contains('open');});
   if(!anyOpen) document.body.classList.remove('modal-open');
 }
@@ -1093,6 +1165,14 @@ function renderFeatured(){
       return da-db;
     }).slice(0,4);
 
+  // Update featured count badge
+  const featBadge=document.getElementById('featCount');
+  if(featBadge){
+    const total=tasks.filter(t=>!t.done&&(isOverdue(t)||isToday(t)||isDueSoon(t))).length;
+    featBadge.textContent=total;
+    featBadge.style.display=total>0?'':'none';
+  }
+
   if(!feat.length&&!notes.length){
     el.innerHTML=`<div class="no-featured"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><p>All caught up!</p></div>`;
     return;
@@ -1174,6 +1254,7 @@ function renderTasks(){
   }
 
   el.innerHTML=html;
+  setTimeout(initStripNavs,0);
 }
 
 // ─────────────────────────────────────────────
@@ -1273,7 +1354,11 @@ function buildCard(t){
 
     <div class="card-expanded-body">
       <div class="card-desc-full">${esc(notes)||'<em style="opacity:0.5">No description.</em>'}</div>
-      ${(imgHTML||addImgBtn)?`<div class="card-images">${imgHTML}${addImgBtn}</div>`:''}
+      ${(imgHTML||addImgBtn)?`<div class="card-images-wrap" id="imgwrap-${t.id}">
+        <button class="strip-nav prev" onclick="event.stopPropagation();stripScroll('${t.id}',-1)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <div class="card-images" id="imgstrip-${t.id}">${imgHTML}${addImgBtn}</div>
+        <button class="strip-nav next" onclick="event.stopPropagation();stripScroll('${t.id}',1)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
+      </div>`:''}
       ${expandedFooter}
     </div>
   </div>`;
@@ -1377,6 +1462,32 @@ function closeDelModal(){
 //  IMAGES
 // ─────────────────────────────────────────────
 function triggerImgUpload(id){uploadTargetId=id;document.getElementById('imgUpload').click();}
+
+function stripScroll(id, dir){
+  const strip=document.getElementById('imgstrip-'+id);
+  if(!strip) return;
+  strip.scrollBy({left: dir * 180, behavior:'smooth'});
+  // Update arrow visibility after scroll settles
+  setTimeout(()=>stripUpdateNav(id), 320);
+}
+function stripUpdateNav(id){
+  const strip=document.getElementById('imgstrip-'+id);
+  const wrap=document.getElementById('imgwrap-'+id);
+  if(!strip||!wrap) return;
+  const prev=wrap.querySelector('.strip-nav.prev');
+  const next=wrap.querySelector('.strip-nav.next');
+  if(prev) prev.classList.toggle('hidden', strip.scrollLeft<=4);
+  if(next) next.classList.toggle('hidden', strip.scrollLeft+strip.clientWidth>=strip.scrollWidth-4);
+}
+// Called after renderTasks so nav buttons reflect initial state
+function initStripNavs(){
+  document.querySelectorAll('[id^="imgstrip-"]').forEach(strip=>{
+    const id=strip.id.replace('imgstrip-','');
+    // Hide prev initially (at start), hide next if no overflow
+    stripUpdateNav(id);
+    strip.addEventListener('scroll',()=>stripUpdateNav(id),{passive:true});
+  });
+}
 function handleImgUpload(e){
   const files=[...e.target.files];
   const t=tasks.find(x=>x.id===uploadTargetId);if(!t)return;
@@ -1393,15 +1504,63 @@ function handleImgUpload(e){
 // ─────────────────────────────────────────────
 //  LIGHTBOX
 // ─────────────────────────────────────────────
+let _lbTaskId=null, _lbIdx=0;
+
 function openLightbox(id,idx){
   const t=tasks.find(x=>x.id===id);if(!t||!t.images[idx])return;
   lockScroll();
-  document.getElementById('lightboxImg').src=t.images[idx];
+  _lbTaskId=id; _lbIdx=idx;
+  _lbUpdate();
   document.getElementById('lightbox').classList.add('open');
+}
+function _lbUpdate(){
+  const t=tasks.find(x=>x.id===_lbTaskId);if(!t)return;
+  const imgs=t.images||[];
+  document.getElementById('lightboxImg').src=imgs[_lbIdx]||'';
+  // Counter
+  const ctr=document.getElementById('lbCounter');
+  ctr.textContent=imgs.length>1?`${_lbIdx+1} / ${imgs.length}`:'';
+  // Nav visibility
+  document.getElementById('lbPrev').style.display=imgs.length>1?'flex':'none';
+  document.getElementById('lbNext').style.display=imgs.length>1?'flex':'none';
+  // Delete button (admin only)
+  const wrap=document.getElementById('lbDelWrap');
+  wrap.className='lb-del-wrap'+(currentRole==='admin'?' admin-visible':'');
+}
+function lbNav(dir){
+  const t=tasks.find(x=>x.id===_lbTaskId);if(!t)return;
+  const total=(t.images||[]).length;
+  _lbIdx=(_lbIdx+dir+total)%total;
+  _lbUpdate();
+}
+function lbDeleteImg(){
+  // Open confirm instead of deleting directly
+  lockScroll();
+  document.getElementById('photoDelOverlay').classList.add('open');
+}
+function closePhotoDelModal(){
+  document.getElementById('photoDelOverlay').classList.remove('open');
+  unlockScroll();
+}
+function confirmPhotoDelete(){
+  closePhotoDelModal();
+  const t=tasks.find(x=>x.id===_lbTaskId);if(!t)return;
+  t.images.splice(_lbIdx,1);
+  persist();
+  if(t.images.length===0){closeLightbox();renderTasks();return;}
+  _lbIdx=Math.min(_lbIdx,t.images.length-1);
+  _lbUpdate();
+  renderTasks();
+}
+function handleLightboxClick(e){
+  // Close only if clicking the backdrop (not buttons or image)
+  if(e.target===document.getElementById('lightbox')||e.target===document.getElementById('lightboxImg'))
+    closeLightbox();
 }
 function closeLightbox(){
   document.getElementById('lightbox').classList.remove('open');
   unlockScroll();
+  _lbTaskId=null;
 }
 
 // ─────────────────────────────────────────────
@@ -1508,7 +1667,11 @@ function deleteNote(id){
 // ─────────────────────────────────────────────
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
-    closeModal();closeLightbox();closeLoginModal();closeDelModal();closeNoteModal();
+    closeModal();closeLightbox();closeLoginModal();closeDelModal();closeNoteModal();closeLogoutModal();closePhotoDelModal();
+  }
+  if(document.getElementById('lightbox').classList.contains('open')){
+    if(e.key==='ArrowLeft') lbNav(-1);
+    if(e.key==='ArrowRight') lbNav(+1);
   }
   if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){
     if(document.getElementById('overlay').classList.contains('open'))saveTask();
