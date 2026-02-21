@@ -50,6 +50,7 @@ body.dark {
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;overflow-x:hidden;overflow-y:auto;}
+body.modal-open{overflow:hidden;}
 
 /* TOPBAR */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
@@ -342,6 +343,13 @@ body.dark .note-card{background:rgba(245,166,35,0.07);border-color:rgba(245,166,
 .cat-output    {background:#fef3c7;color:#78350f;}
 .cat-online    {background:#e0f2fe;color:#075985;}
 .cat-other     {background:#f1f5f9;color:#475569;}
+.cat-info      {background:#e0f2fe;color:#0369a1;}
+.cat-fees      {background:#fef9c3;color:#854d0e;}
+.cat-suspension{background:#fde8d8;color:#9a3412;}
+.cat-noclasses {background:#f0fdf4;color:#166534;}
+.cat-event     {background:#fdf4ff;color:#7e22ce;}
+.cat-fillup    {background:#fff7ed;color:#c2410c;}
+.cat-learning  {background:#ecfdf5;color:#047857;}
 body.dark .cat-quiz      {background:rgba(109,40,217,0.22);color:#a78bfa;}
 body.dark .cat-project   {background:rgba(29,78,216,0.22);color:#60a5fa;}
 body.dark .cat-assignment{background:rgba(190,24,93,0.22);color:#f472b6;}
@@ -351,6 +359,13 @@ body.dark .cat-review    {background:rgba(5,150,105,0.22);color:#6ee7b7;}
 body.dark .cat-output    {background:rgba(133,77,14,0.22);color:#fcd34d;}
 body.dark .cat-online    {background:rgba(3,105,161,0.22);color:#7dd3fc;}
 body.dark .cat-other     {background:rgba(90,100,116,0.22);color:#94a3b8;}
+body.dark .cat-info      {background:rgba(3,105,161,0.22);color:#7dd3fc;}
+body.dark .cat-fees      {background:rgba(133,77,14,0.22);color:#fde68a;}
+body.dark .cat-suspension{background:rgba(154,52,18,0.25);color:#fb923c;}
+body.dark .cat-noclasses {background:rgba(6,95,70,0.2);color:#6ee7b7;}
+body.dark .cat-event     {background:rgba(126,34,206,0.22);color:#d8b4fe;}
+body.dark .cat-fillup    {background:rgba(194,65,12,0.22);color:#fdba74;}
+body.dark .cat-learning  {background:rgba(4,120,87,0.22);color:#6ee7b7;}
 
 /* overdue red border */
 .task-card.overdue-card{border-color:var(--red) !important;}
@@ -648,6 +663,10 @@ input[type=file]{display:none;}
         <option value="assignment">Assignment</option><option value="exam">Exam</option>
         <option value="study">Study</option><option value="review">Review</option>
         <option value="output">Output</option><option value="online">Online Class</option>
+        <option value="info">Info</option><option value="fees">Fees</option>
+        <option value="suspension">Suspension</option><option value="noclasses">No Classes</option>
+        <option value="event">Event</option><option value="fillup">Fill Up</option>
+        <option value="learning">Learning Task</option>
         <option value="other">Other</option>
       </select>
     </div>
@@ -768,7 +787,7 @@ input[type=file]{display:none;}
 <script>
 const KEY='taskhub-v4';
 const NOTES_KEY='taskhub-notes-v1';
-const CAT_LABELS={quiz:'Quiz',project:'Project',assignment:'Assignment',exam:'Exam',study:'Study',review:'Review',output:'Output',online:'Online Class',other:'Other'};
+const CAT_LABELS={quiz:'Quiz',project:'Project',assignment:'Assignment',exam:'Exam',study:'Study',review:'Review',output:'Output',online:'Online Class',other:'Other',info:'Info',fees:'Fees',suspension:'Suspension',noclasses:'No Classes',event:'Event',fillup:'Fill Up',learning:'Learning Task'};
 
 const ADMINS=[
   {username:'Francy',   password:'123BSCS1B'},
@@ -913,8 +932,18 @@ function updateRoleUI(){
   document.getElementById('addNoteBtn').classList.toggle('visible',isAdmin);
 }
 
-// LOGIN MODAL
+// ─────────────────────────────────────────────
+//  SCROLL LOCK
+// ─────────────────────────────────────────────
+function lockScroll(){ document.body.classList.add('modal-open'); }
+function unlockScroll(){
+  const anyOpen=['overlay','noteOverlay','loginOverlay','delOverlay','lightbox']
+    .some(id=>{const el=document.getElementById(id);return el&&el.classList.contains('open');});
+  if(!anyOpen) document.body.classList.remove('modal-open');
+}
+
 function openLoginModal(){
+  lockScroll();
   document.getElementById('loginUser').value='';
   document.getElementById('loginPass').value='';
   document.getElementById('loginError').classList.remove('show');
@@ -923,6 +952,7 @@ function openLoginModal(){
 }
 function closeLoginModal(){
   document.getElementById('loginOverlay').classList.remove('open');
+  unlockScroll();
 }
 function handleLoginOverlay(e){
   if(e.target===document.getElementById('loginOverlay'))closeLoginModal();
@@ -1253,10 +1283,31 @@ function buildCard(t){
 //  EXPAND / COLLAPSE
 // ─────────────────────────────────────────────
 function expandCard(id){
+  // Switch to 'all' filter if current filter would hide this card
+  const t=tasks.find(x=>x.id===id);
+  if(!t) return;
+  if(activeFilter!=='all'){
+    const visible=(activeFilter==='today'&&isToday(t))||(activeFilter==='soon'&&isDueSoon(t))||(activeFilter==='overdue'&&isOverdue(t))||(activeFilter==='done'&&t.done);
+    if(!visible){
+      activeFilter='all';
+      document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelector('.f-all').classList.add('active');
+    }
+  }
   tasks.forEach(x=>x._expanded=false);
-  const t=tasks.find(x=>x.id===id);if(t)t._expanded=true;
+  t._expanded=true;
   renderTasks();
-  setTimeout(()=>{const el=document.getElementById('card-'+id);if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});},60);
+  setTimeout(()=>{
+    const el=document.getElementById('card-'+id);
+    if(!el) return;
+    // Calculate total sticky header height + small gap
+    const topbar  = document.querySelector('.topbar')  ?.offsetHeight||57;
+    const datebar = document.querySelector('.date-bar') ?.offsetHeight||43;
+    const taskhdr = document.querySelector('.all-task-header')?.offsetHeight||44;
+    const offset  = topbar + datebar + taskhdr + 8;
+    const top = el.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({top, behavior:'smooth'});
+  },60);
 }
 function collapseCard(id){
   const t=tasks.find(x=>x.id===id);if(t)t._expanded=false;
@@ -1303,6 +1354,7 @@ function deleteTask(id){
   if(currentRole!=='admin')return;
   const t=tasks.find(x=>x.id===id);
   if(!t)return;
+  lockScroll();
   pendingDeleteId=id;
   document.getElementById('delSubText').textContent=`"${t.name}" will be permanently removed.`;
   document.getElementById('delOverlay').classList.add('open');
@@ -1318,6 +1370,7 @@ function confirmDelete(){
 function closeDelModal(){
   document.getElementById('delOverlay').classList.remove('open');
   pendingDeleteId=null;
+  unlockScroll();
 }
 
 // ─────────────────────────────────────────────
@@ -1342,10 +1395,14 @@ function handleImgUpload(e){
 // ─────────────────────────────────────────────
 function openLightbox(id,idx){
   const t=tasks.find(x=>x.id===id);if(!t||!t.images[idx])return;
+  lockScroll();
   document.getElementById('lightboxImg').src=t.images[idx];
   document.getElementById('lightbox').classList.add('open');
 }
-function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+  unlockScroll();
+}
 
 // ─────────────────────────────────────────────
 //  COMPLETION ANIMATION
@@ -1365,6 +1422,7 @@ function playCompletion(el,cb){
 // ─────────────────────────────────────────────
 function openModal(id){
   if(currentRole!=='admin')return;
+  lockScroll();
   editId=id||null;
   document.getElementById('modalTitle').textContent=editId?'Edit Task':'Add Task';
   if(editId){
@@ -1381,7 +1439,11 @@ function openModal(id){
   document.getElementById('overlay').classList.add('open');
   setTimeout(()=>document.getElementById('fName').focus(),100);
 }
-function closeModal(){document.getElementById('overlay').classList.remove('open');editId=null;}
+function closeModal(){
+  document.getElementById('overlay').classList.remove('open');
+  editId=null;
+  unlockScroll();
+}
 function handleOverlay(e){if(e.target===document.getElementById('overlay'))closeModal();}
 
 function saveTask(){
@@ -1411,12 +1473,16 @@ function saveTask(){
 // ─────────────────────────────────────────────
 function openNoteModal(){
   if(currentRole!=='admin')return;
+  lockScroll();
   document.getElementById('nText').value='';
   document.getElementById('nExpiry').value='3';
   document.getElementById('noteOverlay').classList.add('open');
   setTimeout(()=>document.getElementById('nText').focus(),100);
 }
-function closeNoteModal(){document.getElementById('noteOverlay').classList.remove('open');}
+function closeNoteModal(){
+  document.getElementById('noteOverlay').classList.remove('open');
+  unlockScroll();
+}
 function handleNoteOverlay(e){if(e.target===document.getElementById('noteOverlay'))closeNoteModal();}
 function saveNote(){
   const text=document.getElementById('nText').value.trim();
