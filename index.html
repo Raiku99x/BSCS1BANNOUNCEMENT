@@ -104,52 +104,55 @@ body.dark .role-btn.admin-active.admin-kandiaru{
   border-color:#a78bfa;
 }
 
-/* ── FOOTER CREATOR CHIP — base accent ── */
+/* ── FOOTER CREATOR CHIP — no border ── */
 .footer-creator{
   font-size:10px;font-weight:700;letter-spacing:0.03em;
-  color:var(--accent);background:var(--acc-lt);
-  border:1px solid rgba(91,82,232,0.25);
+  color:var(--sub);background:var(--surf3);
+  border:none;
   padding:3px 9px;border-radius:20px;
   display:inline-flex;align-items:center;gap:4px;
   white-space:nowrap;flex-shrink:0;
 }
 .footer-creator svg{width:10px;height:10px;}
 
-/* Kandiaru footer chip — purple static */
+/* Kandiaru footer chip — no border */
 .footer-creator.chip-kandiaru{
-  color:#a78bfa;background:rgba(139,92,246,0.13);border-color:#8b5cf6;
+  color:#a78bfa;background:rgba(139,92,246,0.10);border:none;
 }
 body.dark .footer-creator.chip-kandiaru{
-  color:#c4b5fd;background:rgba(139,92,246,0.2);border-color:#a78bfa;
+  color:#c4b5fd;background:rgba(139,92,246,0.15);border:none;
 }
-/* Francy + Carina footer chips — plain accent */
+/* Francy + Carina footer chips — no border */
 .footer-creator.chip-francy,
 .footer-creator.chip-carina{
-  color:var(--accent);background:var(--acc-lt);border-color:rgba(91,82,232,0.25);
+  color:var(--sub);background:var(--surf3);border:none;
 }
 
-/* ── NOTE AUTHOR CHIP — all admins: amber/gold style, no glow ── */
+/* ── NOTE AUTHOR CHIP — no border ── */
+.note-author{font-size:10px;font-weight:700;color:var(--amber);background:var(--amb-lt);padding:2px 7px;border-radius:20px;display:flex;align-items:center;gap:3px;border:none;}
+.note-author svg{width:9px;height:9px;}
+
 .note-author.chip-kandiaru{
   color:var(--amber);
   background:var(--amb-lt);
-  border:1px solid rgba(196,122,10,0.4);
+  border:none;
 }
 body.dark .note-author.chip-kandiaru{
   color:var(--amber);
   background:var(--amb-lt);
-  border-color:rgba(245,166,35,0.45);
+  border:none;
 }
 .note-author.chip-francy,
 .note-author.chip-carina{
   color:var(--amber);
   background:var(--amb-lt);
-  border:1px solid rgba(196,122,10,0.3);
+  border:none;
 }
 
 /* Legacy kandiaru-glow — static purple, no animation */
 .kandiaru-glow{
   color:#a78bfa!important;background:rgba(139,92,246,0.13)!important;
-  border-color:#8b5cf6!important;
+  border:none!important;
 }
 
 /* DATE BAR */
@@ -254,8 +257,6 @@ body.dark .note-card{background:rgba(245,166,35,0.07);border-color:rgba(245,166,
 .note-del-btn{width:20px;height:20px;border-radius:6px;border:none;background:transparent;color:var(--sub);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;padding:0;}
 .note-del-btn:hover{background:var(--red-lt);color:var(--red);}
 .note-card-meta{display:flex;align-items:center;gap:6px;margin-top:6px;}
-.note-author{font-size:10px;font-weight:700;color:var(--amber);background:var(--amb-lt);padding:2px 7px;border-radius:20px;display:flex;align-items:center;gap:3px;}
-.note-author svg{width:9px;height:9px;}
 .note-expiry{font-size:10px;color:var(--sub);margin-left:auto;}
 
 /* Add note button (admin only, inside featured panel) */
@@ -411,9 +412,7 @@ body.dark .status-chip.today{background:rgba(234,107,14,0.18);color:#fb923c;}
 .task-card.expanded .card-expanded-body{display:flex;}
 .task-card.expanded .card-desc-collapsed{display:none;}
 .task-card.expanded .card-footer{display:none;}
-.card-desc-full{margin:0 14px 12px;background:var(--surf3);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text);line-height:1.65;max-height:160px;overflow-y:auto;overflow-x:hidden;border:1px solid var(--border);word-break:break-all;overflow-wrap:anywhere;white-space:pre-wrap;}
-.card-desc-full::-webkit-scrollbar{width:3px;}
-.card-desc-full::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.card-desc-full{margin:0 14px 12px;background:var(--surf3);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text);line-height:1.65;overflow:visible;border:1px solid var(--border);word-break:break-word;overflow-wrap:anywhere;white-space:pre-wrap;}
 
 /* image strip */
 .card-images-wrap{position:relative;margin:0 0 12px;}
@@ -1083,10 +1082,8 @@ function toggleFullscreen(){
 document.addEventListener('fullscreenchange',()=>{
   const icon=document.getElementById('fsIcon');
   if(document.fullscreenElement){
-    // Show compress/exit icon
     icon.innerHTML=`<path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/>`;
   } else {
-    // Show expand icon
     icon.innerHTML=`<path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/>`;
   }
 });
@@ -1124,9 +1121,7 @@ function toggleSearch(){
 // ─────────────────────────────────────────────
 //  RENDER
 // ─────────────────────────────────────────────
-// Full render — used when data actually changes (add/edit/delete/done)
 function renderAll(){_invalidateCache();updateCounts();renderFeatured();renderTasks();}
-// Filter-only render — no Featured refresh
 function renderFiltered(){updateCounts();renderTasks();}
 
 let _searchTimer=null;
@@ -1136,8 +1131,7 @@ function debouncedSearch(){
 }
 
 function updateCounts(){
-  // Single pass — no repeated filter calls
-  _buildCache(); // ensure fresh
+  _buildCache();
   let cAll=0,cToday=0,cSoon=0,cOver=0,cDone=0;
   tasks.forEach(t=>{
     cAll++;
@@ -1191,7 +1185,6 @@ function renderFeatured(){
   }
 
   const el=document.getElementById('featuredList');
-  // Build feat from already-cached status — no extra filter passes
   const feat=tasks.filter(t=>{if(t.done)return false;const s=_getStatus(t);return s.over||s.today||s.soon;})
     .sort((a,b)=>{
       const da=a.date?new Date(a.date+'T'+(a.time||'23:59')):new Date('9999');
@@ -1199,7 +1192,6 @@ function renderFeatured(){
       return da-db;
     });
 
-  // Featured count badge — reuse feat.length (already computed, no extra loop)
   const featBadge=document.getElementById('featCount');
   if(featBadge){
     const total=feat.length;
@@ -1242,7 +1234,7 @@ function renderFeatured(){
 
 function renderTasks(){
   const search=(document.getElementById('searchInput').value||'').toLowerCase();
-  _buildCache(); // ensure cache is fresh for this render pass
+  _buildCache();
   let list=tasks.filter(t=>{
     const s=_getStatus(t);
     if(activeFilter==='done'   &&!t.done)return false;
@@ -1433,9 +1425,6 @@ function collapseCard(id){
 // ─────────────────────────────────────────────
 //  TOGGLE DONE
 // ─────────────────────────────────────────────
-// ─────────────────────────────────────────────
-//  COPY DESCRIPTION
-// ─────────────────────────────────────────────
 function copyDesc(id, btnId){
   const t=tasks.find(x=>x.id===id);
   if(!t) return;
@@ -1443,7 +1432,6 @@ function copyDesc(id, btnId){
   navigator.clipboard.writeText(text).then(()=>{
     const btn=document.getElementById(btnId);
     if(!btn) return;
-    // Swap to checkmark briefly
     const orig=btn.innerHTML;
     btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
     btn.classList.add('copied');
@@ -1498,7 +1486,6 @@ function stripScroll(id, dir){
   const strip=document.getElementById('imgstrip-'+id);
   if(!strip) return;
   strip.scrollBy({left: dir * 180, behavior:'smooth'});
-  // Update arrow visibility after scroll settles
   setTimeout(()=>stripUpdateNav(id), 320);
 }
 function stripUpdateNav(id){
@@ -1510,11 +1497,9 @@ function stripUpdateNav(id){
   if(prev) prev.classList.toggle('hidden', strip.scrollLeft<=4);
   if(next) next.classList.toggle('hidden', strip.scrollLeft+strip.clientWidth>=strip.scrollWidth-4);
 }
-// Called after renderTasks so nav buttons reflect initial state
 function initStripNavs(){
   document.querySelectorAll('[id^="imgstrip-"]').forEach(strip=>{
     const id=strip.id.replace('imgstrip-','');
-    // Hide prev initially (at start), hide next if no overflow
     stripUpdateNav(id);
     strip.addEventListener('scroll',()=>stripUpdateNav(id),{passive:true});
   });
@@ -1548,13 +1533,10 @@ function _lbUpdate(){
   const t=tasks.find(x=>x.id===_lbTaskId);if(!t)return;
   const imgs=t.images||[];
   document.getElementById('lightboxImg').src=imgs[_lbIdx]||'';
-  // Counter
   const ctr=document.getElementById('lbCounter');
   ctr.textContent=imgs.length>1?`${_lbIdx+1} / ${imgs.length}`:'';
-  // Nav visibility
   document.getElementById('lbPrev').style.display=imgs.length>1?'flex':'none';
   document.getElementById('lbNext').style.display=imgs.length>1?'flex':'none';
-  // Delete button (admin only)
   const wrap=document.getElementById('lbDelWrap');
   wrap.className='lb-del-wrap'+(currentRole==='admin'?' admin-visible':'');
 }
@@ -1565,7 +1547,6 @@ function lbNav(dir){
   _lbUpdate();
 }
 function lbDeleteImg(){
-  // Open confirm instead of deleting directly
   lockScroll();
   document.getElementById('photoDelOverlay').classList.add('open');
 }
@@ -1584,7 +1565,6 @@ function confirmPhotoDelete(){
   renderTasks();
 }
 function handleLightboxClick(e){
-  // Close only if clicking the backdrop (not buttons or image)
   if(e.target===document.getElementById('lightbox')||e.target===document.getElementById('lightboxImg'))
     closeLightbox();
 }
@@ -1715,31 +1695,24 @@ document.addEventListener('keydown',e=>{
 //  MOBILE KEYBOARD — keep modals above keyboard
 // ─────────────────────────────────────────────
 (function(){
-  // Overlays that contain a sliding .modal bottom sheet
   const SHEET_OVERLAYS=['overlay','noteOverlay'];
 
   function applyViewport(){
     const vv=window.visualViewport;
     if(!vv) return;
-
-    const vvHeight=vv.height;          // visible area height (shrinks when keyboard opens)
-    const vvOffsetTop=vv.offsetTop;    // how far down the visual viewport starts
+    const vvHeight=vv.height;
+    const vvOffsetTop=vv.offsetTop;
     const vvOffsetLeft=vv.offsetLeft;
-
     SHEET_OVERLAYS.forEach(id=>{
       const el=document.getElementById(id);
       if(!el) return;
-      // Reposition overlay to match visual viewport exactly
       el.style.top    = vvOffsetTop  + 'px';
       el.style.left   = vvOffsetLeft + 'px';
       el.style.right  = '0px';
       el.style.height = vvHeight + 'px';
       el.style.bottom = 'auto';
-
-      // Shrink modal max-height so it fits in visible area
       const modal=el.querySelector('.modal');
       if(modal){
-        // Reserve 10% headroom above the sheet so user sees page behind
         modal.style.maxHeight = Math.floor(vvHeight * 0.9) + 'px';
       }
     });
@@ -1762,7 +1735,6 @@ document.addEventListener('keydown',e=>{
     window.visualViewport.addEventListener('scroll', applyViewport);
   }
 
-  // Also reapply whenever a modal opens (keyboard may already be up)
   const _openModal=window.openModal;
   window.openModal=function(...args){
     if(_openModal) _openModal(...args);
@@ -1774,7 +1746,6 @@ document.addEventListener('keydown',e=>{
     setTimeout(applyViewport, 50);
   };
 
-  // Reset when modals close
   const _closeModal=window.closeModal;
   window.closeModal=function(...args){
     if(_closeModal) _closeModal(...args);
