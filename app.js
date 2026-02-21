@@ -7,7 +7,7 @@
 // REPLACE these two values with your own from Supabase Dashboard
 // Project Settings → API → Project URL & anon/public key
 const SUPABASE_URL = 'https://znoveznysqwmolhftxfy.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; 
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpub3Zlem55c3F3bW9saGZ0eGZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MjM3MjQsImV4cCI6MjA4NzE5OTcyNH0.1jlJuRk-7vAVtEZFDvwdV2ZH3UkqUYwlyK-w2PSbl-A'; 
 
 const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
