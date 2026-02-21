@@ -384,7 +384,7 @@ function updateRoleUI() {
   if (isAdmin) {
     const title = getAdminTitle(currentAdminName);
     const icon = getAdminIcon(currentAdminName, 11);
-    adminBtn.innerHTML = `${icon}<span style="margin-left:4px;">${title}</span>`;
+    adminBtn.innerHTML = `${icon}<span style="margin-left:4px;">${currentAdminName}</span>`;
     adminBtn.className = `role-btn admin-active admin-${currentAdminName.toLowerCase()}`;
     adminBtn.style.opacity = '1';
   } else {
