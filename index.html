@@ -69,18 +69,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 /* ADMIN TAG (hidden — button is the tag now) */
 .admin-tag{display:none!important;}
 
-/* ── GLOW KEYFRAME — Kandiaru purple ── */
-@keyframes glowKandiaru{
-  0%,100%{box-shadow:0 0 6px 1px rgba(139,92,246,0.32),0 0 16px 3px rgba(139,92,246,0.14);}
-  50%    {box-shadow:0 0 14px 5px rgba(139,92,246,0.58),0 0 32px 8px rgba(139,92,246,0.22);}
-}
-
-/* ── GLOW KEYFRAME — Amber/orange (Kandiaru inside notes only) ── */
-@keyframes glowAmber{
-  0%,100%{box-shadow:0 0 5px 1px rgba(196,122,10,0.38),0 0 14px 3px rgba(196,122,10,0.16);}
-  50%    {box-shadow:0 0 12px 4px rgba(196,122,10,0.65),0 0 26px 7px rgba(196,122,10,0.28);}
-}
-
 /* ── ADMIN BUTTON — base: purple bg white text (Francy, Carina) ── */
 .role-btn.admin-active{
   display:inline-flex;
@@ -102,12 +90,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 }
 .role-btn.admin-active:hover{opacity:0.85;}
 
-/* ── KANDIARU admin button — purple glow ── */
+/* ── KANDIARU admin button — purple static ── */
 .role-btn.admin-active.admin-kandiaru{
   background:rgba(139,92,246,0.15);
   color:#a78bfa;
   border:1.5px solid #8b5cf6;
-  animation:glowKandiaru 2.2s ease-in-out infinite;
 }
 body.dark .role-btn.admin-active.admin-kandiaru{
   background:rgba(139,92,246,0.2);
@@ -126,35 +113,30 @@ body.dark .role-btn.admin-active.admin-kandiaru{
 }
 .footer-creator svg{width:10px;height:10px;}
 
-/* Kandiaru footer chip — purple glow */
+/* Kandiaru footer chip — purple static */
 .footer-creator.chip-kandiaru{
   color:#a78bfa;background:rgba(139,92,246,0.13);border-color:#8b5cf6;
-  animation:glowKandiaru 2.2s ease-in-out infinite;
 }
 body.dark .footer-creator.chip-kandiaru{
   color:#c4b5fd;background:rgba(139,92,246,0.2);border-color:#a78bfa;
 }
-/* Francy + Carina footer chips — plain accent, no glow */
+/* Francy + Carina footer chips — plain accent */
 .footer-creator.chip-francy,
 .footer-creator.chip-carina{
   color:var(--accent);background:var(--acc-lt);border-color:rgba(91,82,232,0.25);
 }
 
-/* ── NOTE AUTHOR CHIP — all admins: amber/gold style ── */
-/* Base note-author is already amber from original CSS */
-/* Kandiaru inside notes: amber/orange GLOW */
+/* ── NOTE AUTHOR CHIP — all admins: amber/gold style, no glow ── */
 .note-author.chip-kandiaru{
   color:var(--amber);
   background:var(--amb-lt);
   border:1px solid rgba(196,122,10,0.4);
-  animation:glowAmber 2.2s ease-in-out infinite;
 }
 body.dark .note-author.chip-kandiaru{
   color:var(--amber);
   background:var(--amb-lt);
   border-color:rgba(245,166,35,0.45);
 }
-/* Francy + Carina inside notes: amber/gold static, no glow */
 .note-author.chip-francy,
 .note-author.chip-carina{
   color:var(--amber);
@@ -162,11 +144,10 @@ body.dark .note-author.chip-kandiaru{
   border:1px solid rgba(196,122,10,0.3);
 }
 
-/* Legacy kandiaru-glow class */
+/* Legacy kandiaru-glow — static purple, no animation */
 .kandiaru-glow{
   color:#a78bfa!important;background:rgba(139,92,246,0.13)!important;
   border-color:#8b5cf6!important;
-  animation:glowKandiaru 2.2s ease-in-out infinite!important;
 }
 
 /* DATE BAR */
@@ -401,6 +382,13 @@ body.dark .status-chip.today{background:rgba(234,107,14,0.18);color:#fb923c;}
 .cfb.undo-done{border-radius:20px;border-color:var(--amber);color:var(--amber);padding:5px 16px;}
 .cfb.undo-done:hover{background:var(--amb-lt);}
 .cfb-spacer{flex:1;}
+/* Icon-only admin action buttons */
+.cfb-icon{width:30px;height:30px;padding:0;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--sub);cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cfb-icon:hover{background:var(--surf3);color:var(--text);}
+.cfb-icon.edit:hover{border-color:var(--accent);color:var(--accent);background:var(--acc-lt);}
+.cfb-icon.del:hover{border-color:var(--red);color:var(--red);background:var(--red-lt);}
+.cfb-icon.copy:hover{border-color:var(--green);color:var(--green);background:var(--grn-lt);}
+.cfb-icon.copy.copied{border-color:var(--green);color:var(--green);background:var(--grn-lt);}
 
 /* expanded body */
 .card-expanded-body{display:none;flex-direction:column;}
@@ -829,13 +817,24 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function isOverdue(t){return t.date&&!t.done&&new Date(t.date+'T'+(t.time||'23:59'))<new Date();}
 function isToday(t){
   if(!t.date||t.done)return false;
-  const diff=(new Date(t.date+'T'+(t.time||'23:59'))-new Date())/(1000*60*60*24);
-  return diff>=0&&diff<1;
+  const now=new Date();
+  const due=new Date(t.date+'T00:00');
+  // Same calendar date — compare year/month/day only
+  return due.getFullYear()===now.getFullYear()&&
+         due.getMonth()===now.getMonth()&&
+         due.getDate()===now.getDate()&&
+         !isOverdue(t);
 }
 function isDueSoon(t){
   if(!t.date||t.done)return false;
-  const diff=(new Date(t.date+'T'+(t.time||'23:59'))-new Date())/(1000*60*60*24);
-  return diff>=1&&diff<=2;
+  const now=new Date();
+  const due=new Date(t.date+'T00:00');
+  // Strip time — compare calendar days only
+  const nowDay=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const dueDay=new Date(due.getFullYear(),due.getMonth(),due.getDate());
+  const diffDays=Math.round((dueDay-nowDay)/(1000*60*60*24));
+  // Soon = 1, 2, or 3 calendar days from today
+  return diffDays>=1&&diffDays<=3;
 }
 function fmtDue(date,time){
   if(!date)return null;
@@ -1174,8 +1173,15 @@ function buildCard(t){
   let collapsedFooter;
   if(currentRole==='admin'){
     collapsedFooter=`<div class="card-footer">
-      <button class="cfb edit" onclick="event.stopPropagation();openModal('${t.id}')">Edit</button>
-      <button class="cfb del"  onclick="event.stopPropagation();deleteTask('${t.id}')">Delete</button>
+      <button class="cfb-icon edit" onclick="event.stopPropagation();openModal('${t.id}')" title="Edit">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+      <button class="cfb-icon del" onclick="event.stopPropagation();deleteTask('${t.id}')" title="Delete">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </button>
+      <button class="cfb-icon copy" id="copy-c-${t.id}" onclick="event.stopPropagation();copyDesc('${t.id}','copy-c-${t.id}')" title="Copy description">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </button>
       <span class="cfb-spacer"></span>
       ${creatorChip}
       <button class="cfb view" onclick="event.stopPropagation();expandCard('${t.id}')">View</button>
@@ -1195,8 +1201,15 @@ function buildCard(t){
   let expandedFooter;
   if(currentRole==='admin'){
     expandedFooter=`<div class="card-footer-exp">
-      <button class="cfb edit" onclick="event.stopPropagation();openModal('${t.id}')">Edit</button>
-      <button class="cfb del"  onclick="event.stopPropagation();deleteTask('${t.id}')">Delete</button>
+      <button class="cfb-icon edit" onclick="event.stopPropagation();openModal('${t.id}')" title="Edit">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+      <button class="cfb-icon del" onclick="event.stopPropagation();deleteTask('${t.id}')" title="Delete">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </button>
+      <button class="cfb-icon copy" id="copy-e-${t.id}" onclick="event.stopPropagation();copyDesc('${t.id}','copy-e-${t.id}')" title="Copy description">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </button>
       <span class="cfb-spacer"></span>
       ${creatorChip}
       <button class="cfb view" onclick="event.stopPropagation();collapseCard('${t.id}')">Close</button>
@@ -1253,6 +1266,24 @@ function collapseCard(id){
 // ─────────────────────────────────────────────
 //  TOGGLE DONE
 // ─────────────────────────────────────────────
+// ─────────────────────────────────────────────
+//  COPY DESCRIPTION
+// ─────────────────────────────────────────────
+function copyDesc(id, btnId){
+  const t=tasks.find(x=>x.id===id);
+  if(!t) return;
+  const text=(t.notes||'').trim()||t.name;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById(btnId);
+    if(!btn) return;
+    // Swap to checkmark briefly
+    const orig=btn.innerHTML;
+    btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.innerHTML=orig;btn.classList.remove('copied');},1500);
+  }).catch(()=>{});
+}
+
 function toggleDone(id){
   const t=tasks.find(x=>x.id===id);if(!t)return;
   if(!t.done){
