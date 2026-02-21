@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#f4f3f0"/>
 <title>BSCS1B</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root {
   --bg:      #f4f3f0;
@@ -49,7 +50,7 @@ body.dark {
   --shadow:  0 1px 4px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;overflow-x:hidden;overflow-y:auto;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;overflow-x:hidden;overflow-y:auto;-webkit-tap-highlight-color:transparent;}
 body.modal-open{overflow:hidden;}
 
 /* TOPBAR */
@@ -57,7 +58,7 @@ body.modal-open{overflow:hidden;}
 .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;letter-spacing:0.5px;}
 .logo span{color:var(--accent);}
 .topbar-right{display:flex;align-items:center;gap:8px;}
-.role-btn{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:6px 14px;border-radius:20px;border:none;cursor:pointer;transition:all 0.15s;}
+.role-btn{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:6px 14px;border-radius:20px;border:none;cursor:pointer;transition:opacity 0.15s,background 0.15s,color 0.15s;}
 .role-btn.admin{background:var(--accent);color:#fff;}
 .role-btn.admin-active{background:var(--accent);color:#fff;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .role-btn.user{background:var(--green);color:#0f1a12;}
@@ -205,7 +206,7 @@ body.dark .note-author.chip-kandiaru{
 
 /* SIDEBAR */
 .sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;gap:6px;padding:12px 8px;}
-.filter-btn{display:flex;align-items:center;gap:7px;padding:9px 10px;border-radius:10px;background:var(--surf2);border:1.5px solid transparent;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;transition:all 0.18s;text-align:left;width:100%;}
+.filter-btn{display:flex;align-items:center;gap:7px;padding:9px 10px;border-radius:10px;background:var(--surf2);border:1.5px solid transparent;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;transition:background 0.15s,color 0.15s,border-color 0.15s;text-align:left;width:100%;}
 .f-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .f-all      .f-dot{background:var(--accent);}
 .f-soon     .f-dot{background:var(--amber);}
@@ -265,7 +266,7 @@ body.dark .note-card{background:rgba(245,166,35,0.07);border-color:rgba(245,166,
 .feat-section-divider{display:flex;align-items:center;gap:6px;margin:2px 0;}
 .feat-section-divider-line{flex:1;height:1px;background:var(--border);}
 .feat-section-divider-label{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--sub);white-space:nowrap;}
-.featured-card{background:var(--surf2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;cursor:pointer;transition:all 0.15s;border-left:3px solid var(--accent);box-shadow:var(--shadow);}
+.featured-card{background:var(--surf2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;cursor:pointer;transition:background 0.15s,transform 0.15s;border-left:3px solid var(--accent);box-shadow:var(--shadow);}
 .featured-card:hover{background:var(--surf3);transform:translateX(2px);}
 .featured-card.urgent{border-left-color:var(--red);}
 .featured-card.soon{border-left-color:var(--amber);}
@@ -319,7 +320,7 @@ body.dark .note-card{background:rgba(245,166,35,0.07);border-color:rgba(245,166,
 .done-divider-label{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;}
 
 /* TASK CARD */
-.task-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s;animation:fadeUp 0.22s ease;box-shadow:var(--shadow);min-width:0;width:100%;}
+.task-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s;animation:fadeUp 0.22s ease;box-shadow:var(--shadow);min-width:0;width:100%;contain:layout style;}
 .task-card:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(0,0,0,0.10);}
 .task-card.expanded{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent);}
 .task-card.done-card{opacity:0.52;}
@@ -398,7 +399,7 @@ body.dark .status-chip.today{background:rgba(234,107,14,0.18);color:#fb923c;}
 .cfb.undo-done:hover{background:var(--amb-lt);}
 .cfb-spacer{flex:1;}
 /* Icon-only admin action buttons */
-.cfb-icon{width:30px;height:30px;padding:0;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--sub);cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cfb-icon{width:30px;height:30px;padding:0;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--sub);cursor:pointer;transition:background 0.12s,color 0.12s,border-color 0.12s;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
 .cfb-icon:hover{background:var(--surf3);color:var(--text);}
 .cfb-icon.edit:hover{border-color:var(--accent);color:var(--accent);background:var(--acc-lt);}
 .cfb-icon.del:hover{border-color:var(--red);color:var(--red);background:var(--red-lt);}
@@ -462,7 +463,6 @@ body.dark .status-chip.today{background:rgba(234,107,14,0.18);color:#fb923c;}
 .overlay.open{
   background:rgba(0,0,0,0.45);
   pointer-events:all;
-  backdrop-filter:blur(5px);
 }
 .modal{
   background:var(--surface);
@@ -496,7 +496,7 @@ textarea.form-control{resize:vertical;min-height:70px;}
 .btn-save:hover{opacity:0.88;}
 
 /* ADMIN LOGIN MODAL */
-.login-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:300;backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity 0.25s;}
+.login-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:300;opacity:0;pointer-events:none;transition:opacity 0.25s;}
 .login-overlay.open{opacity:1;pointer-events:all;}
 .login-modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px 28px 26px;width:calc(100% - 32px);max-width:380px;transform:scale(0.95) translateY(8px);transition:transform 0.25s ease,opacity 0.25s;box-shadow:0 20px 60px rgba(0,0,0,0.25);}
 .login-overlay.open .login-modal{transform:scale(1) translateY(0);}
@@ -536,11 +536,11 @@ textarea.form-control{resize:vertical;min-height:70px;}
 .lb-del-wrap.admin-visible{display:block;}
 
 /* DELETE CONFIRM MODAL */
-.del-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:400;backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.del-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:400;opacity:0;pointer-events:none;transition:opacity 0.2s;}
 .del-overlay.open{opacity:1;pointer-events:all;}
 /* Photo delete sits above lightbox (z-index 500) */
 #photoDelOverlay{z-index:600;}
-.del-modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px 26px 24px;width:calc(100% - 40px);max-width:320px;text-align:center;transform:scale(0.92) translateY(8px);transition:transform 0.22s ease;box-shadow:0 20px 60px rgba(0,0,0,0.22);}
+.del-modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px 26px 24px;width:calc(100% - 40px);max-width:320px;text-align:center;transform:scale(0.92) translateY(8px);transition:transform 0.22s ease;box-shadow:0 20px 60px rgba(0,0,0,0.22);will-change:transform;}
 .del-overlay.open .del-modal{transform:scale(1) translateY(0);}
 .del-icon{width:52px;height:52px;border-radius:14px;background:var(--red-lt);border:1.5px solid rgba(220,38,38,0.25);display:flex;align-items:center;justify-content:center;color:var(--red);margin:0 auto 14px;}
 .del-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px;}
@@ -655,7 +655,7 @@ input[type=file]{display:none;}
 
   <!-- SEARCH BAR -->
   <div class="search-bar" id="searchBar">
-    <input class="search-input" id="searchInput" type="text" placeholder="Search tasks…" oninput="renderTasks()"/>
+    <input class="search-input" id="searchInput" type="text" placeholder="Search tasks…" oninput="debouncedSearch()"/>
   </div>
 
   <!-- TASK LIST -->
@@ -869,8 +869,44 @@ let tasks=[], notes=[], editId=null, uploadTargetId=null;
 let activeFilter='all', currentRole='user', currentAdminName=null, isDark=false;
 
 // ─────────────────────────────────────────────
-//  HELPERS
+//  CACHED STATUS — recomputed only when needed
 // ─────────────────────────────────────────────
+let _statusCache=null;
+function _invalidateCache(){_statusCache=null;}
+function _getStatus(t){
+  if(!_statusCache) _buildCache();
+  return _statusCache.get(t.id)||{over:false,today:false,soon:false};
+}
+function _buildCache(){
+  _statusCache=new Map();
+  const now=new Date();
+  const todayY=now.getFullYear(),todayM=now.getMonth(),todayD=now.getDate();
+  const nowMs=now.getTime();
+  const nowDay=new Date(todayY,todayM,todayD).getTime();
+  tasks.forEach(t=>{
+    if(!t.date){_statusCache.set(t.id,{over:false,today:false,soon:false});return;}
+    const dueMs=new Date(t.date+'T'+(t.time||'23:59')).getTime();
+    const over=!t.done&&dueMs<nowMs;
+    const due0=new Date(t.date+'T00:00');
+    const sameDay=!t.done&&!over&&due0.getFullYear()===todayY&&due0.getMonth()===todayM&&due0.getDate()===todayD;
+    let soon=false;
+    if(!t.done&&!over&&!sameDay){
+      const dueDay=new Date(due0.getFullYear(),due0.getMonth(),due0.getDate()).getTime();
+      const diff=Math.round((dueDay-nowDay)/86400000);
+      soon=diff>=1&&diff<=3;
+    }
+    _statusCache.set(t.id,{over,today:sameDay,soon});
+  });
+}
+
+// ─────────────────────────────────────────────
+//  CACHED FILTER BUTTONS
+// ─────────────────────────────────────────────
+let _filterBtns=null;
+function _getFilterBtns(){
+  if(!_filterBtns) _filterBtns=document.querySelectorAll('.filter-btn');
+  return _filterBtns;
+}
 function getAdminTitle(name){ return ADMIN_TITLES[name]||name; }
 
 function getAdminIcon(name,size=10){
@@ -897,28 +933,9 @@ function getAdminChipClass(name){
 }
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function isOverdue(t){return t.date&&!t.done&&new Date(t.date+'T'+(t.time||'23:59'))<new Date();}
-function isToday(t){
-  if(!t.date||t.done)return false;
-  const now=new Date();
-  const due=new Date(t.date+'T00:00');
-  // Same calendar date — compare year/month/day only
-  return due.getFullYear()===now.getFullYear()&&
-         due.getMonth()===now.getMonth()&&
-         due.getDate()===now.getDate()&&
-         !isOverdue(t);
-}
-function isDueSoon(t){
-  if(!t.date||t.done)return false;
-  const now=new Date();
-  const due=new Date(t.date+'T00:00');
-  // Strip time — compare calendar days only
-  const nowDay=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  const dueDay=new Date(due.getFullYear(),due.getMonth(),due.getDate());
-  const diffDays=Math.round((dueDay-nowDay)/(1000*60*60*24));
-  // Soon = 1, 2, or 3 calendar days from today
-  return diffDays>=1&&diffDays<=3;
-}
+function isOverdue(t){return _getStatus(t).over;}
+function isToday(t){return _getStatus(t).today;}
+function isDueSoon(t){return _getStatus(t).soon;}
 function fmtDue(date,time){
   if(!date)return null;
   const lbl=new Date(date+'T00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
@@ -937,6 +954,7 @@ function load(){
   renderAll();
 }
 function persist(){
+  _invalidateCache();
   try{localStorage.setItem(KEY,JSON.stringify(tasks));}catch(e){}
   try{localStorage.setItem(NOTES_KEY,JSON.stringify(notes));}catch(e){}
 }
@@ -1092,9 +1110,8 @@ function toggleTheme(){
 // ─────────────────────────────────────────────
 function setFilter(f){
   activeFilter=f;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  _getFilterBtns().forEach(b=>b.classList.remove('active'));
   document.querySelector('.f-'+f).classList.add('active');
-  // Only update counts + task list — Featured stays frozen
   updateCounts();
   renderTasks();
 }
@@ -1108,23 +1125,39 @@ function toggleSearch(){
 //  RENDER
 // ─────────────────────────────────────────────
 // Full render — used when data actually changes (add/edit/delete/done)
-function renderAll(){updateCounts();renderFeatured();renderTasks();}
-// Filter-only render — no Featured refresh, no flicker
+function renderAll(){_invalidateCache();updateCounts();renderFeatured();renderTasks();}
+// Filter-only render — no Featured refresh
 function renderFiltered(){updateCounts();renderTasks();}
 
+let _searchTimer=null;
+function debouncedSearch(){
+  clearTimeout(_searchTimer);
+  _searchTimer=setTimeout(renderTasks,120);
+}
+
 function updateCounts(){
+  // Single pass — no repeated filter calls
+  _buildCache(); // ensure fresh
+  let cAll=0,cToday=0,cSoon=0,cOver=0,cDone=0;
+  tasks.forEach(t=>{
+    cAll++;
+    const s=_getStatus(t);
+    if(t.done)cDone++;
+    if(s.over)cOver++;
+    if(s.today)cToday++;
+    if(s.soon)cSoon++;
+  });
   const setBadge=(id,val)=>{
     const el=document.getElementById(id);
     el.textContent=val;
     el.style.display=val>0?'':'none';
   };
-  setBadge('cnt-all',    tasks.length);
-  setBadge('cnt-today',  tasks.filter(t=>isToday(t)).length);
-  setBadge('cnt-soon',   tasks.filter(t=>isDueSoon(t)).length);
-  const overdueCount=tasks.filter(t=>isOverdue(t)).length;
-  setBadge('cnt-overdue',overdueCount);
-  setBadge('cnt-done',   tasks.filter(t=>t.done).length);
-  document.querySelector('.f-overdue').classList.toggle('has-overdue',overdueCount>0);
+  setBadge('cnt-all',cAll);
+  setBadge('cnt-today',cToday);
+  setBadge('cnt-soon',cSoon);
+  setBadge('cnt-overdue',cOver);
+  setBadge('cnt-done',cDone);
+  document.querySelector('.f-overdue').classList.toggle('has-overdue',cOver>0);
 }
 
 function renderFeatured(){
@@ -1158,20 +1191,23 @@ function renderFeatured(){
   }
 
   const el=document.getElementById('featuredList');
-  const feat=tasks.filter(t=>!t.done&&(isOverdue(t)||isToday(t)||isDueSoon(t)))
+  // Build feat from already-cached status — no extra filter passes
+  const feat=tasks.filter(t=>{if(t.done)return false;const s=_getStatus(t);return s.over||s.today||s.soon;})
     .sort((a,b)=>{
       const da=a.date?new Date(a.date+'T'+(a.time||'23:59')):new Date('9999');
       const db=b.date?new Date(b.date+'T'+(b.time||'23:59')):new Date('9999');
       return da-db;
-    }).slice(0,4);
+    });
 
-  // Update featured count badge
+  // Featured count badge — reuse feat.length (already computed, no extra loop)
   const featBadge=document.getElementById('featCount');
   if(featBadge){
-    const total=tasks.filter(t=>!t.done&&(isOverdue(t)||isToday(t)||isDueSoon(t))).length;
+    const total=feat.length;
     featBadge.textContent=total;
     featBadge.style.display=total>0?'':'none';
   }
+
+  const featSlice=feat.slice(0,4);
 
   if(!feat.length&&!notes.length){
     el.innerHTML=`<div class="no-featured"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><p>All caught up!</p></div>`;
@@ -1179,9 +1215,9 @@ function renderFeatured(){
   }
   if(!feat.length){el.innerHTML='';return;}
 
-  const fOverdue=feat.filter(t=>isOverdue(t));
-  const fToday=feat.filter(t=>isToday(t)&&!isOverdue(t));
-  const fSoon=feat.filter(t=>isDueSoon(t));
+  const fOverdue=featSlice.filter(t=>_getStatus(t).over);
+  const fToday=featSlice.filter(t=>_getStatus(t).today);
+  const fSoon=featSlice.filter(t=>_getStatus(t).soon);
 
   let html='';
   const buildFeatCards=(arr,labelText,labelColor)=>{
@@ -1189,10 +1225,10 @@ function renderFeatured(){
     let out=`<div class="feat-section-divider"><div class="feat-section-divider-line" style="background:${labelColor}33"></div><span class="feat-section-divider-label" style="color:${labelColor}">${labelText}</span><div class="feat-section-divider-line" style="background:${labelColor}33"></div></div>`;
     out+=arr.map(t=>{
       const due=fmtDue(t.date,t.time);
-      const over=isOverdue(t),tod=isToday(t)&&!over;
-      return `<div class="featured-card ${over?'urgent':tod?'soon':''}" onclick="expandCard('${t.id}')">
+      const s=_getStatus(t);
+      return `<div class="featured-card ${s.over?'urgent':s.today?'soon':''}" onclick="expandCard('${t.id}')">
         <div class="fc-top"><span class="fc-name">${esc(t.name)}</span><span class="badge cat-${t.category}">${CAT_LABELS[t.category]}</span></div>
-        <div class="fc-meta">${due?`<span>${over?'<span class="due-dot"></span>':''} ${esc(due)}</span>`:''}</div>
+        <div class="fc-meta">${due?`<span>${s.over?'<span class="due-dot"></span>':''} ${esc(due)}</span>`:''}</div>
       </div>`;
     }).join('');
     return out;
@@ -1206,30 +1242,25 @@ function renderFeatured(){
 
 function renderTasks(){
   const search=(document.getElementById('searchInput').value||'').toLowerCase();
+  _buildCache(); // ensure cache is fresh for this render pass
   let list=tasks.filter(t=>{
+    const s=_getStatus(t);
     if(activeFilter==='done'   &&!t.done)return false;
-    if(activeFilter==='today'  &&(!isToday(t)||t.done))return false;
-    if(activeFilter==='soon'   &&(!isDueSoon(t)||t.done))return false;
-    if(activeFilter==='overdue'&&(!isOverdue(t)||t.done))return false;
+    if(activeFilter==='today'  &&(!s.today||t.done))return false;
+    if(activeFilter==='soon'   &&(!s.soon||t.done))return false;
+    if(activeFilter==='overdue'&&(!s.over||t.done))return false;
     if(search&&!t.name.toLowerCase().includes(search)&&!(t.notes||'').toLowerCase().includes(search))return false;
     return true;
   });
 
-  const upcoming=list.filter(t=>!t.done&&!isOverdue(t)).sort((a,b)=>{
+  const sortByDate=(a,b)=>{
     const da=a.date?new Date(a.date+'T'+(a.time||'23:59')):new Date('9999');
     const db=b.date?new Date(b.date+'T'+(b.time||'23:59')):new Date('9999');
     return da-db;
-  });
-  const overdue=list.filter(t=>!t.done&&isOverdue(t)).sort((a,b)=>{
-    const da=a.date?new Date(a.date+'T'+(a.time||'23:59')):new Date('9999');
-    const db=b.date?new Date(b.date+'T'+(b.time||'23:59')):new Date('9999');
-    return da-db;
-  });
-  const done=list.filter(t=>t.done).sort((a,b)=>{
-    const da=a.date?new Date(a.date+'T'+(a.time||'23:59')):new Date('9999');
-    const db=b.date?new Date(b.date+'T'+(b.time||'23:59')):new Date('9999');
-    return da-db;
-  });
+  };
+  const upcoming=list.filter(t=>!t.done&&!_getStatus(t).over).sort(sortByDate);
+  const overdue=list.filter(t=>!t.done&&_getStatus(t).over).sort(sortByDate);
+  const done=list.filter(t=>t.done).sort(sortByDate);
 
   const tb=document.getElementById('taskCountBadge');
   tb.textContent=list.length;
@@ -1261,9 +1292,10 @@ function renderTasks(){
 //  BUILD CARD
 // ─────────────────────────────────────────────
 function buildCard(t){
-  const over=isOverdue(t);
-  const tod=isToday(t);
-  const soon=isDueSoon(t);
+  const s=_getStatus(t);
+  const over=s.over;
+  const tod=s.today;
+  const soon=s.soon;
   const due=fmtDue(t.date,t.time);
   const notes=t.notes||'';
   const imgs=t.images||[];
@@ -1278,7 +1310,7 @@ function buildCard(t){
     ? `<span class="footer-creator ${getAdminChipClass(t.createdBy)}">${getAdminIcon(t.createdBy,10)}${esc(getAdminTitle(t.createdBy))}</span>`
     : '';
 
-  const imgHTML=imgs.map((src,i)=>`<div class="card-img-thumb" onclick="openLightbox('${t.id}',${i})"><img src="${esc(src)}" alt=""/></div>`).join('');
+  const imgHTML=imgs.map((src,i)=>`<div class="card-img-thumb" onclick="openLightbox('${t.id}',${i})"><img src="${esc(src)}" alt="" loading="lazy"/></div>`).join('');
   const addImgBtn=currentRole==='admin'?`<button class="add-img-btn" onclick="triggerImgUpload('${t.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add</button>`:'';
 
   let collapsedFooter;
@@ -1368,14 +1400,14 @@ function buildCard(t){
 //  EXPAND / COLLAPSE
 // ─────────────────────────────────────────────
 function expandCard(id){
-  // Switch to 'all' filter if current filter would hide this card
   const t=tasks.find(x=>x.id===id);
   if(!t) return;
   if(activeFilter!=='all'){
-    const visible=(activeFilter==='today'&&isToday(t))||(activeFilter==='soon'&&isDueSoon(t))||(activeFilter==='overdue'&&isOverdue(t))||(activeFilter==='done'&&t.done);
+    const s=_getStatus(t);
+    const visible=(activeFilter==='today'&&s.today)||(activeFilter==='soon'&&s.soon)||(activeFilter==='overdue'&&s.over)||(activeFilter==='done'&&t.done);
     if(!visible){
       activeFilter='all';
-      document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+      _getFilterBtns().forEach(b=>b.classList.remove('active'));
       document.querySelector('.f-all').classList.add('active');
     }
   }
@@ -1385,9 +1417,8 @@ function expandCard(id){
   setTimeout(()=>{
     const el=document.getElementById('card-'+id);
     if(!el) return;
-    // Calculate total sticky header height + small gap
-    const topbar  = document.querySelector('.topbar')  ?.offsetHeight||57;
-    const datebar = document.querySelector('.date-bar') ?.offsetHeight||43;
+    const topbar  = document.querySelector('.topbar')?.offsetHeight||57;
+    const datebar = document.querySelector('.date-bar')?.offsetHeight||43;
     const taskhdr = document.querySelector('.all-task-header')?.offsetHeight||44;
     const offset  = topbar + datebar + taskhdr + 8;
     const top = el.getBoundingClientRect().top + window.scrollY - offset;
