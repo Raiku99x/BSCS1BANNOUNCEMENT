@@ -1697,6 +1697,7 @@ document.addEventListener('keydown',e=>{
 (function(){
   const SHEET_OVERLAYS=['overlay','noteOverlay'];
 
+  // Bottom-sheet overlays (task add/edit, note)
   function applyViewport(){
     const vv=window.visualViewport;
     if(!vv) return;
@@ -1730,9 +1731,41 @@ document.addEventListener('keydown',e=>{
     });
   }
 
+  // Centered login modal — reposition to stay within visual viewport above keyboard
+  function applyLoginViewport(){
+    const vv=window.visualViewport;
+    if(!vv) return;
+    const el=document.getElementById('loginOverlay');
+    if(!el) return;
+    el.style.position = 'fixed';
+    el.style.top    = vv.offsetTop  + 'px';
+    el.style.left   = vv.offsetLeft + 'px';
+    el.style.width  = vv.width  + 'px';
+    el.style.height = vv.height + 'px';
+    el.style.bottom = 'auto';
+    el.style.right  = 'auto';
+    // Shrink modal if it's taller than available space
+    const lm=el.querySelector('.login-modal');
+    if(lm){
+      lm.style.maxHeight = Math.floor(vv.height * 0.92) + 'px';
+      lm.style.overflowY = 'auto';
+    }
+  }
+
+  function resetLoginViewport(){
+    const el=document.getElementById('loginOverlay');
+    if(!el) return;
+    el.style.position=''; el.style.top='';
+    el.style.left=''; el.style.width='';
+    el.style.height=''; el.style.bottom='';
+    el.style.right='';
+    const lm=el.querySelector('.login-modal');
+    if(lm){ lm.style.maxHeight=''; lm.style.overflowY=''; }
+  }
+
   if(window.visualViewport){
-    window.visualViewport.addEventListener('resize', applyViewport);
-    window.visualViewport.addEventListener('scroll', applyViewport);
+    window.visualViewport.addEventListener('resize', ()=>{ applyViewport(); applyLoginViewport(); });
+    window.visualViewport.addEventListener('scroll', ()=>{ applyViewport(); applyLoginViewport(); });
   }
 
   const _openModal=window.openModal;
@@ -1745,6 +1778,11 @@ document.addEventListener('keydown',e=>{
     if(_openNoteModal) _openNoteModal(...args);
     setTimeout(applyViewport, 50);
   };
+  const _openLoginModal=window.openLoginModal;
+  window.openLoginModal=function(...args){
+    if(_openLoginModal) _openLoginModal(...args);
+    setTimeout(applyLoginViewport, 50);
+  };
 
   const _closeModal=window.closeModal;
   window.closeModal=function(...args){
@@ -1755,6 +1793,11 @@ document.addEventListener('keydown',e=>{
   window.closeNoteModal=function(...args){
     if(_closeNoteModal) _closeNoteModal(...args);
     resetViewport();
+  };
+  const _closeLoginModal=window.closeLoginModal;
+  window.closeLoginModal=function(...args){
+    if(_closeLoginModal) _closeLoginModal(...args);
+    resetLoginViewport();
   };
 })();
 
