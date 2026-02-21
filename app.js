@@ -543,7 +543,6 @@ function renderFeatured() {
         <div class="note-card-top"><div class="note-card-text">${esc(n.text)}</div>${delBtn}</div>
         <div class="note-card-meta">
           <span class="note-author ${getAdminChipClass(n.author)}">${getAdminIcon(n.author, 9)}${esc(getAdminTitle(n.author))}</span>
-          <span class="note-expiry" style="font-size:10px;color:var(--sub);margin-left:auto;">${expiryLabel}</span>
         </div>
       </div>`;
     }).join('');
@@ -563,8 +562,9 @@ function renderFeatured() {
 
   const featBadge = document.getElementById('featCount');
   if (featBadge) {
-    featBadge.textContent = feat.length;
-    featBadge.style.display = feat.length > 0 ? '' : 'none';
+    const totalFeatCount = feat.length + notes.length;
+    featBadge.textContent = totalFeatCount;
+    featBadge.style.display = totalFeatCount > 0 ? '' : 'none';
   }
 
   const featSlice = feat.slice(0, 4);
