@@ -14,9 +14,9 @@
 <header class="topbar">
   <div class="logo">BSC<span>S1B</span></div>
   <div class="topbar-right">
-    <div class="admin-tag" id="adminTag" style="display:none!important;">
-      <span id="adminTagIcon"></span>
-      <span id="adminTagName"></span>
+    <div class="sync-indicator" id="syncIndicator" title="Sync status">
+      <span class="sync-dot"></span>
+      <span class="sync-label" id="syncLabel">Connecting…</span>
     </div>
     <button class="role-btn admin" id="adminBtn" onclick="clickAdminBtn()">Admin</button>
     <button class="role-btn user" id="userBtn" onclick="userBtnClick()">User</button>
@@ -293,6 +293,8 @@
 
 <input type="file" id="imgUpload" accept="image/*" multiple onchange="handleImgUpload(event)"/>
 
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="app.js"></script>
 </body>
 </html>
