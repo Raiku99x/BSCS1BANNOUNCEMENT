@@ -1,11 +1,10 @@
 // ============================================================
 //  BSCS1B TaskHub — app.js
 //  Supabase backend + realtime sync
+//  ✅ Done state is LOCAL (per-device) — each user tracks their own
 // ============================================================
 
 // ─── SUPABASE CONFIG ────────────────────────────────────────
-// REPLACE these two values with your own from Supabase Dashboard
-// Project Settings → API → Project URL & anon/public key
 const SUPABASE_URL = 'https://znoveznysqwmolhftxfy.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpub3Zlem55c3F3bW9saGZ0eGZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MjM3MjQsImV4cCI6MjA4NzE5OTcyNH0.1jlJuRk-7vAVtEZFDvwdV2ZH3UkqUYwlyK-w2PSbl-A'; 
 
@@ -40,6 +39,34 @@ let _lbTaskId = null, _lbIdx = 0;
 let _realtimeChannel = null;
 let _isLoading = true;
 
+// ─── LOCAL DONE STATE ────────────────────────────────────────
+// Done state is stored per-device in localStorage.
+// Each user/device independently tracks what they've completed.
+const LOCAL_DONE_KEY = 'taskhub-done-v1';
+
+function getLocalDone() {
+  try {
+    const s = localStorage.getItem(LOCAL_DONE_KEY);
+    return s ? JSON.parse(s) : {};
+  } catch(e) { return {}; }
+}
+
+function setLocalDone(id, isDoneVal) {
+  const done = getLocalDone();
+  if (isDoneVal) {
+    done[id] = true;
+  } else {
+    delete done[id];
+  }
+  try { localStorage.setItem(LOCAL_DONE_KEY, JSON.stringify(done)); } catch(e) {}
+}
+
+function applyLocalDone(taskList) {
+  const done = getLocalDone();
+  taskList.forEach(t => { t.done = !!done[t.id]; });
+  return taskList;
+}
+
 // ─── SYNC INDICATOR ─────────────────────────────────────────
 function setSyncStatus(status, label) {
   const el = document.getElementById('syncIndicator');
@@ -62,7 +89,7 @@ async function loadFromSupabase() {
     if (tErr) throw tErr;
     if (nErr) throw nErr;
 
-    tasks = (taskData || []).map(dbToTask);
+    tasks = applyLocalDone((taskData || []).map(dbToTask));
     notes = (noteData || []).map(dbToNote);
     pruneExpiredNotes();
     _isLoading = false;
@@ -97,13 +124,17 @@ function handleTaskChange(payload) {
   const { eventType, new: newRow, old: oldRow } = payload;
   if (eventType === 'INSERT') {
     if (!tasks.find(t => t.id === newRow.id)) {
-      tasks.push(dbToTask(newRow));
+      const t = dbToTask(newRow);
+      // Preserve local done state for newly synced tasks
+      t.done = !!getLocalDone()[t.id];
+      tasks.push(t);
     }
   } else if (eventType === 'UPDATE') {
     const idx = tasks.findIndex(t => t.id === newRow.id);
     if (idx !== -1) {
       const expanded = tasks[idx]._expanded;
-      tasks[idx] = { ...dbToTask(newRow), _expanded: expanded };
+      const localDone = tasks[idx].done; // preserve local done state
+      tasks[idx] = { ...dbToTask(newRow), _expanded: expanded, done: localDone };
     }
   } else if (eventType === 'DELETE') {
     tasks = tasks.filter(t => t.id !== oldRow.id);
@@ -136,7 +167,7 @@ function dbToTask(row) {
     date:       row.date || '',
     time:       row.time || '',
     notes:      row.notes || '',
-    done:       row.done || false,
+    done:       false, // always start as not done; local done state applied separately
     images:     Array.isArray(row.images) ? row.images : [],
     createdBy:  row.created_by || null,
     created:    row.created_at || Date.now(),
@@ -152,7 +183,7 @@ function taskToDb(t) {
     date:       t.date || null,
     time:       t.time || null,
     notes:      t.notes || null,
-    done:       t.done,
+    // ✅ done is intentionally NOT saved to Supabase — it's per-device
     images:     t.images || [],
     created_by: t.createdBy || null,
     created_at: t.created || Date.now(),
@@ -176,6 +207,8 @@ const LS_NOTES_KEY = 'taskhub-notes-v1';
 function loadFromLocalStorage() {
   try { const s = localStorage.getItem(LS_KEY); if (s) tasks = JSON.parse(s); } catch(e) { tasks = []; }
   try { const n = localStorage.getItem(LS_NOTES_KEY); if (n) notes = JSON.parse(n); } catch(e) { notes = []; }
+  // Still apply local done state even in offline mode
+  applyLocalDone(tasks);
 }
 
 function persistToLocalStorage() {
@@ -203,6 +236,8 @@ async function persistTask(task, isNew = false) {
 }
 
 async function deleteTaskFromDb(id) {
+  // Also clean up local done state when a task is deleted
+  setLocalDone(id, false);
   setSyncStatus('syncing', 'Deleting…');
   try {
     const { error } = await _sb.from('tasks').delete().eq('id', id);
@@ -745,15 +780,15 @@ async function toggleDone(id) {
   if (!t) return;
   if (!t.done) {
     const card = document.getElementById('card-' + id);
-    playCompletion(card, async () => {
+    playCompletion(card, () => {
       t.done = true;
+      setLocalDone(id, true);   // ✅ Save to localStorage only — NOT Supabase
       renderAll();
-      await persistTask(t, false);
     });
   } else {
     t.done = false;
+    setLocalDone(id, false);    // ✅ Remove from localStorage only
     renderAll();
-    await persistTask(t, false);
   }
 }
 
