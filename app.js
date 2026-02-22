@@ -59,6 +59,22 @@ function setLocalDone(id, isDoneVal) {
     delete done[id];
   }
   try { localStorage.setItem(LOCAL_DONE_KEY, JSON.stringify(done)); } catch(e) {}
+
+  // Sync done IDs to Supabase so push notifications skip completed tasks
+  _syncDoneToSupabase();
+}
+
+async function _syncDoneToSupabase() {
+  // Only sync if user has an active push subscription
+  if (!_pushSubscription) return;
+  const doneIds = Object.keys(getLocalDone());
+  try {
+    await _sb.from('push_subscriptions')
+      .update({ done_task_ids: doneIds })
+      .eq('endpoint', _pushSubscription.endpoint);
+  } catch(e) {
+    console.warn('[Done sync] Could not sync done state:', e);
+  }
 }
 
 function applyLocalDone(taskList) {
