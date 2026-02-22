@@ -1,12 +1,10 @@
 // ============================================================
 //  BSCS1B TaskHub — notifications.js
 //  Client-side push subscription management
-//  Load this AFTER app.js (needs _sb to be defined)
 // ============================================================
 
-// ─── ⚠️  REPLACE WITH YOUR OWN VAPID PUBLIC KEY ──────────────
-//  Run:  npx web-push generate-vapid-keys
-//  Or:   https://vapidkeys.com/
+// ─── VAPID PUBLIC KEY ──────────────
+
 const VAPID_PUBLIC_KEY = 'BDB28hUn4e2av41itWZ8NP2hryHALsKH2OHomYfNCkWI6rTLwTJEbTNtotHf2jz663NB5DdLI-hkyC3jsck_8iU';
 // ─────────────────────────────────────────────────────────────
 
@@ -169,6 +167,13 @@ async function updateBellUI() {
   btn.className = 'icon-bar notif-bell' +
     (active  ? ' notif-on'     : '') +
     (denied  ? ' notif-denied' : '');
+
+  btn.className = 'icon-bar notif-bell' +
+    (active  ? ' notif-on'     : '') +
+    (denied  ? ' notif-denied' : '');
+
+  // ← ADD THIS LINE
+  btn.style.display = active ? 'none' : '';
 
   btn.title = denied ? 'Notifications blocked (enable in browser settings)'
             : active ? 'Notifications ON — click to disable'
