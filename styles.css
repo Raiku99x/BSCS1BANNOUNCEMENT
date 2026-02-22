@@ -473,13 +473,13 @@ input[type=file]{display:none;}
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235b52e8' stroke='none'%3E%3Cpath d='M13 1a2 2 0 0 0-2 2v7H9.5A1.5 1.5 0 0 0 8 11.5v.5l-1.5 4A3.5 3.5 0 0 0 9.83 21H15a4 4 0 0 0 4-4v-5.5A1.5 1.5 0 0 0 17.5 10H16V3a2 2 0 0 0-2-2h-1z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235b52e8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='12' y1='5' x2='12' y2='19'/%3E%3Cpolyline points='19 12 12 19 5 12'/%3E%3C/svg%3E");
   animation: pointerBounce 1s ease-in-out infinite;
   pointer-events: none;
 }
 
 .notif-bell.notif-denied::after {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23dc2626' stroke='none'%3E%3Cpath d='M13 1a2 2 0 0 0-2 2v7H9.5A1.5 1.5 0 0 0 8 11.5v.5l-1.5 4A3.5 3.5 0 0 0 9.83 21H15a4 4 0 0 0 4-4v-5.5A1.5 1.5 0 0 0 17.5 10H16V3a2 2 0 0 0-2-2h-1z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23dc2626' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='12' y1='5' x2='12' y2='19'/%3E%3Cpolyline points='19 12 12 19 5 12'/%3E%3C/svg%3E");
 }
 
 @keyframes pointerBounce {
