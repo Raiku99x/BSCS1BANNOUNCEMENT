@@ -321,7 +321,7 @@ function _buildCache() {
     if (!t.done && !over && !sameDay) {
       const dueDay = new Date(due0.getFullYear(), due0.getMonth(), due0.getDate()).getTime();
       const diff = Math.round((dueDay - nowDay) / 86400000);
-      soon = diff >= 1 && diff <= 3;
+      soon = diff >= 1 && diff <= 2;
     }
     _statusCache.set(t.id, { over, today:sameDay, soon });
   });
