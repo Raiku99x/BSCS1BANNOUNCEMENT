@@ -460,3 +460,25 @@ input[type=file]{display:none;}
 .notif-toast-error   { border-color: var(--red);   color: var(--red);   background: var(--red-lt); }
 .notif-toast-warn    { border-color: var(--amber);  color: var(--amber); background: var(--amb-lt); }
 .notif-toast-info    { border-color: var(--accent); color: var(--accent); background: var(--acc-lt); }
+
+/* ── BELL POINTER ANIMATION ──────────────────────────────────── */
+.notif-bell:not(.notif-on):not(.notif-denied)::after {
+  content: '';
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 16px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235b52e8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 11V6a2 2 0 0 1 4 0v5'/%3E%3Cpath d='M13 11V9a2 2 0 0 1 4 0v5'/%3E%3Cpath d='M17 14a2 2 0 0 1 4 0v2a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6v-1a2 2 0 0 1 4 0'/%3E%3Cpath d='M9 11a2 2 0 0 0-4 0v1'/%3E%3C/svg%3E");
+  animation: pointerBounce 1s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pointerBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0);   opacity: 1; }
+  50%       { transform: translateX(-50%) translateY(-5px); opacity: 0.6; }
+}
