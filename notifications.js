@@ -76,10 +76,19 @@ async function subscribeToPush(reg) {
       updated_at: new Date().toISOString(),
     }, { onConflict: 'endpoint' });
 
-    if (error) {
+if (error) {
       console.error('[Notif] Failed to save subscription:', error);
     } else {
       console.log('[Notif] Push subscription saved ✓');
+    }
+
+    // Sync any already-done tasks from this device immediately after subscribing
+    const doneIds = Object.keys(getLocalDone());
+    if (doneIds.length > 0) {
+      await _sb.from('push_subscriptions')
+        .update({ done_task_ids: doneIds })
+        .eq('endpoint', sub.endpoint);
+      console.log('[Notif] Done tasks synced ✓', doneIds.length);
     }
 
     return sub;
