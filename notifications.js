@@ -7,7 +7,7 @@
 // ─── ⚠️  REPLACE WITH YOUR OWN VAPID PUBLIC KEY ──────────────
 //  Run:  npx web-push generate-vapid-keys
 //  Or:   https://vapidkeys.com/
-const VAPID_PUBLIC_KEY = 'BFG4EQHggrkQGiXJTRozWMNY8jrEI1SlEIEEJASbGPb1r-zHcVxqsp0wKC2GMdkB_7nA2xrncu0LZpWkcgoTorY';
+const VAPID_PUBLIC_KEY = 'BDB28hUn4e2av41itWZ8NP2hryHALsKH2OHomYfNCkWI6rTLwTJEbTNtotHf2jz663NB5DdLI-hkyC3jsck_8iU';
 // ─────────────────────────────────────────────────────────────
 
 let _swRegistration = null;
