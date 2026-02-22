@@ -465,7 +465,7 @@ input[type=file]{display:none;}
 .notif-bell:not(.notif-on):not(.notif-denied)::after {
   content: '';
   position: absolute;
-  top: -22px;
+  bottom: -22px;  /* ← changed from top: -22px */
   left: 50%;
   transform: translateX(-50%);
   width: 16px;
@@ -480,5 +480,5 @@ input[type=file]{display:none;}
 
 @keyframes pointerBounce {
   0%, 100% { transform: translateX(-50%) translateY(0);   opacity: 1; }
-  50%       { transform: translateX(-50%) translateY(-5px); opacity: 0.6; }
+  50%       { transform: translateX(-50%) translateY(5px); opacity: 0.6; }
 }
