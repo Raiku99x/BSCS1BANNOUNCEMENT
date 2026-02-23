@@ -81,13 +81,12 @@ if (error) {
     }
 
     // Sync any already-done tasks from this device immediately after subscribing
-    const doneIds = Object.keys(getLocalDone());
-    if (doneIds.length > 0) {
-      await _sb.from('push_subscriptions')
-        .update({ done_task_ids: doneIds })
-        .eq('endpoint', sub.endpoint);
-      console.log('[Notif] Done tasks synced ✓', doneIds.length);
-    }
+    const doneIds = (() => {
+      try {
+        const s = localStorage.getItem('taskhub-done-v1');
+        return s ? Object.keys(JSON.parse(s)) : [];
+      } catch(e) { return []; }
+    })();
 
     return sub;
   } catch (err) {
