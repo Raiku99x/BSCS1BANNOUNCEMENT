@@ -612,7 +612,7 @@ function renderFeatured() {
     if (totalFeatCount > 0) {
       // Show as "featuredTaskCount/totalActive" ratio (notes don't count toward active ratio)
       if (featuredCount > 0 && totalActive > 0) {
-        featBadge.textContent = `${featuredCount} of ${totalActive} active`;
+        featBadge.textContent = `${featuredCount} of ${totalActive}`;
       } else if (notes.length > 0) {
         featBadge.textContent = notes.length;
       } else {
