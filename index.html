@@ -308,5 +308,142 @@
 <script src="app.js"></script>
 <!-- Push Notifications (must be after app.js so _sb is available) -->
 <script src="notifications.js"></script>
+
+
+<!-- HELP BUTTON -->
+<button class="help-fab" id="helpBtn" onclick="openHelp()" title="Help & Guide">
+  ?
+</button>
+
+<!-- HELP MODAL OVERLAY -->
+<div class="help-overlay" id="helpOverlay" onclick="handleHelpOverlay(event)">
+  <div class="help-modal" id="helpModal">
+
+    <div class="help-modal-header">
+      <div class="help-modal-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        How to Use TaskHub
+      </div>
+      <button class="help-close-btn" onclick="closeHelp()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="help-body">
+
+      <!-- Filters -->
+      <div class="help-section">
+        <div class="help-section-title">
+          <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          Filters
+        </div>
+        <div class="help-item">
+          <span class="help-badge badge-all">All</span>
+          <span>Shows every task regardless of status.</span>
+        </div>
+        <div class="help-item">
+          <span class="help-badge badge-soon">Soon</span>
+          <span>Tasks due within the next 3 days.</span>
+        </div>
+        <div class="help-item">
+          <span class="help-badge badge-today">Today</span>
+          <span>Tasks due today specifically.</span>
+        </div>
+        <div class="help-item">
+          <span class="help-badge badge-overdue">Overdue</span>
+          <span>Tasks past their due date — act fast!</span>
+        </div>
+        <div class="help-item">
+          <span class="help-badge badge-done">Done</span>
+          <span>Tasks you've personally marked completed.</span>
+        </div>
+      </div>
+
+      <!-- Featured -->
+      <div class="help-section">
+        <div class="help-section-title">
+          <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Featured Panel
+        </div>
+        <div class="help-desc">
+          The top panel highlights your most urgent tasks — overdue, due today, and due soon. Pinned notes from admins also appear here. Tap any featured card to jump to that task.
+        </div>
+      </div>
+
+      <!-- Task Cards -->
+      <div class="help-section">
+        <div class="help-section-title">
+          <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12h6M12 9v6"/></svg>
+          Task Cards
+        </div>
+        <div class="help-desc">
+          Tap <strong>View</strong> to expand a card and read the full description and images. Tap <strong>Mark Done</strong> to complete a task — this is saved <strong>only on your device</strong>, so every classmate tracks their own progress independently.
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="help-section">
+        <div class="help-section-title">
+          <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Notifications
+        </div>
+        <div class="help-desc">
+          Tap the <strong>bell icon</strong> (top left) to enable push notifications. You'll get reminded about tasks due today, tomorrow, and within 3 days — even when the app is closed. Once enabled, the bell hides itself (it's working in the background).
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="help-section">
+        <div class="help-section-title">
+          <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Search
+        </div>
+        <div class="help-desc">
+          Tap the <strong>search icon</strong> beside "All Tasks" to search by task name or description. Results filter as you type.
+        </div>
+      </div>
+
+      <!-- Theme & Fullscreen -->
+      <div class="help-section">
+        <div class="help-section-title">
+          <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          Theme & Fullscreen
+        </div>
+        <div class="help-desc">
+          Use the <strong>moon/sun icon</strong> (top right) to toggle dark mode. Use the <strong>expand icon</strong> (top left) to go fullscreen for a focused view.
+        </div>
+      </div>
+
+      <!-- Sync Status -->
+      <div class="help-section">
+        <div class="help-section-title">
+          <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Sync Status
+        </div>
+        <div class="help-item">
+          <span class="help-sync-dot" style="background:var(--green)"></span>
+          <span><strong>Live</strong> — connected and syncing in real time.</span>
+        </div>
+        <div class="help-item">
+          <span class="help-sync-dot" style="background:var(--amber)"></span>
+          <span><strong>Saving…</strong> — currently syncing a change.</span>
+        </div>
+        <div class="help-item">
+          <span class="help-sync-dot" style="background:var(--red)"></span>
+          <span><strong>Offline</strong> — no connection, refresh to retry.</span>
+        </div>
+      </div>
+
+      <!-- Footer note -->
+      <div class="help-footer-note">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;margin-top:1px;"><polyline points="20 6 9 17 4 12"/></svg>
+        Your <strong>Done</strong> state is saved on your device only — each classmate tracks their own progress independently!
+      </div>
+
+    </div>
+  </div>
+</div>
 </body>
 </html>
