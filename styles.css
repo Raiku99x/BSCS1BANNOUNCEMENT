@@ -692,3 +692,30 @@ body.dark .help-fab:hover {
 }
 .help-footer-note svg { color: var(--green); }
 .help-footer-note strong { color: var(--green); }
+
+/* ── ACTIVE FILTER ─────────────────────────────────────────── */
+.f-active .f-dot { background: #0ea5e9; }
+.filter-btn.active.f-active {
+  background: rgba(14,165,233,0.12);
+  border-color: #0ea5e9;
+  color: #0ea5e9;
+}
+.filter-btn.active.f-active .filter-count {
+  background: rgba(0,0,0,0.10);
+  color: inherit;
+}
+body.dark .filter-btn.active.f-active .filter-count {
+  background: rgba(255,255,255,0.12);
+}
+
+/* ── ACTIVE BADGE IN HELP MODAL ────────────────────────────── */
+.badge-active {
+  background: rgba(14,165,233,0.12);
+  color: #0ea5e9;
+  border: 1px solid #0ea5e9;
+}
+body.dark .badge-active {
+  background: rgba(14,165,233,0.18);
+  color: #38bdf8;
+  border-color: #38bdf8;
+}
