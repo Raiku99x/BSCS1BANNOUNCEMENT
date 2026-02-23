@@ -267,7 +267,7 @@ body.dark .status-chip.today{background:rgba(234,107,14,0.18);color:#fb923c;}
 .task-card.expanded .card-expanded-body{display:flex;}
 .task-card.expanded .card-desc-collapsed{display:none;}
 .task-card.expanded .card-footer{display:none;}
-.card-desc-full{margin:0 14px 12px;background:var(--surf3);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text);line-height:0.8;overflow:visible;border:1px solid var(--border);word-break:break-word;overflow-wrap:anywhere;white-space:pre-wrap;}
+.card-desc-full{margin:0 14px 12px;background:var(--surf3);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text);line-height:1;overflow:visible;border:1px solid var(--border);word-break:break-word;overflow-wrap:anywhere;white-space:pre-wrap;}
 /* IMAGE STRIP */
 .card-images-wrap{position:relative;margin:0 0 12px;}
 .card-images{display:flex;gap:8px;padding:0 14px;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none;}
