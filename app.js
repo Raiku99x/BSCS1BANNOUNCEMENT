@@ -28,6 +28,17 @@ const ADMIN_TITLES = {
   Francy:'P.I.O. Francy', Carina:'Mayor Carina', Kandiaru:'Admin Kandiaru',
 };
 
+// ─── FILTER CONFIG ───────────────────────────────────────────
+// Labels and badge colors for the dynamic "All Tasks" header
+const FILTER_META = {
+  all:     { label: 'All Tasks',      badgeBg: 'var(--accent)',  badgeColor: '#fff' },
+  active:  { label: 'Active Tasks',   badgeBg: '#0ea5e9',        badgeColor: '#fff' },
+  soon:    { label: 'Soon Tasks',     badgeBg: 'var(--amber)',   badgeColor: '#fff' },
+  today:   { label: 'Today Tasks',    badgeBg: '#ea6b0e',        badgeColor: '#fff' },
+  overdue: { label: 'Overdue Tasks',  badgeBg: 'var(--red)',     badgeColor: '#fff' },
+  done:    { label: 'Done Tasks',     badgeBg: 'var(--green)',   badgeColor: '#0f1a12' },
+};
+
 // ─── STATE ──────────────────────────────────────────────────
 let tasks = [], notes = [], editId = null, uploadTargetId = null;
 let activeFilter = 'all', currentRole = 'user', currentAdminName = null, isDark = false;
@@ -519,7 +530,7 @@ function debouncedSearch() {
 
 function updateCounts() {
   _buildCache();
-  let cAll = 0, cToday = 0, cSoon = 0, cOver = 0, cDone = 0;
+  let cAll = 0, cActive = 0, cToday = 0, cSoon = 0, cOver = 0, cDone = 0;
   tasks.forEach(t => {
     cAll++;
     const s = _getStatus(t);
@@ -527,18 +538,32 @@ function updateCounts() {
     if (s.over) cOver++;
     if (s.today) cToday++;
     if (s.soon) cSoon++;
+    // Active = not done AND not overdue
+    if (!t.done && !s.over) cActive++;
   });
   const setBadge = (id, val) => {
     const el = document.getElementById(id);
+    if (!el) return;
     el.textContent = val;
     el.style.display = val > 0 ? '' : 'none';
   };
   setBadge('cnt-all', cAll);
+  setBadge('cnt-active', cActive);
   setBadge('cnt-today', cToday);
   setBadge('cnt-soon', cSoon);
   setBadge('cnt-overdue', cOver);
   setBadge('cnt-done', cDone);
   document.querySelector('.f-overdue').classList.toggle('has-overdue', cOver > 0);
+
+  // ── Dynamic header title + badge color ──────────────────────
+  const meta = FILTER_META[activeFilter] || FILTER_META.all;
+  const titleEl = document.getElementById('taskAreaTitle');
+  const badgeEl = document.getElementById('taskCountBadge');
+  if (titleEl) titleEl.textContent = meta.label;
+  if (badgeEl) {
+    badgeEl.style.background = meta.badgeBg;
+    badgeEl.style.color = meta.badgeColor;
+  }
 }
 
 function renderFeatured() {
@@ -576,11 +601,27 @@ function renderFeatured() {
       return da - db;
     });
 
+  // ── Featured badge: shows "featCount / totalActive" ──────────
   const featBadge = document.getElementById('featCount');
   if (featBadge) {
-    const totalFeatCount = feat.length + notes.length;
-    featBadge.textContent = totalFeatCount;
-    featBadge.style.display = totalFeatCount > 0 ? '' : 'none';
+    // Total active = not done, not overdue (same as cnt-active)
+    const totalActive = tasks.filter(t => !t.done && !_getStatus(t).over).length;
+    const featuredCount = feat.length;
+    const totalFeatCount = featuredCount + notes.length; // for show/hide decision
+
+    if (totalFeatCount > 0) {
+      // Show as "featuredTaskCount/totalActive" ratio (notes don't count toward active ratio)
+      if (featuredCount > 0 && totalActive > 0) {
+        featBadge.textContent = `${featuredCount}/${totalActive}`;
+      } else if (notes.length > 0) {
+        featBadge.textContent = notes.length;
+      } else {
+        featBadge.textContent = featuredCount;
+      }
+      featBadge.style.display = '';
+    } else {
+      featBadge.style.display = 'none';
+    }
   }
 
   const featSlice = feat.slice(0, 4);
@@ -631,6 +672,8 @@ function renderTasks() {
     if (activeFilter === 'today'   && (!s.today || t.done)) return false;
     if (activeFilter === 'soon'    && (!s.soon  || t.done)) return false;
     if (activeFilter === 'overdue' && (!s.over  || t.done)) return false;
+    // Active = not done AND not overdue
+    if (activeFilter === 'active'  && (t.done || s.over)) return false;
     if (search && !t.name.toLowerCase().includes(search) && !(t.notes || '').toLowerCase().includes(search)) return false;
     return true;
   });
@@ -748,7 +791,8 @@ function expandCard(id) {
   if (activeFilter !== 'all') {
     const s = _getStatus(t);
     const visible = (activeFilter === 'today' && s.today) || (activeFilter === 'soon' && s.soon) ||
-                    (activeFilter === 'overdue' && s.over) || (activeFilter === 'done' && t.done);
+                    (activeFilter === 'overdue' && s.over) || (activeFilter === 'done' && t.done) ||
+                    (activeFilter === 'active' && !t.done && !s.over);
     if (!visible) {
       activeFilter = 'all';
       _getFilterBtns().forEach(b => b.classList.remove('active'));
