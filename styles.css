@@ -491,14 +491,14 @@ input[type=file]{display:none;}
   position: fixed;
   bottom: 20px;
   left: 20px;
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: transparent;
-  border: none;
+  border: 1.5px solid var(--sub);
   color: var(--sub);
   font-family: 'Syne', sans-serif;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   line-height: 1;
   cursor: pointer;
@@ -509,7 +509,6 @@ input[type=file]{display:none;}
   z-index: 55;
   user-select: none;
   opacity: 0.38;
-  pointer-events: all;
 }
 .help-fab:hover {
   opacity: 0.7;
