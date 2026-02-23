@@ -1,3 +1,7 @@
+const _notifSb = supabase.createClient(
+  'https://znoveznysqwmolhftxfy.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpub3Zlem55c3F3bW9saGZ0eGZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MjM3MjQsImV4cCI6MjA4NzE5OTcyNH0.1jlJuRk-7vAVtEZFDvwdV2ZH3UkqUYwlyK-w2PSbl-A'
+);
 // ============================================================
 //  BSCS1B TaskHub — notifications.js
 //  Client-side push subscription management
