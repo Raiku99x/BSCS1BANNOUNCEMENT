@@ -435,7 +435,7 @@ function updateRoleUI() {
 // ─── SCROLL LOCK ─────────────────────────────────────────────
 function lockScroll() { document.body.classList.add('modal-open'); }
 function unlockScroll() {
-  const anyOpen = ['overlay','noteOverlay','loginOverlay','delOverlay','lightbox','logoutOverlay','photoDelOverlay']
+  const anyOpen = ['overlay','noteOverlay','loginOverlay','delOverlay','lightbox','logoutOverlay','photoDelOverlay','helpOverlay']
     .some(id => { const el = document.getElementById(id); return el && el.classList.contains('open'); });
   if (!anyOpen) document.body.classList.remove('modal-open');
 }
@@ -1123,7 +1123,7 @@ async function deleteNote(id) {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     closeModal(); closeLightbox(); closeLoginModal();
-    closeDelModal(); closeNoteModal(); closeLogoutModal(); closePhotoDelModal();
+    closeDelModal(); closeNoteModal(); closeLogoutModal(); closePhotoDelModal(); closeHelp();
   }
   if (document.getElementById('lightbox').classList.contains('open')) {
     if (e.key === 'ArrowLeft')  lbNav(-1);
@@ -1205,3 +1205,16 @@ document.getElementById('dateBarText').innerHTML =
 currentRole = 'user';
 updateRoleUI();
 loadFromSupabase();
+
+// ─── HELP MODAL ──────────────────────────────────────────────
+function openHelp() {
+  lockScroll();
+  document.getElementById('helpOverlay').classList.add('open');
+}
+function closeHelp() {
+  document.getElementById('helpOverlay').classList.remove('open');
+  unlockScroll();
+}
+function handleHelpOverlay(e) {
+  if (e.target === document.getElementById('helpOverlay')) closeHelp();
+}
