@@ -64,6 +64,9 @@
       <button class="filter-btn f-all active" onclick="setFilter('all')">
         <span class="f-dot"></span>All<span class="filter-count" id="cnt-all">0</span>
       </button>
+      <button class="filter-btn f-active" onclick="setFilter('active')">
+        <span class="f-dot"></span>Active<span class="filter-count" id="cnt-active">0</span>
+      </button>
       <button class="filter-btn f-soon" onclick="setFilter('soon')">
         <span class="f-dot"></span>Soon<span class="filter-count" id="cnt-soon">0</span>
       </button>
@@ -92,7 +95,7 @@
 
   <!-- ALL TASK HEADER -->
   <div class="all-task-header">
-    <span class="all-task-title">All Tasks</span>
+    <span class="all-task-title" id="taskAreaTitle">All Tasks</span>
     <span class="task-count-badge" id="taskCountBadge">0</span>
     <div class="header-right">
       <button class="search-btn" onclick="toggleSearch()">
@@ -344,6 +347,10 @@
           <span>Shows every task regardless of status.</span>
         </div>
         <div class="help-item">
+          <span class="help-badge badge-active">Active</span>
+          <span>Tasks that are active — not done and not overdue.</span>
+        </div>
+        <div class="help-item">
           <span class="help-badge badge-soon">Soon</span>
           <span>Tasks due within the next 3 days.</span>
         </div>
@@ -368,7 +375,7 @@
           Featured Panel
         </div>
         <div class="help-desc">
-          The top panel highlights your most urgent tasks — overdue, due today, and due soon. Pinned notes from admins also appear here. Tap any featured card to jump to that task.
+          The top panel highlights your most urgent tasks — overdue, due today, and due soon. The badge shows <strong>featured / total active</strong> tasks so you know how many are urgent vs. all active. Pinned notes from admins also appear here. Tap any featured card to jump to that task.
         </div>
       </div>
 
