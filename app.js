@@ -41,7 +41,7 @@ const FILTER_META = {
 
 // ─── STATE ──────────────────────────────────────────────────
 let tasks = [], notes = [], editId = null, uploadTargetId = null;
-let activeFilter = 'all', currentRole = 'user', currentAdminName = null, isDark = false;
+let activeFilter = 'active', currentRole = 'user', currentAdminName = null, isDark = false;
 let _statusCache = null;
 let _filterBtns = null;
 let _searchTimer = null;
