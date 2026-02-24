@@ -1,10 +1,6 @@
 /* ============================================================
-   featured-patch.css — Animated Carousel Featured Panel
+   featured-patch.css — Ping-Pong Carousel Styles
    BSCS1B TaskHub — Drop-in enhancement
-
-   HOW TO USE:
-   In index.html, add AFTER styles.css:
-     <link rel="stylesheet" href="featured-patch.css"/>
    ============================================================ */
 
 /* ── CAROUSEL STRIP ─────────────────────────────────────────── */
@@ -16,95 +12,86 @@
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   gap: 10px;
-  padding: 4px 0 4px !important;
+  padding: 4px 2px 4px !important;
   scrollbar-width: none;
   flex-shrink: 0;
+  align-items: stretch;
 }
 #featuredList::-webkit-scrollbar { display: none; }
 
 /* ── CAROUSEL CARDS ──────────────────────────────────────────── */
 #featuredList .featured-card {
-  min-width: 188px !important;
-  max-width: 188px !important;
-  width: 188px !important;
+  min-width: 175px !important;
+  max-width: 175px !important;
+  width: 175px !important;
   scroll-snap-align: start;
   flex-shrink: 0 !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 7px;
-  padding: 13px 13px 12px !important;
+  gap: 6px;
+  padding: 11px 12px 11px !important;
   border-radius: 12px;
   cursor: pointer;
-  /* vibrant gradient per status — set below */
   transition: box-shadow 0.22s, transform 0.22s !important;
   animation: fcSlideIn 0.35s ease both;
-  transform: translateX(0) !important; /* reset old hover */
+  transform: translateX(0) !important;
+  /* Reset original hover */
 }
 #featuredList .featured-card:hover {
   transform: translateY(-3px) scale(1.015) !important;
-  box-shadow: 0 10px 28px rgba(0,0,0,0.14) !important;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.13) !important;
 }
-
-/* slide-in stagger */
 @keyframes fcSlideIn {
-  from { opacity: 0; transform: translateX(18px); }
+  from { opacity: 0; transform: translateX(14px); }
   to   { opacity: 1; transform: translateX(0); }
 }
 
-/* ── STATUS-BASED CARD STYLES ────────────────────────────────── */
+/* ── STATUS COLORS ───────────────────────────────────────────── */
 #featuredList .fc-overdue {
-  background: linear-gradient(140deg, rgba(220,38,38,0.16) 0%, transparent 65%) !important;
-  border: 1px solid rgba(220,38,38,0.30) !important;
+  background: linear-gradient(140deg, rgba(220,38,38,0.13) 0%, transparent 70%) !important;
+  border: 1px solid rgba(220,38,38,0.28) !important;
   border-left: 3px solid var(--red) !important;
-  box-shadow: 0 2px 12px rgba(220,38,38,0.10) !important;
 }
 #featuredList .fc-today {
-  background: linear-gradient(140deg, rgba(234,107,14,0.15) 0%, transparent 65%) !important;
-  border: 1px solid rgba(234,107,14,0.28) !important;
+  background: linear-gradient(140deg, rgba(234,107,14,0.13) 0%, transparent 70%) !important;
+  border: 1px solid rgba(234,107,14,0.25) !important;
   border-left: 3px solid #ea6b0e !important;
-  box-shadow: 0 2px 12px rgba(234,107,14,0.10) !important;
 }
 #featuredList .fc-soon {
-  background: linear-gradient(140deg, rgba(196,122,10,0.13) 0%, transparent 65%) !important;
-  border: 1px solid rgba(196,122,10,0.25) !important;
+  background: linear-gradient(140deg, rgba(196,122,10,0.11) 0%, transparent 70%) !important;
+  border: 1px solid rgba(196,122,10,0.22) !important;
   border-left: 3px solid var(--amber) !important;
-  box-shadow: 0 2px 12px rgba(196,122,10,0.08) !important;
 }
-
-/* Dark mode card gradients */
 body.dark #featuredList .fc-overdue {
-  background: linear-gradient(140deg, rgba(255,91,91,0.14) 0%, transparent 65%) !important;
-  border-color: rgba(255,91,91,0.25) !important;
-  box-shadow: 0 2px 14px rgba(255,91,91,0.08) !important;
+  background: linear-gradient(140deg, rgba(255,91,91,0.13) 0%, transparent 70%) !important;
 }
 body.dark #featuredList .fc-today {
-  background: linear-gradient(140deg, rgba(251,146,60,0.14) 0%, transparent 65%) !important;
-  border-color: rgba(251,146,60,0.25) !important;
+  background: linear-gradient(140deg, rgba(251,146,60,0.13) 0%, transparent 70%) !important;
 }
 body.dark #featuredList .fc-soon {
-  background: linear-gradient(140deg, rgba(245,166,35,0.12) 0%, transparent 65%) !important;
-  border-color: rgba(245,166,35,0.22) !important;
+  background: linear-gradient(140deg, rgba(245,166,35,0.11) 0%, transparent 70%) !important;
 }
+
+/* ── HIDE ORIGINAL FC-TOP (we use our own layout) ───────────── */
+#featuredList .fc-top { display: none !important; }
+#featuredList .fc-meta { display: none !important; }
 
 /* ── STATUS PILL ─────────────────────────────────────────────── */
 .fc-status-pill {
   font-size: 9px;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
-  padding: 3px 9px;
+  padding: 3px 8px;
   border-radius: 20px;
   width: fit-content;
   line-height: 1.4;
 }
-.fc-overdue .fc-status-pill { background: var(--red-lt);              color: var(--red);   }
-.fc-today   .fc-status-pill { background: rgba(234,107,14,0.12);      color: #ea6b0e;      }
-.fc-soon    .fc-status-pill { background: var(--amb-lt);              color: var(--amber); }
+.fc-overdue .fc-status-pill { background: var(--red-lt);         color: var(--red);   }
+.fc-today   .fc-status-pill { background: rgba(234,107,14,0.12); color: #ea6b0e;      }
+.fc-soon    .fc-status-pill { background: var(--amb-lt);         color: var(--amber); }
 
-/* ── CARD CONTENT ────────────────────────────────────────────── */
-/* Hide legacy fc-top/fc-name from the original renderer */
-#featuredList .fc-top { display: none !important; }
-
+/* ── CARD NAME ───────────────────────────────────────────────── */
 .fc-card-name {
   font-size: 13px;
   font-weight: 700;
@@ -114,9 +101,9 @@ body.dark #featuredList .fc-soon {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  flex: 1;
 }
 
+/* ── CARD META (date) ────────────────────────────────────────── */
 .fc-card-meta {
   display: flex;
   align-items: center;
@@ -127,9 +114,20 @@ body.dark #featuredList .fc-soon {
 }
 .fc-card-meta svg { flex-shrink: 0; }
 
+/* ── OVERDUE PULSE (first overdue only) ──────────────────────── */
+@keyframes fcOverduePulse {
+  0%,100% { box-shadow: 0 2px 8px rgba(220,38,38,0.08); }
+  50%     { box-shadow: 0 4px 20px rgba(220,38,38,0.25); }
+}
+#featuredList .fc-overdue {
+  animation: fcSlideIn 0.35s ease both, fcOverduePulse 2.4s ease-in-out 0.6s infinite;
+}
+#featuredList .fc-overdue ~ .fc-overdue {
+  animation: fcSlideIn 0.35s ease both;
+}
+
 /* ── DOT INDICATORS ──────────────────────────────────────────── */
 #fcDotsEl { flex-shrink: 0; }
-
 .fc-dots {
   display: flex;
   align-items: center;
@@ -137,35 +135,17 @@ body.dark #featuredList .fc-soon {
   gap: 5px;
   padding: 6px 0 2px;
 }
-
 .fc-dot {
-  width: 5px;
-  height: 5px;
+  width: 6px; height: 6px;
   border-radius: 50%;
   background: var(--border);
   cursor: pointer;
   flex-shrink: 0;
-  transition: width 0.3s ease, border-radius 0.3s ease, background 0.3s ease;
+  transition: width 0.28s ease, border-radius 0.28s ease, background 0.28s ease;
 }
 .fc-dot.active {
   width: 20px;
   border-radius: 3px;
   background: var(--accent);
 }
-.fc-dot:hover:not(.active) {
-  background: var(--sub);
-  transform: scale(1.2);
-}
-
-/* ── PULSE on overdue cards ──────────────────────────────────── */
-@keyframes fcOverduePulse {
-  0%,100% { box-shadow: 0 2px 12px rgba(220,38,38,0.10); }
-  50%     { box-shadow: 0 4px 22px rgba(220,38,38,0.28); }
-}
-#featuredList .fc-overdue {
-  animation: fcSlideIn 0.35s ease both, fcOverduePulse 2.4s ease-in-out 0.5s infinite;
-}
-/* Only pulse the first overdue card */
-#featuredList .fc-overdue ~ .fc-overdue {
-  animation: fcSlideIn 0.35s ease both;
-}
+.fc-dot:hover:not(.active) { background: var(--sub); }
