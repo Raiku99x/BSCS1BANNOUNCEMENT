@@ -9,7 +9,7 @@
   let currentIdx  = 0;
   let direction   = 1;
   let isPaused    = false;
-  const SPEED     = 800;
+  const SPEED     = 1800;
 
   // ── HELPERS ─────────────────────────────────────────────────
   function getCards() {
