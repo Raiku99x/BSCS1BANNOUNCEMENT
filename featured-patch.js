@@ -101,19 +101,15 @@
     strip.addEventListener('touchend',   pause, { passive: true });
     strip.addEventListener('mouseenter', pause);
     
-    // Debounced scroll handler for smoother mobile experience
     strip.addEventListener('scroll', function() {
-      // Clear previous timeout
       clearTimeout(scrollTimeout);
       
-      // Wait for scroll to finish before updating
       scrollTimeout = setTimeout(function() {
         const cards = getCards();
         if (!cards.length) return;
         
         const newIdx = Math.round(strip.scrollLeft / (cards[0].offsetWidth + 10));
         
-        // Only update if index actually changed
         if (newIdx !== currentIdx) {
           cards.forEach(card => card.classList.remove('fc-active'));
           currentIdx = newIdx;
@@ -123,8 +119,8 @@
           updateDots(currentIdx, cards.length);
         }
         
-        pause(); // Pause auto-scroll for 5 seconds after manual scroll
-      }, 150); // ← Wait 150ms after scroll stops
+        pause();
+      }, 150); 
       
     }, { passive: true });
   }
