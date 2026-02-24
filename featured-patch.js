@@ -1,5 +1,5 @@
 // ============================================================
-//  featured-patch.js — Ping-Pong Carousel (Fixed)
+//  featured-patch.js — Ping-Pong Carousel (Fixed Mobile)
 //  Overrides renderFeatured cleanly — no dividers in strip
 // ============================================================
 
@@ -9,7 +9,8 @@
   let currentIdx  = 0;
   let direction   = 1;
   let isPaused    = false;
-  const SPEED     = 1800;
+  let scrollTimeout = null;
+  const SPEED     = 800;
 
   // ── HELPERS ─────────────────────────────────────────────────
   function getCards() {
@@ -78,7 +79,7 @@
   function pause() {
     isPaused = true;
     clearTimeout(resumeTimer);
-    resumeTimer = setTimeout(function() { isPaused = false; }, 4000);
+    resumeTimer = setTimeout(function() { isPaused = false; }, 5000); // ← Increased to 5 seconds
   }
 
   // ── START / STOP ─────────────────────────────────────────────
@@ -95,32 +96,40 @@
     const strip = getStrip();
     if (!strip || strip._fcAttached) return;
     strip._fcAttached = true;
+    
     strip.addEventListener('touchstart', pause, { passive: true });
     strip.addEventListener('touchend',   pause, { passive: true });
     strip.addEventListener('mouseenter', pause);
+    
+    // Debounced scroll handler for smoother mobile experience
     strip.addEventListener('scroll', function() {
-      const cards = getCards();
-      if (!cards.length) return;
-      const newIdx = Math.round(strip.scrollLeft / (cards[0].offsetWidth + 10));
+      // Clear previous timeout
+      clearTimeout(scrollTimeout);
       
-      // Only update if index changed
-      if (newIdx !== currentIdx) {
-        // Remove active from all
-        cards.forEach(card => card.classList.remove('fc-active'));
-        currentIdx = newIdx;
-        // Add active to current
-        if (cards[currentIdx]) {
-          cards[currentIdx].classList.add('fc-active');
+      // Wait for scroll to finish before updating
+      scrollTimeout = setTimeout(function() {
+        const cards = getCards();
+        if (!cards.length) return;
+        
+        const newIdx = Math.round(strip.scrollLeft / (cards[0].offsetWidth + 10));
+        
+        // Only update if index actually changed
+        if (newIdx !== currentIdx) {
+          cards.forEach(card => card.classList.remove('fc-active'));
+          currentIdx = newIdx;
+          if (cards[currentIdx]) {
+            cards[currentIdx].classList.add('fc-active');
+          }
+          updateDots(currentIdx, cards.length);
         }
-        updateDots(currentIdx, cards.length);
-      }
+        
+        pause(); // Pause auto-scroll for 5 seconds after manual scroll
+      }, 150); // ← Wait 150ms after scroll stops
       
-      pause();
     }, { passive: true });
-  } 
+  }
 
   // ── OVERRIDE renderFeatured ──────────────────────────────────
-  // Wait until app.js globals are ready, then wrap
   function installOverride() {
     if (typeof pruneExpiredNotes === 'undefined' ||
         typeof tasks === 'undefined'             ||
