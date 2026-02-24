@@ -38,16 +38,11 @@ async function loadAdmins() {
     
     console.log('[Admins] Loaded from Supabase:', ADMINS.length);
   } catch (err) {
-    console.error('[Admins] Failed to load:', err);
-    // Fallback to hardcoded admins
-    ADMINS = [
-      { username:'Francy',   password:'123BSCS1B' },
-      { username:'Carina',   password:'321BSCS1B' },
-      { username:'Kandiaru', password:'ONEABOVEALL' },
-    ];
-    ADMIN_TITLES = {
-      Francy:'P.I.O. Francy', Carina:'Mayor Carina', Kandiaru:'Admin Kandiaru',
-    };
+    console.error('[Admins] Failed to load from Supabase:', err);
+    // No fallback - admins must be loaded from database
+    ADMINS = [];
+    ADMIN_TITLES = {};
+    setSyncStatus('error', 'Admin load failed');
   }
 }
 
