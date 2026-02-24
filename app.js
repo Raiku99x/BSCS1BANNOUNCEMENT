@@ -1206,6 +1206,141 @@ currentRole = 'user';
 updateRoleUI();
 loadFromSupabase();
 
+// ─── DAILY TIP (changes at 8am, 12pm, 6pm PHT) ───────────────
+(function () {
+  const TIPS = [
+    // Navigation & Filters
+    "Tap 'View' on any card to see the full description and images.",
+    "Use the 🔍 search icon to find tasks by name or description.",
+    "'Active' filter shows tasks you should be working on right now.",
+    "'Soon' shows tasks due within 3 days — check it every morning!",
+    "'Today' filter is your daily priority list. Start there!",
+    "Overdue tasks are highlighted in red — deal with them first!",
+    "'All' filter shows everything: active, done, and overdue together.",
+    "The 'Done' filter lets you review everything you've completed.",
+    "Tap any Featured card to jump straight to that task in the list.",
+
+    // Featured Panel
+    "Featured panel shows your most urgent tasks — overdue, today, and soon.",
+    "The badge next to 'Featured' shows how many urgent tasks need attention.",
+    "Notes posted by admins expire automatically after 1–7 days.",
+    "The featured carousel auto-scrolls — swipe it manually too!",
+    "Pinned notes from admins appear at the top of the Featured panel.",
+
+    // Done & Progress
+    "Your 'Done' progress is saved only on your device — it's yours alone.",
+    "Each classmate tracks their own progress independently.",
+    "Marked something done by mistake? Tap '↩ Undo' to revert it.",
+    "Completing a task plays a small animation — satisfying, right? ✅",
+    "Clearing your browser data will reset your done state — be careful!",
+
+    // Notifications
+    "Tap the bell 🔔 to get notified before deadlines — even when closed.",
+    "Once the bell is enabled, it hides itself — it's still working!",
+    "Push notifications remind you about tasks due today, tomorrow, or in 3 days.",
+    "You only need to enable notifications once. They persist across visits.",
+    "Notifications still work when your phone screen is locked. 🔒",
+
+    // UI & Display
+    "Tap the 🌙 moon icon to switch to dark mode — easier on the eyes at night.",
+    "Expand icon (top-left) hides the browser UI for a cleaner view during class.",
+    "The sync dot turns green 🟢 when live and orange 🟡 when saving.",
+    "Red sync dot means you're offline — tasks are still visible from cache.",
+    "Add this app to your home screen for a full app-like experience!",
+    "Dark mode + fullscreen = distraction-free studying. Try it! 🌙",
+
+    // Task Cards
+    "Each card shows name, category, due date, and status at a glance.",
+    "Status chips — Soon, Today, Overdue, Done — update automatically.",
+    "Tap the description preview to expand the full card.",
+    "Expanded cards show full notes, images, and action buttons.",
+    "Tap 'Close' on an expanded card to collapse it back.",
+    "Images attached to tasks can be tapped to view in full-screen lightbox.",
+
+    // Study Habits & Reminders
+    "Check the app every morning to see what's due today or soon!",
+    "Don't wait for Overdue — set a goal to always clear 'Today' first.",
+    "Review 'Soon' tasks the night before to plan your next day.",
+    "Exams and quizzes show up here — never miss one again. 📚",
+    "Treat 'Today' tasks as your to-do list for the day.",
+    "Reviewing tasks regularly helps you stay ahead, not just catch up.",
+    "If you see red, act fast — overdue tasks don't disappear on their own!",
+    "Bookmark or install this app so you always have quick access.",
+    "Share the app link with classmates who might not know about it yet!",
+    "Good luck on your studies, BSCS1B! You've got this. 💪",
+  ];
+
+  // Slot labels shown in the tip box
+  const SLOT_LABELS = {
+    0: 'Morning Tip',
+    1: 'Midday Tip',
+    2: 'Evening Tip',
+  };
+
+  // Returns { slotIndex, msUntilNext } based on current PHT time
+  function getPHTSlot() {
+    const now = new Date();
+    // PHT = UTC+8
+    const phtOffset = 8 * 60; // minutes
+    const localOffset = now.getTimezoneOffset(); // minutes behind UTC
+    const phtMs = now.getTime() + (phtOffset + localOffset) * 60000;
+    const pht = new Date(phtMs);
+
+    const h = pht.getHours();
+    const m = pht.getMinutes();
+    const s = pht.getSeconds();
+    const ms = pht.getMilliseconds();
+
+    // Slot boundaries: 8:00, 12:00, 18:00
+    let slot;
+    let nextHour;
+    if (h >= 18) {
+      slot = 2;
+      nextHour = 32; // next 8am = 24+8
+    } else if (h >= 12) {
+      slot = 1;
+      nextHour = 18;
+    } else if (h >= 8) {
+      slot = 0;
+      nextHour = 12;
+    } else {
+      slot = 2; // overnight — still showing evening tip
+      nextHour = 8;
+    }
+
+    // ms until next slot change
+    const msUntilNext =
+      ((nextHour - h - 1) * 3600 + (60 - m - 1) * 60 + (60 - s)) * 1000 +
+      (1000 - ms);
+
+    // Unique slot count: day * 3 + slot (PHT day)
+    const phtDayNum = Math.floor(phtMs / 86400000);
+    const slotCount = phtDayNum * 3 + slot;
+
+    return { slot, slotCount, msUntilNext };
+  }
+
+  function renderTip() {
+    const el = document.getElementById('dailyTip');
+    if (!el) return;
+    const { slot, slotCount, msUntilNext } = getPHTSlot();
+    const tipIdx = slotCount % TIPS.length;
+    el.innerHTML =
+      `<span class="daily-tip-label">${SLOT_LABELS[slot]}</span>${TIPS[tipIdx]}`;
+
+    // Schedule next update exactly when the slot changes
+    clearTimeout(el._tipTimer);
+    el._tipTimer = setTimeout(renderTip, msUntilNext);
+  }
+
+  // Run on load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderTip);
+  } else {
+    renderTip();
+  }
+})();
+
 // ─── HELP MODAL ──────────────────────────────────────────────
 function openHelp() {
   lockScroll();
