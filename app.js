@@ -429,7 +429,7 @@ function updateRoleUI() {
     userBtn.style.opacity = '1';
   }
   document.getElementById('addBtn').style.display = isAdmin ? 'block' : 'none';
-  document.getElementById('addNoteBtn').classList.toggle('visible', isAdmin);
+  // document.getElementById('addNoteBtn').classList.toggle('visible', isAdmin);
 }
 
 // ─── SCROLL LOCK ─────────────────────────────────────────────
