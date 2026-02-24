@@ -719,3 +719,26 @@ body.dark .badge-active {
   color: #38bdf8;
   border-color: #38bdf8;
 }
+
+/* ── DAILY TIP ──────────────────────────────────────────────── */
+.daily-tip {
+  margin-top: auto;
+  padding: 9px 9px 7px;
+  border-radius: 9px;
+  background: var(--surf3);
+  border: 1px solid var(--border);
+  font-size: 10px;
+  color: var(--sub);
+  line-height: 1.55;
+  word-break: break-word;
+}
+.daily-tip-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 4px;
+  display: block;
+}
