@@ -149,3 +149,13 @@ body.dark #featuredList .fc-soon {
   background: var(--accent);
 }
 .fc-dot:hover:not(.active) { background: var(--sub); }
+
+/* ── FIX: Remove extra empty space below dots ────────────────── */
+.top-panel {
+  height: auto !important;
+  min-height: unset !important;
+}
+.featured-panel {
+  height: auto !important;
+  min-height: unset !important;
+}
