@@ -22,10 +22,19 @@
     const strip = getStrip();
     const cards = getCards();
     if (!strip || !cards.length) return;
+    
+    cards.forEach(card => card.classList.remove('fc-active'));
+    
     currentIdx = ((idx % cards.length) + cards.length) % cards.length;
     const gap   = 10;
     const cardW = cards[0].offsetWidth + gap;
     strip.scrollTo({ left: currentIdx * cardW, behavior: 'smooth' });
+    
+    // Add active class to current card
+    if (cards[currentIdx]) {
+      cards[currentIdx].classList.add('fc-active');
+    }
+    
     updateDots(currentIdx, cards.length);
   }
 
@@ -90,13 +99,21 @@
     strip.addEventListener('touchend',   pause, { passive: true });
     strip.addEventListener('mouseenter', pause);
     strip.addEventListener('scroll', function() {
-      const cards = getCards();
-      if (!cards.length) return;
-      currentIdx = Math.round(strip.scrollLeft / (cards[0].offsetWidth + 10));
-      updateDots(currentIdx, cards.length);
-      pause();
-    }, { passive: true });
+  const cards = getCards();
+  if (!cards.length) return;
+  const newIdx = Math.round(strip.scrollLeft / (cards[0].offsetWidth + 10));
+  
+  if (newIdx !== currentIdx) {
+    cards.forEach(card => card.classList.remove('fc-active'));
+    currentIdx = newIdx;
+    if (cards[currentIdx]) {
+      cards[currentIdx].classList.add('fc-active');
+    }
+    updateDots(currentIdx, cards.length);
   }
+  
+  pause();
+}, { passive: true });
 
   // ── OVERRIDE renderFeatured ──────────────────────────────────
   // Wait until app.js globals are ready, then wrap
