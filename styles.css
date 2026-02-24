@@ -725,7 +725,7 @@ body.dark .badge-active {
   margin-top: 8px;
   padding: 9px 9px 7px;
   border-radius: 9px;
-  background: var(--surf3);
+  background: transparent;
   border: 1px solid var(--border);
   font-size: 10px;
   color: var(--sub);
