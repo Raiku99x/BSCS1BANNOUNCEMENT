@@ -18,15 +18,38 @@ const CAT_LABELS = {
   noclasses:'No Classes', event:'Event', fillup:'Fill Up', learning:'Learning Task'
 };
 
-const ADMINS = [
-  { username:'Francy',   password:'123BSCS1B' },
-  { username:'Carina',   password:'321BSCS1B' },
-  { username:'Kandiaru', password:'ONEABOVEALL' },
-];
+let ADMINS = [];
+let ADMIN_TITLES = {};
 
-const ADMIN_TITLES = {
-  Francy:'P.I.O. Francy', Carina:'Mayor Carina', Kandiaru:'Admin Kandiaru',
-};
+async function loadAdmins() {
+  try {
+    const { data, error } = await _sb.from('admins').select('*');
+    if (error) throw error;
+    
+    ADMINS = data.map(admin => ({
+      username: admin.username,
+      password: admin.password
+    }));
+    
+    ADMIN_TITLES = {};
+    data.forEach(admin => {
+      ADMIN_TITLES[admin.username] = admin.display_name || admin.username;
+    });
+    
+    console.log('[Admins] Loaded from Supabase:', ADMINS.length);
+  } catch (err) {
+    console.error('[Admins] Failed to load:', err);
+    // Fallback to hardcoded admins
+    ADMINS = [
+      { username:'Francy',   password:'123BSCS1B' },
+      { username:'Carina',   password:'321BSCS1B' },
+      { username:'Kandiaru', password:'ONEABOVEALL' },
+    ];
+    ADMIN_TITLES = {
+      Francy:'P.I.O. Francy', Carina:'Mayor Carina', Kandiaru:'Admin Kandiaru',
+    };
+  }
+}
 
 // ─── FILTER CONFIG ───────────────────────────────────────────
 // Labels and badge colors for the dynamic "All Tasks" header
@@ -1204,7 +1227,10 @@ document.getElementById('dateBarText').innerHTML =
 
 currentRole = 'user';
 updateRoleUI();
-loadFromSupabase();
+
+loadAdmins().then(() => {
+  loadFromSupabase();
+});
 
 // ─── DAILY TIP (changes at 8am, 12pm, 6pm PHT) ───────────────
 (function () {
