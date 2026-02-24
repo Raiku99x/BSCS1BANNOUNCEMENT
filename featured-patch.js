@@ -99,21 +99,25 @@
     strip.addEventListener('touchend',   pause, { passive: true });
     strip.addEventListener('mouseenter', pause);
     strip.addEventListener('scroll', function() {
-  const cards = getCards();
-  if (!cards.length) return;
-  const newIdx = Math.round(strip.scrollLeft / (cards[0].offsetWidth + 10));
-  
-  if (newIdx !== currentIdx) {
-    cards.forEach(card => card.classList.remove('fc-active'));
-    currentIdx = newIdx;
-    if (cards[currentIdx]) {
-      cards[currentIdx].classList.add('fc-active');
-    }
-    updateDots(currentIdx, cards.length);
-  }
-  
-  pause();
-}, { passive: true });
+      const cards = getCards();
+      if (!cards.length) return;
+      const newIdx = Math.round(strip.scrollLeft / (cards[0].offsetWidth + 10));
+      
+      // Only update if index changed
+      if (newIdx !== currentIdx) {
+        // Remove active from all
+        cards.forEach(card => card.classList.remove('fc-active'));
+        currentIdx = newIdx;
+        // Add active to current
+        if (cards[currentIdx]) {
+          cards[currentIdx].classList.add('fc-active');
+        }
+        updateDots(currentIdx, cards.length);
+      }
+      
+      pause();
+    }, { passive: true });
+  } 
 
   // ── OVERRIDE renderFeatured ──────────────────────────────────
   // Wait until app.js globals are ready, then wrap
