@@ -1,6 +1,7 @@
 // ============================================================
 //  featured-patch.js — Ping-Pong Carousel (Fixed Mobile)
 //  Overrides renderFeatured cleanly — no dividers in strip
+//  ✅ FIXED: Excludes cancelled tasks from active count
 // ============================================================
 
 (function () {
@@ -79,7 +80,7 @@
   function pause() {
     isPaused = true;
     clearTimeout(resumeTimer);
-    resumeTimer = setTimeout(function() { isPaused = false; }, 5000); // ← Increased to 5 seconds
+    resumeTimer = setTimeout(function() { isPaused = false; }, 5000);
   }
 
   // ── START / STOP ─────────────────────────────────────────────
@@ -168,6 +169,7 @@
       // ── Featured cards ──────────────────────────────────────
       var el = document.getElementById('featuredList');
       var feat = tasks.filter(function(t) {
+        if (t.cancelled) return false; // ✅ FIXED: Exclude cancelled tasks
         if (t.done) return false;
         var s = _getStatus(t);
         return s.over || s.today || s.soon;
@@ -180,7 +182,10 @@
       // Featured badge
       var featBadge = document.getElementById('featCount');
       if (featBadge) {
-        var totalActive = tasks.filter(function(t) { return !t.done && !_getStatus(t).over; }).length;
+        // ✅ FIXED: Exclude cancelled tasks from active count
+        var totalActive = tasks.filter(function(t) { 
+          return !t.cancelled && !t.done && !_getStatus(t).over; 
+        }).length;
         var totalFeat   = feat.length + notes.length;
         if (totalFeat > 0) {
           featBadge.textContent = feat.length > 0 && totalActive > 0
@@ -247,7 +252,7 @@
       window._fcStartDelay = setTimeout(startCarousel, 400);
     };
 
-    console.log('[featured-patch] renderFeatured override installed ✓');
+    console.log('[featured-patch] renderFeatured override installed ✓ (cancelled tasks excluded)');
   }
 
   if (document.readyState === 'loading') {
