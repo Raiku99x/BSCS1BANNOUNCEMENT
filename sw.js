@@ -1,9 +1,7 @@
 // ============================================================
 //  BSCS1B TaskHub — sw.js
-//  Service Worker: handles push events + notification clicks
+//  Handles push events including zero-payload pushes
 // ============================================================
-
-const CACHE_NAME = 'taskhub-sw-v1';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -15,47 +13,39 @@ self.addEventListener('activate', event => {
 
 // ─── PUSH EVENT ──────────────────────────────────────────────
 self.addEventListener('push', event => {
-  let data = {};
-  try {
-    data = event.data ? event.data.json() : {};
-  } catch {
-    data = {};
+  // Try to parse payload — but ALWAYS show a notification
+  // even if payload is empty (zero-payload push)
+  let title = '🚫 Task Cancelled';
+  let body  = 'A task has been cancelled. Tap to view.';
+  let tag   = 'taskhub-cancel';
+  let url   = '/';
+
+  if (event.data) {
+    try {
+      const data = event.data.json();
+      title = data.title || title;
+      body  = data.body  || body;
+      tag   = data.tag   || tag;
+      url   = data.url   || url;
+    } catch {
+      try {
+        // Maybe it's plain text
+        const text = event.data.text();
+        if (text) body = text;
+      } catch {}
+    }
   }
 
-  const title = data.title || '🚫 Task Cancelled';
   const options = {
-    body:    data.body || 'A task has been cancelled.',
-    icon:    data.icon  || '/icon-192.png',
-    badge:   data.badge || '/badge-72.png',
-    tag:     data.tag   || 'taskhub-cancel',
-    data:    { url: data.url || '/' },
-    vibrate: [200, 100, 200],
-    silent:  false,
-    renotify: true,
-  };
-
-  event.waitUntil(
-    self.registration.showNotification(title, options)
-  );
-
-  let data;
-  try {
-    data = event.data.json();
-  } catch {
-    data = { title: 'BSCS1B TaskHub', body: event.data.text() };
-  }
-
-  const title   = data.title  || 'BSCS1B TaskHub';
-  const options = {
-    body:              data.body    || '',
-    icon:              data.icon    || '/icon-192.png',
-    badge:             data.badge   || '/badge-72.png',
-    tag:               data.tag     || 'taskhub-general',
-    data:              { url: data.url || '/' },
-    requireInteraction: data.requireInteraction || false,
-    vibrate:           [200, 100, 200],
-    silent:            false,
-    renotify:          true,
+    body,
+    icon:               '/icon-192.png',
+    badge:              '/badge-72.png',
+    tag,
+    data:               { url },
+    vibrate:            [200, 100, 200],
+    silent:             false,
+    renotify:           true,
+    requireInteraction: false,
   };
 
   event.waitUntil(
@@ -80,7 +70,4 @@ self.addEventListener('notificationclick', event => {
   );
 });
 
-// ─── NOTIFICATION CLOSE ──────────────────────────────────────
-self.addEventListener('notificationclose', () => {
-  // Optional: analytics/logging
-});
+self.addEventListener('notificationclose', () => {});
