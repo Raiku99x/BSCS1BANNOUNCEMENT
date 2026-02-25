@@ -155,34 +155,37 @@ async function toggleNotifications() {
 }
 
 // ─── UPDATE BELL ICON STATE ──────────────────────────────────
+
 async function updateBellUI() {
   const btn  = document.getElementById('notifBellBtn');
   const icon = document.getElementById('notifBellIcon');
   if (!btn || !icon) return;
 
-  const sub = _swRegistration
-    ? await _swRegistration.pushManager.getSubscription()
-    : null;
+  // _swRegistration may be null on first paint, causing bell to flash visible
+  let sub = null;
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    sub = await reg.pushManager.getSubscription();
+    // Also keep _swRegistration in sync
+    if (reg) _swRegistration = reg;
+  } catch (e) {
+    // SW not available
+  }
 
   const denied = Notification?.permission === 'denied';
   const active = !!sub;
 
   btn.className = 'icon-bar notif-bell' +
-    (active  ? ' notif-on'     : '') +
-    (denied  ? ' notif-denied' : '');
+    (active ? ' notif-on'     : '') +
+    (denied ? ' notif-denied' : '');
 
-  btn.className = 'icon-bar notif-bell' +
-    (active  ? ' notif-on'     : '') +
-    (denied  ? ' notif-denied' : '');
-
-  // ← ADD THIS LINE
+  // Hide bell when subscribed, show when not
   btn.style.display = active ? 'none' : '';
 
   btn.title = denied ? 'Notifications blocked (enable in browser settings)'
             : active ? 'Notifications ON — click to disable'
             :          'Enable task notifications';
 
-  // Bell icon: filled when active, outline when not
   icon.innerHTML = active
     ? `<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
