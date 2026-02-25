@@ -551,9 +551,12 @@ function debouncedSearch() {
 
 function updateCounts() {
   _buildCache();
-  let cAll = 0, cActive = 0, cToday = 0, cSoon = 0, cOver = 0, cDone = 0;
+  let cAll = 0, cActive = 0, cToday = 0, cSoon = 0, cOver = 0, cDone = 0, cCancelled = 0; // ✅ NEW
   tasks.forEach(t => {
-    if (t.cancelled) return;
+    if (t.cancelled) {
+      cCancelled++;
+      return; 
+    }
     
     cAll++;
     const s = _getStatus(t);
@@ -575,6 +578,7 @@ function updateCounts() {
   setBadge('cnt-soon', cSoon);
   setBadge('cnt-overdue', cOver);
   setBadge('cnt-done', cDone);
+  setBadge('cnt-cancelled', cCancelled); 
   document.querySelector('.f-overdue').classList.toggle('has-overdue', cOver > 0);
 
   // ── Dynamic header title + badge color ──────────────────────
@@ -769,19 +773,36 @@ function buildCard(t) {
 
   let collapsedFooter, expandedFooter;
   if (currentRole === 'admin') {
-    const adminBtns = `
-      <button class="cfb-icon edit" onclick="event.stopPropagation();openModal('${t.id}')" title="Edit">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      </button>
-      <button class="cfb-icon cancel" onclick="event.stopPropagation();cancelTask('${t.id}')" title="Cancel task">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-      </button>
-      <button class="cfb-icon del" onclick="event.stopPropagation();deleteTask('${t.id}')" title="Delete">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-      </button>
-      <button class="cfb-icon copy" id="copy-c-${t.id}" onclick="event.stopPropagation();copyDesc('${t.id}','copy-c-${t.id}')" title="Copy description">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-      </button>`;
+    const adminBtns = t.cancelled 
+      ? `
+        <button class="cfb-icon edit" onclick="event.stopPropagation();openModal('${t.id}')" title="Edit">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="cfb-icon restore" onclick="event.stopPropagation();uncancelTask('${t.id}')" title="Restore task">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+        </button>
+        <button class="cfb-icon del" onclick="event.stopPropagation();deleteTask('${t.id}')" title="Delete permanently">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>
+        <button class="cfb-icon copy" id="copy-c-${t.id}" onclick="event.stopPropagation();copyDesc('${t.id}','copy-c-${t.id}')" title="Copy description">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>`
+      : `
+        <button class="cfb-icon edit" onclick="event.stopPropagation();openModal('${t.id}')" title="Edit">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="cfb-icon cancel" onclick="event.stopPropagation();cancelTask('${t.id}')" title="Cancel task">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        </button>
+        <button class="cfb-icon del" onclick="event.stopPropagation();deleteTask('${t.id}')" title="Delete permanently">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>
+        <button class="cfb-icon copy" id="copy-c-${t.id}" onclick="event.stopPropagation();copyDesc('${t.id}','copy-c-${t.id}')" title="Copy description">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>`;
+
+    const adminBtnsExp = adminBtns.replace('copy-c-', 'copy-e-');
+    
     collapsedFooter = `<div class="card-footer">${adminBtns}<span class="cfb-spacer"></span>${creatorChip}<button class="cfb view" onclick="event.stopPropagation();expandCard('${t.id}')">View</button></div>`;
     const adminBtnsExp = adminBtns.replace('copy-c-', 'copy-e-');
     expandedFooter = `<div class="card-footer-exp">${adminBtnsExp}<span class="cfb-spacer"></span>${creatorChip}<button class="cfb view" onclick="event.stopPropagation();collapseCard('${t.id}')">Close</button></div>`;
@@ -923,7 +944,7 @@ async function cancelTask(id) {
   if (!t) return;
   lockScroll();
   pendingCancelId = id;
-  document.getElementById('cancelSubText').textContent = `"${t.name}" will be hidden for all users.`;
+  document.getElementById('cancelSubText').textContent = `"${t.name}" will be moved to Cancelled.`;
   document.getElementById('cancelOverlay').classList.add('open');
 }
 
@@ -948,6 +969,17 @@ function closeCancelModal() {
   pendingCancelId = null;
   unlockScroll();
 }
+
+async function uncancelTask(id) {
+  if (currentRole !== 'admin') return;
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  
+  task.cancelled = false;
+  renderAll();
+  await persistTask(task, false);
+}
+
 
 // ─── IMAGES ──────────────────────────────────────────────────
 function triggerImgUpload(id) { uploadTargetId = id; document.getElementById('imgUpload').click(); }
@@ -1195,6 +1227,7 @@ document.addEventListener('keydown', e => {
     closeModal(); closeLightbox(); closeLoginModal();
     closeDelModal(); closeNoteModal(); closeLogoutModal(); closePhotoDelModal(); closeCancelModal(); closeHelp();
   }
+
   if (document.getElementById('lightbox').classList.contains('open')) {
     if (e.key === 'ArrowLeft')  lbNav(-1);
     if (e.key === 'ArrowRight') lbNav(+1);
