@@ -49,13 +49,15 @@ async function loadAdmins() {
 // ─── FILTER CONFIG ───────────────────────────────────────────
 // Labels and badge colors for the dynamic "All Tasks" header
 const FILTER_META = {
-  all:     { label: 'All Tasks',      badgeBg: 'var(--accent)',  badgeColor: '#fff' },
-  active:  { label: 'Active Tasks',   badgeBg: '#0ea5e9',        badgeColor: '#fff' },
-  soon:    { label: 'Soon Tasks',     badgeBg: 'var(--amber)',   badgeColor: '#fff' },
-  today:   { label: 'Today Tasks',    badgeBg: '#ea6b0e',        badgeColor: '#fff' },
-  overdue: { label: 'Overdue Tasks',  badgeBg: 'var(--red)',     badgeColor: '#fff' },
-  done:    { label: 'Done Tasks',     badgeBg: 'var(--green)',   badgeColor: '#0f1a12' },
+  all:       { label: 'All Tasks',        badgeBg: 'var(--accent)',  badgeColor: '#fff' },
+  active:    { label: 'Active Tasks',     badgeBg: '#0ea5e9',        badgeColor: '#fff' },
+  soon:      { label: 'Soon Tasks',       badgeBg: 'var(--amber)',   badgeColor: '#fff' },
+  today:     { label: 'Today Tasks',      badgeBg: '#ea6b0e',        badgeColor: '#fff' },
+  overdue:   { label: 'Overdue Tasks',    badgeBg: 'var(--red)',     badgeColor: '#fff' },
+  done:      { label: 'Done Tasks',       badgeBg: 'var(--green)',   badgeColor: '#0f1a12' },
+  cancelled: { label: 'Cancelled Tasks',  badgeBg: '#6b7280',        badgeColor: '#fff' }, 
 };
+
 
 // ─── STATE ──────────────────────────────────────────────────
 let tasks = [], notes = [], editId = null, uploadTargetId = null;
@@ -213,7 +215,7 @@ function dbToTask(row) {
     time:       row.time || '',
     notes:      row.notes || '',
     done:       false,
-    cancelled:  row.cancelled || false,
+    cancelled:  row.cancelled || false, 
     images:     Array.isArray(row.images) ? row.images : [],
     createdBy:  row.created_by || null,
     created:    row.created_at || Date.now(),
@@ -692,9 +694,12 @@ function renderTasks() {
   const search = (document.getElementById('searchInput').value || '').toLowerCase();
   _buildCache();
   let list = tasks.filter(t => {
-    if (t.cancelled) return false;
-    
     const s = _getStatus(t);
+    
+    if (activeFilter === 'cancelled' && !t.cancelled) return false;
+    
+    if (activeFilter !== 'cancelled' && t.cancelled) return false;
+    
     if (activeFilter === 'done'    && !t.done) return false;
     if (activeFilter === 'today'   && (!s.today || t.done)) return false;
     if (activeFilter === 'soon'    && (!s.soon  || t.done)) return false;
