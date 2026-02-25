@@ -15,7 +15,28 @@ self.addEventListener('activate', event => {
 
 // ─── PUSH EVENT ──────────────────────────────────────────────
 self.addEventListener('push', event => {
-  if (!event.data) return;
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = {};
+  }
+
+  const title = data.title || '🚫 Task Cancelled';
+  const options = {
+    body:    data.body || 'A task has been cancelled.',
+    icon:    data.icon  || '/icon-192.png',
+    badge:   data.badge || '/badge-72.png',
+    tag:     data.tag   || 'taskhub-cancel',
+    data:    { url: data.url || '/' },
+    vibrate: [200, 100, 200],
+    silent:  false,
+    renotify: true,
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
 
   let data;
   try {
