@@ -551,11 +551,11 @@ function debouncedSearch() {
 
 function updateCounts() {
   _buildCache();
-  let cAll = 0, cActive = 0, cToday = 0, cSoon = 0, cOver = 0, cDone = 0, cCancelled = 0; // ✅ NEW
+  let cAll = 0, cActive = 0, cToday = 0, cSoon = 0, cOver = 0, cDone = 0, cCancelled = 0;
   tasks.forEach(t => {
     if (t.cancelled) {
       cCancelled++;
-      return; 
+      return; // Don't count in any other category
     }
     
     cAll++;
@@ -636,7 +636,7 @@ function renderFeatured() {
   const featBadge = document.getElementById('featCount');
   if (featBadge) {
     // Total active = not done, not overdue (same as cnt-active)
-    const totalActive = tasks.filter(t => !t.done && !_getStatus(t).over).length;
+    const totalActive = tasks.filter(t => !t.cancelled && !t.done && !_getStatus(t).over).length;
     const featuredCount = feat.length;
     const totalFeatCount = featuredCount + notes.length; // for show/hide decision
 
