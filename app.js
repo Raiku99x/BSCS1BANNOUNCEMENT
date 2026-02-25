@@ -982,7 +982,6 @@ async function _notifyCancelledTask(task) {
         body: JSON.stringify({
           taskId:      task.id,
           taskName:    task.name,
-          cancelledBy: currentAdminName || 'Admin',
         }),
       }
     );
