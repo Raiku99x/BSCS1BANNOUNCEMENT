@@ -212,7 +212,8 @@ function dbToTask(row) {
     date:       row.date || '',
     time:       row.time || '',
     notes:      row.notes || '',
-    done:       false, // always start as not done; local done state applied separately
+    done:       false,
+    cancelled:  row.cancelled || false,
     images:     Array.isArray(row.images) ? row.images : [],
     createdBy:  row.created_by || null,
     created:    row.created_at || Date.now(),
@@ -228,7 +229,7 @@ function taskToDb(t) {
     date:       t.date || null,
     time:       t.time || null,
     notes:      t.notes || null,
-    // ✅ done is intentionally NOT saved to Supabase — it's per-device
+    cancelled:  t.cancelled || false, 
     images:     t.images || [],
     created_by: t.createdBy || null,
     created_at: t.created || Date.now(),
@@ -453,7 +454,7 @@ function updateRoleUI() {
 // ─── SCROLL LOCK ─────────────────────────────────────────────
 function lockScroll() { document.body.classList.add('modal-open'); }
 function unlockScroll() {
-  const anyOpen = ['overlay','noteOverlay','loginOverlay','delOverlay','lightbox','logoutOverlay','photoDelOverlay','helpOverlay']
+  const anyOpen = ['overlay','noteOverlay','loginOverlay','delOverlay','lightbox','logoutOverlay','photoDelOverlay','cancelOverlay','helpOverlay']
     .some(id => { const el = document.getElementById(id); return el && el.classList.contains('open'); });
   if (!anyOpen) document.body.classList.remove('modal-open');
 }
@@ -550,13 +551,14 @@ function updateCounts() {
   _buildCache();
   let cAll = 0, cActive = 0, cToday = 0, cSoon = 0, cOver = 0, cDone = 0;
   tasks.forEach(t => {
+    if (t.cancelled) return;
+    
     cAll++;
     const s = _getStatus(t);
     if (t.done) cDone++;
     if (s.over) cOver++;
     if (s.today) cToday++;
     if (s.soon) cSoon++;
-    // Active = not done AND not overdue
     if (!t.done && !s.over) cActive++;
   });
   const setBadge = (id, val) => {
@@ -612,7 +614,12 @@ function renderFeatured() {
 
   const el = document.getElementById('featuredList');
   const feat = tasks
-    .filter(t => { if (t.done) return false; const s = _getStatus(t); return s.over || s.today || s.soon; })
+    .filter(t => { 
+      if (t.cancelled) return false;
+      if (t.done) return false; 
+      const s = _getStatus(t); 
+      return s.over || s.today || s.soon; 
+    })
     .sort((a, b) => {
       const da = a.date ? new Date(a.date + 'T' + (a.time || '23:59')) : new Date('9999');
       const db = b.date ? new Date(b.date + 'T' + (b.time || '23:59')) : new Date('9999');
@@ -685,16 +692,18 @@ function renderTasks() {
   const search = (document.getElementById('searchInput').value || '').toLowerCase();
   _buildCache();
   let list = tasks.filter(t => {
+    if (t.cancelled) return false;
+    
     const s = _getStatus(t);
     if (activeFilter === 'done'    && !t.done) return false;
     if (activeFilter === 'today'   && (!s.today || t.done)) return false;
     if (activeFilter === 'soon'    && (!s.soon  || t.done)) return false;
     if (activeFilter === 'overdue' && (!s.over  || t.done)) return false;
-    // Active = not done AND not overdue
     if (activeFilter === 'active'  && (t.done || s.over)) return false;
     if (search && !t.name.toLowerCase().includes(search) && !(t.notes || '').toLowerCase().includes(search)) return false;
     return true;
   });
+
 
   const sortByDate = (a, b) => {
     const da = a.date ? new Date(a.date + 'T' + (a.time || '23:59')) : new Date('9999');
@@ -758,6 +767,9 @@ function buildCard(t) {
     const adminBtns = `
       <button class="cfb-icon edit" onclick="event.stopPropagation();openModal('${t.id}')" title="Edit">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+      <button class="cfb-icon cancel" onclick="event.stopPropagation();cancelTask('${t.id}')" title="Cancel task">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
       </button>
       <button class="cfb-icon del" onclick="event.stopPropagation();deleteTask('${t.id}')" title="Delete">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
@@ -894,6 +906,41 @@ async function confirmDelete() {
 function closeDelModal() {
   document.getElementById('delOverlay').classList.remove('open');
   pendingDeleteId = null;
+  unlockScroll();
+}
+
+// ─── CANCEL TASK ─────────────────────────────────────────────
+let pendingCancelId = null;
+
+async function cancelTask(id) {
+  if (currentRole !== 'admin') return;
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  lockScroll();
+  pendingCancelId = id;
+  document.getElementById('cancelSubText').textContent = `"${t.name}" will be hidden for all users.`;
+  document.getElementById('cancelOverlay').classList.add('open');
+}
+
+async function confirmCancel() {
+  if (!pendingCancelId) return;
+  const id = pendingCancelId;
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  
+  // Mark as cancelled in memory
+  task.cancelled = true;
+  pendingCancelId = null;
+  closeCancelModal();
+  renderAll();
+  
+  // Update in Supabase
+  await persistTask(task, false);
+}
+
+function closeCancelModal() {
+  document.getElementById('cancelOverlay').classList.remove('open');
+  pendingCancelId = null;
   unlockScroll();
 }
 
@@ -1141,7 +1188,7 @@ async function deleteNote(id) {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     closeModal(); closeLightbox(); closeLoginModal();
-    closeDelModal(); closeNoteModal(); closeLogoutModal(); closePhotoDelModal(); closeHelp();
+    closeDelModal(); closeNoteModal(); closeLogoutModal(); closePhotoDelModal(); closeCancelModal(); closeHelp();
   }
   if (document.getElementById('lightbox').classList.contains('open')) {
     if (e.key === 'ArrowLeft')  lbNav(-1);
