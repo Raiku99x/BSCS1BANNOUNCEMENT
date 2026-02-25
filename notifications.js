@@ -208,6 +208,8 @@ function showNotifToast(msg, type = 'info') {
 }
 
 // ─── INIT ────────────────────────────────────────────────────
+// Replace the existing initNotifications() in notifications.js with this
+
 async function initNotifications() {
   if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
 
@@ -216,13 +218,30 @@ async function initNotifications() {
   if (!reg) return;
   _swRegistration = reg;
 
+  // Check if already subscribed
+  const sub = await reg.pushManager.getSubscription();
+
+  if (sub) {
+    // ✅ KEY FIX: Re-upsert subscription to DB on every page load
+    // This ensures desktop users who subscribed before are always in the DB
+    _pushSubscription = sub;
+    const p256dh = arrayBufferToBase64(sub.getKey('p256dh'));
+    const auth   = arrayBufferToBase64(sub.getKey('auth'));
+
+    const { error } = await _sb.from('push_subscriptions').upsert({
+      endpoint:   sub.endpoint,
+      p256dh,
+      auth,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'endpoint' });
+
+    if (error) {
+      console.warn('[Notif] Re-upsert failed:', error);
+    } else {
+      console.log('[Notif] Subscription refreshed in DB ✓');
+    }
+  }
+
   // Update bell UI to reflect current state
   await updateBellUI();
-}
-
-// Auto-init once DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initNotifications);
-} else {
-  initNotifications();
 }
