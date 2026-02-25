@@ -119,6 +119,21 @@ body.dark .footer-creator.chip-kandiaru{color:#c4b5fd;background:rgba(139,92,246
 .filter-btn.active.f-today  {background:rgba(234,107,14,0.10);border-color:#ea6b0e;color:#ea6b0e;}
 .filter-btn.active.f-overdue{background:var(--red-lt);border-color:var(--red);color:var(--red);}
 .filter-btn.active.f-done   {background:var(--grn-lt);border-color:var(--green);color:var(--green);}
+.f-cancelled .f-dot {
+  background: #6b7280;
+}
+
+.filter-btn.active.f-cancelled {
+  background: rgba(107, 116, 128, 0.12);
+  border-color: #6b7280;
+  color: #6b7280;
+}
+
+body.dark .filter-btn.active.f-cancelled {
+  background: rgba(107, 116, 128, 0.18);
+  color: #9ca3af;
+  border-color: #9ca3af;
+}
 
 @keyframes overdueGlow{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,0);background:var(--surf2);}50%{box-shadow:0 0 0 4px rgba(220,38,38,0.18),0 0 14px rgba(220,38,38,0.22);background:var(--red-lt);}}
 .f-overdue.has-overdue{animation:overdueGlow 2s ease-in-out infinite;border-color:rgba(220,38,38,0.35)!important;color:var(--red)!important;}
@@ -190,6 +205,21 @@ body.dark .note-card{background:rgba(245,166,35,0.07);border-color:rgba(245,166,
 .card-top{display:flex;align-items:center;gap:10px;padding:13px 14px 10px;}
 .card-name{flex:1;min-width:0;font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;word-break:break-word;}
 .task-card.done-card .card-name{text-decoration:line-through;color:var(--sub);}
+.task-card.cancelled-card {
+  opacity: 0.6;
+  background: var(--surf2);
+  border-color: #6b7280;
+}
+
+.task-card.cancelled-card .card-name {
+  color: var(--sub);
+}
+
+/* Optional: Strikethrough for cancelled tasks */
+.task-card.cancelled-card .card-name {
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+}
 .card-due-meta{display:flex;align-items:center;gap:5px;padding:0 14px 8px;font-size:12px;color:var(--sub);}
 .card-due-meta svg{flex-shrink:0;position:relative;top:0;vertical-align:middle;}
 
@@ -263,6 +293,12 @@ body.dark .status-chip.today{background:rgba(234,107,14,0.18);color:#fb923c;}
   border-color: var(--amber);
   color: var(--amber);
   background: var(--amb-lt);
+}
+
+.cfb-icon.restore:hover {
+  border-color: var(--green);
+  color: var(--green);
+  background: var(--grn-lt);
 }
 
 @keyframes taskCancel {
@@ -684,6 +720,18 @@ body.dark .help-fab:hover {
 .badge-today   { background: rgba(234,107,14,0.12); color: #ea6b0e; border: 1px solid #ea6b0e; }
 .badge-overdue { background: var(--red-lt); color: var(--red);   border: 1px solid var(--red); }
 .badge-done    { background: var(--grn-lt); color: var(--green); border: 1px solid var(--green); }
+
+.badge-cancelled {
+  background: rgba(107, 116, 128, 0.12);
+  color: #6b7280;
+  border: 1px solid #6b7280;
+}
+
+body.dark .badge-cancelled {
+  background: rgba(107, 116, 128, 0.18);
+  color: #9ca3af;
+  border-color: #9ca3af;
+}
 
 /* ── SYNC DOTS ──────────────────────────────────────── */
 .help-sync-dot {
