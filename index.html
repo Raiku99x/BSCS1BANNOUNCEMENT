@@ -80,6 +80,9 @@
       <button class="filter-btn f-done" onclick="setFilter('done')">
         <span class="f-dot"></span>Done<span class="filter-count" id="cnt-done">0</span>
       </button>
+      <button class="filter-btn f-cancelled" onclick="setFilter('cancelled')">
+        <span class="f-dot"></span>Cancelled<span class="filter-count" id="cnt-cancelled">0</span>
+      </button>
     </div>
     
     <div class="featured-panel">
@@ -281,7 +284,7 @@
       </svg>
     </div>
     <div class="del-title">Cancel Task?</div>
-    <div class="del-sub" id="cancelSubText">This task will be hidden from all users.</div>
+    <div class="del-sub" id="cancelSubText">This task will be moved to the Cancelled filter.</div>
     <div class="del-actions">
       <button class="del-btn-cancel" onclick="closeCancelModal()">Go Back</button>
       <button class="del-btn-confirm" style="background:var(--amber);" onclick="confirmCancel()">Cancel Task</button>
