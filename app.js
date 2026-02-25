@@ -951,15 +951,46 @@ async function confirmCancel() {
   const id = pendingCancelId;
   const task = tasks.find(t => t.id === id);
   if (!task) return;
-  
+
   // Mark as cancelled in memory
   task.cancelled = true;
   pendingCancelId = null;
   closeCancelModal();
   renderAll();
-  
+
   // Update in Supabase
   await persistTask(task, false);
+
+  // 🔔 Notify all subscribed users about the cancellation
+  _notifyCancelledTask(task);
+}
+
+/**
+ * Calls the Supabase Edge Function to push a cancellation notification
+ * to all subscribed users (skipping those who already marked it done).
+ */
+async function _notifyCancelledTask(task) {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/functions/v1/notify-cancel`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+        },
+        body: JSON.stringify({
+          taskId:      task.id,
+          taskName:    task.name,
+          cancelledBy: currentAdminName || 'Admin',
+        }),
+      }
+    );
+    const data = await res.json();
+    console.log(`[Cancel Notif] Sent: ${data.sent}, Failed: ${data.failed}`);
+  } catch (err) {
+    console.warn('[Cancel Notif] Could not send push notifications:', err);
+  }
 }
 
 function closeCancelModal() {
@@ -972,7 +1003,7 @@ async function uncancelTask(id) {
   if (currentRole !== 'admin') return;
   const task = tasks.find(t => t.id === id);
   if (!task) return;
-  
+
   task.cancelled = false;
   renderAll();
   await persistTask(task, false);
