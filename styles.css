@@ -93,7 +93,7 @@ body.dark .footer-creator.chip-kandiaru{color:#c4b5fd;background:rgba(139,92,246
 .date-bar{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:var(--surface);border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--sub);letter-spacing:0.05em;position:sticky;top:var(--h-topbar);z-index:99;}
 .date-bar-center{flex:1;text-align:center;}
 .date-bar-center span{color:var(--text);}
-.date-bar-side{display:flex;align-items:center;gap:6px;width:80px;}
+.date-bar-side{display:flex;align-items:center;gap:6px;width:auto;}
 .date-bar-side.right{justify-content:flex-end;}
 .icon-bar{width:30px;height:30px;border-radius:9px;border:1px solid var(--border);background:var(--surf2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sub);transition:all 0.15s;flex-shrink:0;}
 .icon-bar:hover{border-color:var(--accent);color:var(--accent);background:var(--acc-lt);}
