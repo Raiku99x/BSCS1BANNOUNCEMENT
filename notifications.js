@@ -216,13 +216,11 @@ function showNotifToast(msg, type = 'info') {
 async function initNotifications() {
   if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
 
-  // ✅ Show bell immediately — don't wait for async checks
+  // Show bell immediately before any async checks
   const bellBtn = document.getElementById('notifBellBtn');
   if (bellBtn) bellBtn.style.display = '';
 
   // Register SW silently on page load
-  const bellBtn = document.getElementById('notifBellBtn');
-  if (bellBtn) bellBtn.classList.remove('notif-bell-hidden');
   const reg = await registerServiceWorker();
   if (!reg) return;
   _swRegistration = reg;
