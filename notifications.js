@@ -216,10 +216,6 @@ function showNotifToast(msg, type = 'info') {
 async function initNotifications() {
   if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
 
-  // Show bell immediately before any async checks
-  const bellBtn = document.getElementById('notifBellBtn');
-  if (bellBtn) bellBtn.style.display = '';
-
   // Register SW silently on page load
   const reg = await registerServiceWorker();
   if (!reg) return;
