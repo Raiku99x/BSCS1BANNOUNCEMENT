@@ -1335,7 +1335,7 @@ document.addEventListener('keydown', e => {
 
 // ─── INIT ────────────────────────────────────────────────────
 document.getElementById('dateBarText').innerHTML =
-  `<span>${new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' })}</span>`;
+  `<span>${new Date().toLocaleDateString('en-US', { weekday:'long', month:'short', day:'numeric', year:'numeric' })}</span>`;
 
 currentRole = 'user';
 updateRoleUI();
