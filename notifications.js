@@ -175,9 +175,9 @@ async function updateBellUI() {
   const denied = Notification?.permission === 'denied';
   const active = !!sub;
 
-  btn.className = 'icon-bar notif-bell' +
-    (active ? ' notif-on'     : '') +
-    (denied ? ' notif-denied' : '');
+    btn.className = 'icon-bar notif-bell' +
+    (active ? ' notif-on notif-subscribed' : '') +
+    (denied ? ' notif-denied'              : '');
 
   // Hide bell when subscribed, show when not
 btn.classList.remove('notif-bell-hidden');
