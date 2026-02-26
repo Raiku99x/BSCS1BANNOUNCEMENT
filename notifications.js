@@ -180,8 +180,8 @@ async function updateBellUI() {
     (denied ? ' notif-denied' : '');
 
   // Hide bell when subscribed, show when not
-  btn.style.display = active ? 'none' : '';
-
+btn.classList.remove('notif-bell-hidden');
+btn.style.display = active ? 'none' : '';
   btn.title = denied ? 'Notifications blocked (enable in browser settings)'
             : active ? 'Notifications ON — click to disable'
             :          'Enable task notifications';
@@ -221,6 +221,8 @@ async function initNotifications() {
   if (bellBtn) bellBtn.style.display = '';
 
   // Register SW silently on page load
+  const bellBtn = document.getElementById('notifBellBtn');
+  if (bellBtn) bellBtn.classList.remove('notif-bell-hidden');
   const reg = await registerServiceWorker();
   if (!reg) return;
   _swRegistration = reg;
