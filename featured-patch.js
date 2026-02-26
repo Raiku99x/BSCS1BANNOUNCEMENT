@@ -202,8 +202,7 @@
         el.innerHTML = '<div class="no-featured">' +
           '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">' +
           '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>' +
-          '</svg><p>All caught up!</p></div>';
-        var d = document.getElementById('fcDotsEl');
+      '</svg><p>No urgent tasks here — but scroll down, there may still be active tasks without a close due date.</p></div>';        var d = document.getElementById('fcDotsEl');
         if (d) d.innerHTML = '';
         stopCarousel();
         return;
