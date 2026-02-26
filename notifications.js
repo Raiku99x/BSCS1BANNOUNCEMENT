@@ -243,6 +243,7 @@ async function initNotifications() {
     } else {
       console.log('[Notif] Subscription refreshed in DB ✓');
     }
+    _syncDoneToSupabase();
   }
 
   // Update bell UI to reflect current state
