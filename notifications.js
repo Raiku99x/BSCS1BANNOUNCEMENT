@@ -8,9 +8,7 @@ const _notifSb = supabase.createClient(
 // ============================================================
 
 // ─── VAPID PUBLIC KEY ──────────────
-
 const VAPID_PUBLIC_KEY = 'BDB28hUn4e2av41itWZ8NP2hryHALsKH2OHomYfNCkWI6rTLwTJEbTNtotHf2jz663NB5DdLI-hkyC3jsck_8iU';
-// ─────────────────────────────────────────────────────────────
 
 let _swRegistration = null;
 let _notifPermission = Notification?.permission || 'default';
@@ -49,7 +47,6 @@ async function requestNotifPermission() {
 
   const perm = await Notification.requestPermission();
   _notifPermission = perm;
-  updateBellUI();
   return perm === 'granted';
 }
 
@@ -67,7 +64,6 @@ async function subscribeToPush(reg) {
 
     _pushSubscription = sub;
 
-    // Persist to Supabase push_subscriptions table
     const p256dh = arrayBufferToBase64(sub.getKey('p256dh'));
     const auth   = arrayBufferToBase64(sub.getKey('auth'));
 
@@ -78,19 +74,11 @@ async function subscribeToPush(reg) {
       updated_at: new Date().toISOString(),
     }, { onConflict: 'endpoint' });
 
-if (error) {
+    if (error) {
       console.error('[Notif] Failed to save subscription:', error);
     } else {
       console.log('[Notif] Push subscription saved ✓');
     }
-
-    // Sync any already-done tasks from this device immediately after subscribing
-    const doneIds = (() => {
-      try {
-        const s = localStorage.getItem('taskhub-done-v1');
-        return s ? Object.keys(JSON.parse(s)) : [];
-      } catch(e) { return []; }
-    })();
 
     return sub;
   } catch (err) {
@@ -118,7 +106,7 @@ async function toggleNotifications() {
     return;
   }
 
-  if (_notifPermission === 'denied') {
+  if (_notifPermission === 'denied' || Notification.permission === 'denied') {
     showNotifToast('⚠️ Notifications are blocked. Enable them in browser settings.', 'warn');
     return;
   }
@@ -137,6 +125,7 @@ async function toggleNotifications() {
     const granted = await requestNotifPermission();
     if (!granted) {
       showNotifToast('⚠️ Permission denied. Enable notifications in browser settings.', 'warn');
+      updateBellUI();
       return;
     }
     const reg = _swRegistration || await registerServiceWorker();
@@ -155,43 +144,56 @@ async function toggleNotifications() {
 }
 
 // ─── UPDATE BELL ICON STATE ──────────────────────────────────
-
 async function updateBellUI() {
   const btn  = document.getElementById('notifBellBtn');
   const icon = document.getElementById('notifBellIcon');
   if (!btn || !icon) return;
 
-  // _swRegistration may be null on first paint, causing bell to flash visible
+  // Check real subscription state from SW
   let sub = null;
   try {
-    const reg = await navigator.serviceWorker.ready;
-    sub = await reg.pushManager.getSubscription();
-    // Also keep _swRegistration in sync
-    if (reg) _swRegistration = reg;
+    const reg = _swRegistration || await navigator.serviceWorker.ready;
+    if (reg) {
+      _swRegistration = reg;
+      sub = await reg.pushManager.getSubscription();
+    }
   } catch (e) {
-    // SW not available
+    // SW not available — treat as unsubscribed
   }
 
-  const denied = Notification?.permission === 'denied';
-  const active = !!sub;
+  const denied  = Notification?.permission === 'denied';
+  const active  = !!sub;
 
-    btn.className = 'icon-bar notif-bell' +
-    (active ? ' notif-on notif-subscribed' : '') +
-    (denied ? ' notif-denied'              : '');
+  // ── Always show the bell; never hide it ──────────────────────
+  // Visibility: show always. The bell is how users toggle notifications.
+  btn.style.display = '';
+  btn.style.removeProperty('display');
 
-  // Hide bell when subscribed, show when not
-btn.classList.remove('notif-bell-hidden');
-btn.style.display = active ? 'none' : '';
-  btn.title = denied ? 'Notifications blocked (enable in browser settings)'
-            : active ? 'Notifications ON — click to disable'
+  // ── Reset classes cleanly ────────────────────────────────────
+  btn.className = 'icon-bar notif-bell';
+  if (active) btn.classList.add('notif-on', 'notif-subscribed');
+  if (denied) btn.classList.add('notif-denied');
+
+  btn.title = denied ? 'Notifications blocked — enable in browser settings'
+            : active ? 'Notifications ON — tap to disable'
             :          'Enable task notifications';
 
-  icon.innerHTML = active
-    ? `<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-       <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-       <circle cx="18" cy="4" r="3" fill="var(--accent)" stroke="none"/>`
-    : `<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-       <path d="M13.73 21a2 2 0 0 1-3.46 0"/>`;
+  // ── Icon: bell with filled dot when active, plain when not ───
+  if (active) {
+    icon.innerHTML = `
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>`;
+    // Active dot is handled via CSS ::before on .notif-on
+  } else if (denied) {
+    icon.innerHTML = `
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>`;
+  } else {
+    icon.innerHTML = `
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>`;
+  }
 }
 
 // ─── TOAST ───────────────────────────────────────────────────
@@ -211,8 +213,6 @@ function showNotifToast(msg, type = 'info') {
 }
 
 // ─── INIT ────────────────────────────────────────────────────
-// Replace the existing initNotifications() in notifications.js with this
-
 async function initNotifications() {
   if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
 
@@ -225,12 +225,11 @@ async function initNotifications() {
   const sub = await reg.pushManager.getSubscription();
 
   if (sub) {
-    // ✅ KEY FIX: Re-upsert subscription to DB on every page load
-    // This ensures desktop users who subscribed before are always in the DB
     _pushSubscription = sub;
     const p256dh = arrayBufferToBase64(sub.getKey('p256dh'));
     const auth   = arrayBufferToBase64(sub.getKey('auth'));
 
+    // Re-upsert to DB on every page load so subscription stays fresh
     const { error } = await _sb.from('push_subscriptions').upsert({
       endpoint:   sub.endpoint,
       p256dh,
@@ -248,4 +247,11 @@ async function initNotifications() {
 
   // Update bell UI to reflect current state
   await updateBellUI();
+}
+
+// Auto-init when script loads
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initNotifications);
+} else {
+  initNotifications();
 }
