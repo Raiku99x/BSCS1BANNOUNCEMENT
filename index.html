@@ -368,16 +368,33 @@
       </button>
     </div>
 
-   <div class="help-body">
+<!-- ============================================================
+  REPLACE the entire <div class="help-body"> ... </div>
+  inside the help modal in index.html with this content
+  ============================================================ -->
+
+<div class="help-body">
 
   <!-- Welcome -->
   <div class="help-section">
     <div class="help-section-title">
       <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      Welcome to BSCS1B TaskHub
+      Welcome
     </div>
     <div class="help-desc">
-      This is your class task tracker. Admins post tasks, quizzes, exams, and announcements here. As a student, you can view all tasks, track your own progress, and get notified before deadlines — all without needing an account.
+      BSCS1B TaskHub is your class task tracker. Admins post tasks and announcements. Students view, track progress, and get notified — no account needed.
+    </div>
+  </div>
+
+  <!-- Roles -->
+  <div class="help-section">
+    <div class="help-section-title">
+      <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+      User vs Admin
+    </div>
+    <div class="help-desc">
+      <strong>User</strong> — default, no login. View tasks, mark done, use filters, enable notifications.<br><br>
+      <strong>Admin</strong> — tap <strong>Admin</strong> (top right) and log in. Can add, edit, cancel, restore, delete tasks, post notes, and manage images. Tap the <strong>arrow icon</strong> to log out.
     </div>
   </div>
 
@@ -388,21 +405,34 @@
       Push Notifications
     </div>
     <div class="help-desc">
-      Tap the <strong>bell icon</strong> in the top left bar to enable push notifications. Once enabled, you will automatically receive reminders about tasks that are due today, tomorrow, or within 3 days — even when the app is closed or your phone is locked.<br><br>
-      After enabling, the bell icon hides itself to keep things clean. It is still running in the background. You only need to enable this once.
+      Tap the <strong>🔔 bell</strong> to enable. Two types of notifications:<br><br>
+      <strong>Daily reminders</strong> — alerts for overdue, today, and upcoming tasks. Skips tasks you already marked done.<br><br>
+      <strong>Instant cancel alert</strong> — fires immediately when an admin cancels a task, even if the app is closed. Skips users who already marked it done.<br><br>
+      A dot on the bell means it's active. Tap again to disable. Only needs to be enabled once.
     </div>
   </div>
-     
+
   <!-- Featured Panel -->
   <div class="help-section">
     <div class="help-section-title">
       <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      The Featured Panel (Top Section)
+      Featured Panel
     </div>
     <div class="help-desc">
-      The top section is the first thing you see. It automatically shows your most urgent tasks — things that are <strong>overdue</strong>, <strong>due today</strong>, or <strong>due within 3 days</strong>. Pinned notes from admins also appear here.<br><br>
-      The badge next to "Featured" shows something like <strong>"2 of 5 active"</strong> — this means 2 of your 5 active tasks are urgent and need your attention soon.<br><br>
-      <strong>Tap any featured card</strong> to jump directly to that task in the list below.
+      Shows your most urgent tasks — <strong>overdue, today, and due within 3 days</strong> — as a scrollable carousel. Swipe manually or tap the dots to navigate. Touch/hover pauses auto-scroll.<br><br>
+      The <strong>"X of Y active"</strong> badge shows how many urgent tasks need attention. Tap any card to jump to it in the list.<br><br>
+      Admin notes appear above the carousel and expire automatically after 1–7 days.
+    </div>
+  </div>
+
+  <!-- Daily Tip -->
+  <div class="help-section">
+    <div class="help-section-title">
+      <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Daily Tip
+    </div>
+    <div class="help-desc">
+      A tip shown below the carousel. Changes 3× a day — 8am, 12pm, and 6pm (PHT).
     </div>
   </div>
 
@@ -410,34 +440,35 @@
   <div class="help-section">
     <div class="help-section-title">
       <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-      Filters — How to Sort Your Tasks
-    </div>
-    <div class="help-desc">
-      Use the filter buttons on the left to quickly find what you need:
+      Filters
     </div>
     <div class="help-item">
       <span class="help-badge badge-active">Active</span>
-      <span>Your default view. Shows all tasks that are not yet done and not overdue — these are the tasks you should be working on right now.</span>
+      <span>Default. Not done, not overdue.</span>
     </div>
     <div class="help-item">
       <span class="help-badge badge-all">All</span>
-      <span>Shows every single task — active, done, and overdue all together.</span>
+      <span>Every task — active, done, overdue.</span>
     </div>
     <div class="help-item">
       <span class="help-badge badge-soon">Soon</span>
-      <span>Tasks due within the next 3 days. Check this daily so nothing sneaks up on you.</span>
+      <span>Due within 3 days.</span>
     </div>
     <div class="help-item">
       <span class="help-badge badge-today">Today</span>
-      <span>Tasks that are due specifically today. These should be your top priority.</span>
+      <span>Due today — top priority.</span>
     </div>
     <div class="help-item">
       <span class="help-badge badge-overdue">Overdue</span>
-      <span>Tasks that have already passed their deadline. Deal with these immediately.</span>
+      <span>Past deadline. Pulses red.</span>
     </div>
     <div class="help-item">
       <span class="help-badge badge-done">Done</span>
-      <span>Tasks you have personally marked as completed on your device.</span>
+      <span>Marked complete on this device.</span>
+    </div>
+    <div class="help-item">
+      <span class="help-badge badge-cancelled">Cancelled</span>
+      <span>Cancelled by admin. Kept for reference.</span>
     </div>
   </div>
 
@@ -445,12 +476,10 @@
   <div class="help-section">
     <div class="help-section-title">
       <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12h6M12 9v6"/></svg>
-      Reading a Task Card
+      Task Cards
     </div>
     <div class="help-desc">
-      Each task card shows the <strong>task name</strong>, its <strong>category</strong> (e.g. Quiz, Exam, Project), the <strong>due date and time</strong>, and a <strong>status chip</strong> (Soon, Today, Overdue, Done).<br><br>
-      The card preview only shows a short description. Tap <strong>View</strong> to expand the card and read the full description, see attached images, and access action buttons.<br><br>
-      Once expanded, tap <strong>Close</strong> to collapse it back.
+      Each card shows the name, category, due date, and status. Tap <strong>View</strong> (eye icon) to expand — shows full description, images, and action buttons. Tap the <strong>close icon</strong> to collapse. A creator chip shows which admin posted it.
     </div>
   </div>
 
@@ -458,12 +487,37 @@
   <div class="help-section">
     <div class="help-section-title">
       <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
-      Marking Tasks as Done
+      Marking Tasks Done
     </div>
     <div class="help-desc">
-      Tap <strong>✓ Mark Done</strong> on any task card to mark it as completed. A checkmark animation will play to confirm.<br><br>
-      Your done state is <strong>saved only on your device</strong>. This means each classmate independently tracks their own progress — marking something done for you does not mark it done for anyone else.<br><br>
-      Made a mistake? Tap <strong>↩ Undo</strong> to unmark it.
+      Tap <strong>✓ Mark Done</strong> to complete a task. Progress is <strong>per-device only</strong> — your done state is independent from classmates. Done tasks are also synced so push reminders skip them. Tap <strong>↩ Undo</strong> to revert.
+    </div>
+  </div>
+
+  <!-- Admin Actions -->
+  <div class="help-section">
+    <div class="help-section-title">
+      <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Admin Actions
+    </div>
+    <div class="help-desc">
+      Visible only when logged in as admin:<br><br>
+      <strong>✏️ Edit</strong> — update name, category, date, time, or description.<br>
+      <strong>✕ Cancel</strong> — moves to Cancelled and instantly notifies all subscribers.<br>
+      <strong>↺ Restore</strong> — brings a cancelled task back to active.<br>
+      <strong>🗑 Delete</strong> — permanently removes. Cannot be undone.<br>
+      <strong>📋 Copy</strong> — copies the description to clipboard.
+    </div>
+  </div>
+
+  <!-- Images -->
+  <div class="help-section">
+    <div class="help-section-title">
+      <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      Images
+    </div>
+    <div class="help-desc">
+      Tap a thumbnail to open the <strong>full-screen lightbox</strong>. Use arrows to browse, counter shows position (e.g. 1 / 3). Admins can add images via <strong>+ Add</strong> and delete via the trash icon in the lightbox.
     </div>
   </div>
 
@@ -471,10 +525,21 @@
   <div class="help-section">
     <div class="help-section-title">
       <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      Searching for a Task
+      Search
     </div>
     <div class="help-desc">
-      Tap the <strong>search icon</strong> next to "Active Tasks" at the top of the task list. A search bar will appear. Type any keyword and the list will filter instantly by task name or description.
+      Tap 🔍 to open the search bar. Searches by name or description within the current filter. Switch to <strong>All</strong> to search across everything.
+    </div>
+  </div>
+
+  <!-- Notes -->
+  <div class="help-section">
+    <div class="help-section-title">
+      <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Pinned Notes
+    </div>
+    <div class="help-desc">
+      Short announcements posted by admins. Shown above the carousel. Auto-expire after 1, 3, or 7 days. Only the author admin can delete their own note.
     </div>
   </div>
 
@@ -482,41 +547,71 @@
   <div class="help-section">
     <div class="help-section-title">
       <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      Theme & Fullscreen
+      Theme, Fullscreen & Refresh
     </div>
     <div class="help-desc">
-      Tap the <strong>moon icon</strong> on the top right to switch to dark mode. Tap it again to go back to light mode.<br><br>
-      Tap the <strong>expand icon</strong> on the top left to go fullscreen. This hides the browser UI for a cleaner reading experience, useful during class.
+      <strong>🌙 Moon</strong> — toggle dark/light mode.<br>
+      <strong>⛶ Expand</strong> — fullscreen mode, hides browser UI.<br>
+      <strong>↺ Refresh</strong> — manually reloads and re-syncs from server.
     </div>
   </div>
 
-  <!-- Sync Status -->
+  <!-- Sync -->
   <div class="help-section">
     <div class="help-section-title">
       <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-      Sync Status Indicator
-    </div>
-    <div class="help-desc">
-      The small indicator at the top right shows the connection status of the app:
+      Sync Status
     </div>
     <div class="help-item">
       <span class="help-sync-dot" style="background:var(--green)"></span>
-      <span><strong>Live</strong> — connected to the server. Any new tasks posted by admins will appear automatically without refreshing.</span>
+      <span><strong>Live</strong> — connected, updates appear instantly.</span>
     </div>
     <div class="help-item">
       <span class="help-sync-dot" style="background:var(--amber)"></span>
-      <span><strong>Saving / Loading</strong> — the app is currently syncing a change. Wait a moment.</span>
+      <span><strong>Syncing</strong> — saving or loading, wait a moment.</span>
     </div>
     <div class="help-item">
       <span class="help-sync-dot" style="background:var(--red)"></span>
-      <span><strong>Offline</strong> — no internet connection. The app will show cached tasks. Refresh when you're back online.</span>
+      <span><strong>Offline</strong> — showing cached data. Refresh when back online.</span>
     </div>
   </div>
 
-  <!-- Footer note -->
+  <!-- Coming Soon -->
+  <div class="help-section">
+    <div class="help-section-title">
+      <svg class="help-section-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Coming Soon / Work in Progress
+    </div>
+    <div class="help-item" style="align-items:flex-start;">
+      <span style="font-size:14px;flex-shrink:0;">🍎</span>
+      <span><strong>iOS Push</strong> — not supported in Safari. Add to Home Screen first (Share → Add to Home Screen), then enable the bell. Requires iOS 16.4+.</span>
+    </div>
+    <div class="help-item" style="align-items:flex-start;">
+      <span style="font-size:14px;flex-shrink:0;">🔄</span>
+      <span><strong>Realtime drops</strong> — if sync disconnects, tap ↺ refresh to reconnect.</span>
+    </div>
+    <div class="help-item" style="align-items:flex-start;">
+      <span style="font-size:14px;flex-shrink:0;">🖼️</span>
+      <span><strong>Large images</strong> — no compression yet. Many big photos may slow loading.</span>
+    </div>
+    <div class="help-item" style="align-items:flex-start;">
+      <span style="font-size:14px;flex-shrink:0;">💾</span>
+      <span><strong>Done state resets</strong> — clears if you clear browser data, use incognito, or switch browsers. Cross-device sync coming soon.</span>
+    </div>
+    <div class="help-item" style="align-items:flex-start;">
+      <span style="font-size:14px;flex-shrink:0;">🔍</span>
+      <span><strong>Search is filter-scoped</strong> — only searches within the active filter. Switch to All to search everything.</span>
+    </div>
+    <div class="help-item" style="align-items:flex-start;">
+      <span style="font-size:14px;flex-shrink:0;">📱</span>
+      <span><strong>Older Android</strong> — carousel may jump instead of smooth scroll.</span>
+    </div>
+  </div>
+
+  <!-- Footer -->
   <div class="help-footer-note">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;margin-top:1px;"><polyline points="20 6 9 17 4 12"/></svg>
-    Your <strong>Done</strong> progress is saved on your device only. Each classmate tracks their own progress independently. Clearing your browser data will reset your done state.
+    Done progress is <strong>per-device only</strong>. Clearing browser data resets it. Add to Home Screen for the best experience!
   </div>
 
 </div>
