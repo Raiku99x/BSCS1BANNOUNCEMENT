@@ -984,15 +984,22 @@ async function _notifyCancelledTask(task) {
           'Authorization': `Bearer ${SUPABASE_KEY}`,
         },
         body: JSON.stringify({
-          taskId:      task.id,
-          taskName:    task.name,
+          taskId:   task.id,
+          taskName: task.name,
         }),
       }
     );
+
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '(no body)');
+      console.error(`[Cancel Notif] Edge Function returned ${res.status}: ${errText}`);
+      return;
+    }
+
     const data = await res.json();
-    console.log(`[Cancel Notif] Sent: ${data.sent}, Failed: ${data.failed}`);
+    console.log(`[Cancel Notif] sent=${data.sent} failed=${data.failed} skipped=${data.skipped ?? 0}`);
   } catch (err) {
-    console.warn('[Cancel Notif] Could not send push notifications:', err);
+    console.warn('[Cancel Notif] Network error — could not reach Edge Function:', err);
   }
 }
 
