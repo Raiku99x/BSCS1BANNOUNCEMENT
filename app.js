@@ -99,9 +99,12 @@ async function _syncDoneToSupabase() {
   // Only sync if user has an active push subscription
   if (!_pushSubscription) return;
   const doneIds = Object.keys(getLocalDone());
+  // Also include cancelled task IDs so the server skips them in reminders
+  const cancelledIds = tasks.filter(t => t.cancelled).map(t => t.id);
+  const excludeIds = [...new Set([...doneIds, ...cancelledIds])];
   try {
     await _sb.from('push_subscriptions')
-      .update({ done_task_ids: doneIds })
+      .update({ done_task_ids: excludeIds })
       .eq('endpoint', _pushSubscription.endpoint);
   } catch(e) {
     console.warn('[Done sync] Could not sync done state:', e);
@@ -344,6 +347,7 @@ function _buildCache() {
   const nowMs = now.getTime();
   const nowDay = new Date(todayY, todayM, todayD).getTime();
   tasks.forEach(t => {
+    if (t.cancelled) { _statusCache.set(t.id, { over:false, today:false, soon:false }); return; }
     if (!t.date) { _statusCache.set(t.id, { over:false, today:false, soon:false }); return; }
     const dueMs = new Date(t.date + 'T' + (t.time || '23:59')).getTime();
     const over = !t.done && dueMs < nowMs;
@@ -754,7 +758,8 @@ function buildCard(t) {
   const imgs = t.images || [];
 
   let statusChip = '';
-  if (t.done)      statusChip = `<span class="status-chip done">Done</span>`;
+  if (t.cancelled) statusChip = `<span class="status-chip cancelled">Cancelled</span>`;
+  else if (t.done)      statusChip = `<span class="status-chip done">Done</span>`;
   else if (over)   statusChip = `<span class="status-chip overdue">Overdue</span>`;
   else if (tod)    statusChip = `<span class="status-chip today">Today</span>`;
   else if (soon)   statusChip = `<span class="status-chip soon">Soon</span>`;
@@ -816,7 +821,7 @@ function buildCard(t) {
   }
 
   return `
-  <div class="task-card ${t.done ? 'done-card' : ''} ${over && !t.done ? 'overdue-card' : ''} ${t._expanded ? 'expanded' : ''}" id="card-${t.id}" data-id="${t.id}">
+  <div class="task-card ${t.done ? 'done-card' : ''} ${t.cancelled ? 'cancelled-card' : ''} ${over && !t.done && !t.cancelled ? 'overdue-card' : ''} ${t._expanded ? 'expanded' : ''}" id="card-${t.id}" data-id="${t.id}">
     <div class="card-top">
       <div class="card-name">${esc(t.name)}</div>
       <span class="badge cat-${t.category}">${CAT_LABELS[t.category] || t.category}</span>
