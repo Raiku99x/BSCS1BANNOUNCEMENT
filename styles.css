@@ -206,19 +206,27 @@ body.dark .note-card{background:rgba(245,166,35,0.07);border-color:rgba(245,166,
 .card-name{flex:1;min-width:0;font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;word-break:break-word;}
 .task-card.done-card .card-name{text-decoration:line-through;color:var(--sub);}
 .task-card.cancelled-card {
-  opacity: 0.6;
+  opacity: 0.55;
   background: var(--surf2);
-  border-color: #6b7280;
+  border-color: #6b7280 !important;
+  border-left: 3px solid #6b7280 !important;
 }
 
-.task-card.cancelled-card .card-name {
-  color: var(--sub);
-}
-
-/* Optional: Strikethrough for cancelled tasks */
+/* Strikethrough name — matches done-card behaviour */
 .task-card.cancelled-card .card-name {
   text-decoration: line-through;
   text-decoration-thickness: 1.5px;
+  color: var(--sub);
+}
+
+/* Mute the description preview */
+.task-card.cancelled-card .card-desc-collapsed {
+  opacity: 0.6;
+}
+
+/* Mute the due date row */
+.task-card.cancelled-card .card-due-meta {
+  opacity: 0.5;
 }
 .card-due-meta{display:flex;align-items:center;gap:5px;padding:0 14px 8px;font-size:12px;color:var(--sub);}
 .card-due-meta svg{flex-shrink:0;position:relative;top:0;vertical-align:middle;}
@@ -267,6 +275,14 @@ body.dark .cat-learning  {background:rgba(4,120,87,0.22);color:#6ee7b7;}
 .status-chip.today  {background:rgba(234,107,14,0.12);color:#ea6b0e;}
 .status-chip.soon   {background:var(--amb-lt);color:var(--amber);}
 .status-chip.done   {background:var(--grn-lt);color:var(--green);}
+.status-chip.cancelled {
+  background: rgba(107, 116, 128, 0.12);
+  color: #6b7280;
+}
+body.dark .status-chip.cancelled {
+  background: rgba(107, 116, 128, 0.18);
+  color: #9ca3af;
+}
 body.dark .status-chip.today{background:rgba(234,107,14,0.18);color:#fb923c;}
 
 /* CARD DESC */
