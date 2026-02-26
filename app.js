@@ -661,8 +661,7 @@ function renderFeatured() {
 
   const featSlice = feat.slice(0, 4);
   if (!feat.length && !notes.length) {
-    el.innerHTML = `<div class="no-featured"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><p>All caught up!</p></div>`;
-    return;
+  el.innerHTML = `<div class="no-featured"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><p>No urgent tasks here — but scroll down, there may still be active tasks without a close due date.</p></div>`;    return;
   }
   if (!feat.length) { el.innerHTML = ''; return; }
 
@@ -1410,9 +1409,9 @@ loadAdmins().then(() => {
   ];
 
   // Slot labels shown in the tip box
-  const SLOT_LABELS = {
+const SLOT_LABELS = {
     0: 'Morning Tip',
-    1: 'Midday Tip',
+    1: 'Afternoon Tip',
     2: 'Evening Tip',
   };
 
@@ -1433,18 +1432,15 @@ loadAdmins().then(() => {
     // Slot boundaries: 8:00, 12:00, 18:00
     let slot;
     let nextHour;
-    if (h >= 18) {
+if (h >= 18) {
       slot = 2;
-      nextHour = 32; // next 8am = 24+8
+      nextHour = 24; // next midnight = new day
     } else if (h >= 12) {
       slot = 1;
       nextHour = 18;
-    } else if (h >= 8) {
+    } else {
       slot = 0;
       nextHour = 12;
-    } else {
-      slot = 2; // overnight — still showing evening tip
-      nextHour = 8;
     }
 
     // ms until next slot change
