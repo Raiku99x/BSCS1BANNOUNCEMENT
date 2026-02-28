@@ -115,11 +115,10 @@ async function toggleNotifications() {
     ? await _swRegistration.pushManager.getSubscription()
     : null;
 
-  if (currentSub) {
-    // Already subscribed → unsubscribe
-    await unsubscribeFromPush();
-    showNotifToast('🔕 Notifications disabled.', 'info');
-    updateBellUI();
+if (currentSub) {
+    // Already subscribed → show challenge before unsubscribing
+    openUnsubChallenge();
+    return;
   } else {
     // Not subscribed → subscribe
     const granted = await requestNotifPermission();
