@@ -1261,7 +1261,8 @@ async function deleteNote(id) {
 }
 
 // ─── KEYBOARD SHORTCUTS ──────────────────────────────────────
-if (e.key === 'Escape') {
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
     closeModal(); closeLightbox(); closeLoginModal();
     closeDelModal(); closeNoteModal(); closeLogoutModal(); closePhotoDelModal(); closeCancelModal(); closeHelp();
     closeUnsubChallenge();
