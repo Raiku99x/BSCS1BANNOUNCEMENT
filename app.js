@@ -1261,10 +1261,10 @@ async function deleteNote(id) {
 }
 
 // ─── KEYBOARD SHORTCUTS ──────────────────────────────────────
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
+if (e.key === 'Escape') {
     closeModal(); closeLightbox(); closeLoginModal();
     closeDelModal(); closeNoteModal(); closeLogoutModal(); closePhotoDelModal(); closeCancelModal(); closeHelp();
+    closeUnsubChallenge();
   }
 
   if (document.getElementById('lightbox').classList.contains('open')) {
