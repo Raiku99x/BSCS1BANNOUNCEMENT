@@ -422,7 +422,8 @@ function closeLogoutModal() {
   document.getElementById('logoutOverlay').classList.remove('open');
   unlockScroll();
 }
-function confirmLogout() {
+async function confirmLogout() {
+  await _sb.auth.signOut();
   closeLogoutModal();
   currentRole = 'user';
   currentAdminName = null;
@@ -481,27 +482,32 @@ function closeLoginModal() {
 function handleLoginOverlay(e) {
   if (e.target === document.getElementById('loginOverlay')) closeLoginModal();
 }
-function attemptLogin() {
+async function attemptLogin() {
   const u = document.getElementById('loginUser').value.trim();
   const p = document.getElementById('loginPass').value;
-  const match = ADMINS.find(a => a.username === u && a.password === p);
-  if (match) {
-    currentRole = 'admin';
-    currentAdminName = match.username;
-    closeLoginModal();
-    updateRoleUI();
-    renderAll();
-  } else {
+
+  const { data, error } = await _sb.auth.signInWithPassword({
+    email: u,
+    password: p,
+  });
+
+  if (error || !data.user) {
     const errEl = document.getElementById('loginError');
     errEl.classList.add('show');
-    document.getElementById('loginErrorMsg').textContent = 'Invalid username or password.';
+    document.getElementById('loginErrorMsg').textContent = 'Invalid email or password.';
     document.getElementById('loginModal').classList.add('shake');
     setTimeout(() => document.getElementById('loginModal').classList.remove('shake'), 400);
     document.getElementById('loginPass').value = '';
     document.getElementById('loginPass').focus();
+    return;
   }
-}
 
+  currentRole = 'admin';
+  currentAdminName = data.user.user_metadata?.display_name || u;
+  closeLoginModal();
+  updateRoleUI();
+  renderAll();
+}
 // ─── FULLSCREEN ──────────────────────────────────────────────
 function toggleFullscreen() {
   if (!document.fullscreenElement) {
