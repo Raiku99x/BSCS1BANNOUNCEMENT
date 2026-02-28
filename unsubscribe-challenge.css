@@ -90,28 +90,15 @@
 }
 .unsub-code-text {
   display: block;
-  width: 100%;
-  background: var(--surf3);
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  padding: 13px 16px;
-  font-family: 'Courier New', monospace;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: 0.08em;
   text-align: center;
-  /* Prevent selection / copy */
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-all;
+  line-height: 1.6;
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   pointer-events: none;
-  word-break: break-all;
-  line-height: 1.5;
-}
-body.dark .unsub-code-text {
-  background: var(--surf2);
-  color: var(--text);
 }
 
 /* ── INPUT ──────────────────────────────────────────────────── */
@@ -126,21 +113,21 @@ body.dark .unsub-code-text {
   border: 1.5px solid var(--border);
   border-radius: 10px;
   padding: 10px 13px;
-  font-family: 'Courier New', monospace;
+  
   font-size: 13px;
-  font-weight: 600;
+  
   color: var(--text);
   outline: none;
   transition: border-color 0.18s, background 0.18s;
-  letter-spacing: 0.04em;
+  
   caret-color: var(--accent);
 }
 .unsub-input::placeholder {
   color: var(--sub);
-  font-family: 'Outfit', sans-serif;
+  
   font-weight: 400;
   font-size: 13px;
-  letter-spacing: 0;
+  
 }
 .unsub-input:focus {
   border-color: var(--accent);
@@ -169,7 +156,7 @@ body.dark .unsub-code-text {
 /* ── HINT TEXT ──────────────────────────────────────────────── */
 .unsub-input-hint {
   font-size: 11px;
-  font-weight: 600;
+  
   min-height: 16px;
   transition: color 0.15s;
   color: transparent;
@@ -211,7 +198,7 @@ body.dark .unsub-code-text {
   border: 2px solid var(--text);
   border-radius: 10px;
   padding: 11px;
-  font-family: 'Outfit', sans-serif;
+  
   font-size: 13px;
   font-weight: 700;
   color: var(--text);
@@ -247,7 +234,7 @@ body.dark .unsub-btn-cancel:active {
   border: none;
   border-radius: 10px;
   padding: 11px;
-  font-family: 'Outfit', sans-serif;
+  
   font-size: 13px;
   font-weight: 700;
   color: #fff;
