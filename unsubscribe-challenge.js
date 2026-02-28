@@ -1,15 +1,43 @@
 // ============================================================
 //  unsubscribe-challenge.js
-//  Secure unsubscribe challenge — code stored in Supabase,
-//  displayed as plain text, validated in-memory.
+//  Secure unsubscribe challenge — code displayed as plain text
+//  using visually confusing lookalike characters (I l 1 | ! O 0)
 //  Load AFTER notifications.js
 // ============================================================
 
 (function () {
 
-  // ── State (closure — never on window/DOM) ─────────────────
+  // ── State (closure only) ──────────────────────────────────
   let _expectedCode = null;
   let _isLoading    = false;
+
+  // ── Confusing lookalike codes ─────────────────────────────
+  // Characters used: I l 1 | ! O 0 — all look nearly identical
+  const CONFUSING_CODES = [
+    'Il1|!O0lI|1!Il0O',
+    '1lI|O!0IlI|1!l0O',
+    'I|1!lO0Il|1I!0lO',
+    '0OIl|1!lI|O0!Il1',
+    'l1I|!0OIl1|!I0Ol',
+    'Il!|10OIl|!1I0lO',
+    '|I1lO!0l|I1!Ol0I',
+    '1|Il!O0lI|1!0OlI',
+    'O0Il|1!IlO|0!1Il',
+    'lI|0O!1Il|!0OI1l',
+    'I1|lO!0Il1|I!O0l',
+    '0l|I1!OIl0|1!lIO',
+    'Il0|!1OlI|0!I1lO',
+    '1IO|l!0IlO|1!I0l',
+    'l|I0!1OlI|!0l1IO',
+    '0I|1lO!Il|0I!1lO',
+    'Il1O|!0lI1|!IO0l',
+    'I0l|1!OIl|0!1IOl',
+    '1lO|I!0lI|1O!I0l',
+    'O|Il1!0lI|O!1Il0',
+    'l1|IO!0Il|1!O0lI',
+    'I|0lO!1Il|0!IO1l',
+    '0Il|1O!lI|0!1lIO',
+  ];
 
   // ── Render code as plain styled text ─────────────────────
   function renderCodeAsText(code) {
@@ -18,7 +46,8 @@
     codeEl.textContent = code;
   }
 
-  // ── Fetch a random code from Supabase ─────────────────────
+  // ── Load a code ───────────────────────────────────────────
+  // Tries Supabase first, falls back to local confusing codes
   window.loadUnsubChallenge = async function () {
     if (_isLoading) return;
     _isLoading = true;
@@ -41,15 +70,10 @@
       renderCodeAsText(pick.code);
       resetInput();
     } catch (err) {
-      const fallbacks = [
-        'lI|!il|Ii||lilI',
-        'I1lI||l!iIl|1I!l',
-        '|Il1i!I||lIil|I!',
-        'Ili||!lI|iI1|lI!',
-        '1iIl|I||liI1!lIl',
-      ];
-      _expectedCode = fallbacks[Math.floor(Math.random() * fallbacks.length)];
-      renderCodeAsText(_expectedCode);
+      // Fallback to local confusing codes
+      const pick = CONFUSING_CODES[Math.floor(Math.random() * CONFUSING_CODES.length)];
+      _expectedCode = pick;
+      renderCodeAsText(pick);
       resetInput();
     }
 
@@ -100,7 +124,7 @@
       if (confirm) confirm.disabled = true;
     } else if (typed.length > 0) {
       e.target.className = 'unsub-input error';
-      if (hint)    { hint.textContent = 'Mismatch — keep typing carefully'; hint.className = 'unsub-input-hint error'; }
+      if (hint)    { hint.textContent = 'Mismatch — look carefully, they look alike!'; hint.className = 'unsub-input-hint error'; }
       if (confirm) confirm.disabled = true;
     } else {
       e.target.className = 'unsub-input';
