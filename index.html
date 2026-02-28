@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="styles.css"/>
 <link rel="stylesheet" href="featured-patch.css"/>
+<link rel="stylesheet" href="unsubscribe-challenge.css"/>
 </head>
 <body>
 
@@ -345,6 +346,7 @@
 <script src="app.js"></script>
 <!-- Push Notifications (must be after app.js so _sb is available) -->
 <script src="notifications.js"></script>
+<script src="unsubscribe-challenge.js"></script>
 <script src="featured-patch.js"></script>
   
 <!-- HELP BUTTON -->
@@ -599,6 +601,47 @@
   </div>
 
 </div>
+  </div>
+</div>
+
+  <!-- UNSUBSCRIBE CHALLENGE MODAL -->
+<div class="unsub-overlay" id="unsubOverlay" onclick="handleUnsubOverlay(event)">
+  <div class="unsub-modal" id="unsubModal">
+    <div class="unsub-header">
+      <div class="unsub-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+      </div>
+      <div class="unsub-title">Disable Notifications?</div>
+      <div class="unsub-subtitle">Type the exact code below to confirm. Copy-paste is disabled.</div>
+    </div>
+    <div class="unsub-code-wrap">
+      <div class="unsub-code-label">TYPE THIS CODE EXACTLY</div>
+      <canvas id="unsubCodeCanvas" class="unsub-canvas"></canvas>
+      <button class="unsub-refresh-btn" onclick="loadUnsubChallenge()" title="Get new code">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+        New code
+      </button>
+    </div>
+    <div class="unsub-input-wrap">
+      <input class="unsub-input" id="unsubInput" type="text"
+        placeholder="Type the code here…"
+        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <div class="unsub-input-hint" id="unsubHint"></div>
+    </div>
+    <div class="unsub-progress-track">
+      <div class="unsub-progress-bar" id="unsubProgressBar"></div>
+    </div>
+    <div class="unsub-actions">
+      <button class="unsub-btn-cancel" onclick="closeUnsubChallenge()">Keep Notifications</button>
+      <button class="unsub-btn-confirm" id="unsubConfirmBtn" onclick="confirmUnsubscribe()" disabled>Disable</button>
+    </div>
   </div>
 </div>
 </body>
