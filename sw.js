@@ -2,6 +2,13 @@
 //  BSCS1B TaskHub — sw.js
 //  Handles push events including zero-payload pushes
 // ============================================================
+const _sbAnon = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    storageKey: 'sb-anon-push',
+    persistSession: false,
+    autoRefreshToken: false,
+  }
+});
 
 self.addEventListener('install', event => {
   self.skipWaiting();
