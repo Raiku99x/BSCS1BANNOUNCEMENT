@@ -5,6 +5,7 @@
 
 // ─── VAPID PUBLIC KEY ──────────────
 const VAPID_PUBLIC_KEY = 'BDB28hUn4e2av41itWZ8NP2hryHALsKH2OHomYfNCkWI6rTLwTJEbTNtotHf2jz663NB5DdLI-hkyC3jsck_8iU';
+const _sbAnon = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let _swRegistration = null;
 let _notifPermission = Notification?.permission || 'default';
@@ -63,7 +64,7 @@ async function subscribeToPush(reg) {
     const p256dh = arrayBufferToBase64(sub.getKey('p256dh'));
     const auth   = arrayBufferToBase64(sub.getKey('auth'));
 
-    const { error } = await _sb.from('push_subscriptions').upsert({
+    const { error } = await _sbAnon.from('push_subscriptions').upsert({
       endpoint: sub.endpoint,
       p256dh,
       auth,
@@ -89,7 +90,7 @@ async function unsubscribeFromPush() {
   const sub = await _swRegistration.pushManager.getSubscription();
   if (!sub) return;
 
-  await _sb.from('push_subscriptions').delete().eq('endpoint', sub.endpoint);
+  await _sbAnon.from('push_subscriptions').delete().eq('endpoint', sub.endpoint);
   await sub.unsubscribe();
   _pushSubscription = null;
   console.log('[Notif] Unsubscribed ✓');
@@ -225,7 +226,7 @@ async function initNotifications() {
     const auth   = arrayBufferToBase64(sub.getKey('auth'));
 
     // Re-upsert to DB on every page load so subscription stays fresh
-    const { error } = await _sb.from('push_subscriptions').upsert({
+    const { error } = await _sbAnon.from('push_subscriptions').upsert({
       endpoint:   sub.endpoint,
       p256dh,
       auth,
