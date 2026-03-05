@@ -103,7 +103,7 @@ async function _syncDoneToSupabase() {
   const cancelledIds = tasks.filter(t => t.cancelled).map(t => t.id);
   const excludeIds = [...new Set([...doneIds, ...cancelledIds])];
   try {
-    await _sb.from('push_subscriptions')
+    await _sbAnon.from('push_subscriptions')
       .update({ done_task_ids: excludeIds })
       .eq('endpoint', _pushSubscription.endpoint);
   } catch(e) {
